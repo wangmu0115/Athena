@@ -19,5 +19,5 @@ def parse_str_time(t_str: str, t_format: str = "") -> time:
     pass
 
 
-def str_datetime(dt_str: str, dt_format: str = "%Y"):
+def str_datetime(dt_str: str, dt_format: str = "%Y-%m-%d %H"):
     pass
