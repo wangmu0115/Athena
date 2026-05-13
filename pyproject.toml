@@ -2,4 +2,5 @@
 members=[
     "libs/core",
     "libs/charts",
+    "libs/charts-matplotlib",
 ]
