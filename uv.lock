@@ -1,0 +1,25 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[manifest]
+members = [
+    "athena-charts",
+    "athena-core",
+]
+
+[[package]]
+name = "athena-charts"
+version = "0.1.0"
+source = { editable = "libs/charts" }
+dependencies = [
+    { name = "athena-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "athena-core", editable = "libs/core" }]
+
+[[package]]
+name = "athena-core"
+version = "0.1.0"
+source = { editable = "libs/core" }
