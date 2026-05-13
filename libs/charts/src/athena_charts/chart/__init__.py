@@ -3,17 +3,11 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.themes.base import FigureTheme
-    from athena_charts.themes.default import DEFAULT_FIGURE_THEME
-
-__all__ = (
-    "FigureTheme",
-    "DEFAULT_FIGURE_THEME",
-)
+    from athena_charts.chart.chart import Chart
+__all__ = ("Chart",)
 
 _dynamic_imports = {
-    "FigureTheme": "base",
-    "DEFAULT_FIGURE_THEME": "default",
+    "Chart": "chart",
 }
 
 
