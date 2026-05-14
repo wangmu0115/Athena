@@ -3,11 +3,14 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.coords.base import CoordKind, Coord
+    from athena_charts.coords.base import Coord, CoordKind
+
+
 __all__ = (
     "CoordKind",
     "Coord",
 )
+
 
 _dynamic_imports = {
     "CoordKind": "base",

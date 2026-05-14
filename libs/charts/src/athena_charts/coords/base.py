@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from athena_core.models.base import BaseAthenaModel
+from athena_core.models import BaseAthenaModel
 
 type CoordKind = Literal["cartesian", "polar"]
 
