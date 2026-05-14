@@ -1,7 +1,18 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from athena_charts.themes import (
+    AxisTheme,
+    ChartTheme,
+    FigureTheme,
+    GridTheme,
+    LegendTheme,
+    PlotTheme,
+)
+from athena_core.models import BaseAthenaModel
 
 
-class FigureTheme(BaseModel):
+class TextTheme(BaseAthenaModel):
+    color: str = Field("#111111", description="默认文本颜色")
     font_family: str = Field("sans-serif", description="图表默认字体族")
     sans_serif_fonts: list[str] = Field(
         default_factory=lambda: [
@@ -16,29 +27,9 @@ class FigureTheme(BaseModel):
         ]
     )
 
-    text_color: str = Field("#111111", description="默认文本颜色")
-    title_fontsize: int = Field(13, gt=0, description="图表标题字号")
-    subtitle_fontsize: int = Field(11, gt=0, description="图表副标题字号")
 
-    figure_background_color: str = Field("white", description="图表画布背景颜色")
-
-    chart_background_color: str = Field("white", description="绘图区背景颜色")
-    chart_edge_color: str = Field("#333333", description="轴线默认颜色")
-    chart_label_color: str = Field("#111111", description="标签文本颜色")
-    chart_label_fontsize: int = Field(10, gt=0, description="坐标轴标签字号")
-
-    grid_color: str = Field("#999999", description="网格线颜色")
-    grid_alpha: float = Field(0.3, ge=0, le=1, description="网格线透明度")
-    grid_linestyle: str = Field("--", description="网格线样式")
-    grid_linewidth: float = Field(0.5, gt=0, description="网格线宽度")
-
-    axis_tick_fontsize: int = Field(8, gt=0, description="刻度标签字号")
-    axis_tick_color: str = Field("#333333", description="刻度线的默认颜色")
-
-    legend_title_fontsize: int = Field(10, gt=0, description="图例标题字号")
-    legend_fontsize: int = Field(8, gt=0, description="图例文本字号")
-
-    color_palette: list[str] = Field(
+class PaletteTheme(BaseAthenaModel):
+    colors: list[str] = Field(
         default_factory=lambda: [
             "#1f77b4",
             "#ff7f0e",
@@ -54,9 +45,22 @@ class FigureTheme(BaseModel):
         description="默认颜色调色板",
     )
 
-    def pick_color(self, index: int) -> str | None:
-        """从调色板中选取颜色"""
-
-        if not self.color_palette:
+    def pick(self, index: int) -> str | None:
+        if not self.colors:
             return None
-        return self.color_palette[index % len(self.color_palette)]
+        return self.colors[index % len(self.colors)]
+
+
+class Theme(BaseAthenaModel):
+    text: TextTheme = Field(default_factory=TextTheme, description="全局文本主题")
+    palette: PaletteTheme = Field(default_factory=PaletteTheme, description="调色板主题")
+
+    figure: FigureTheme = Field(default_factory=FigureTheme, description="画布主题")
+    chart: ChartTheme = Field(default_factory=ChartTheme, description="图表主题")
+    axis: AxisTheme = Field(default_factory=AxisTheme, description="坐标轴主题")
+    grid: GridTheme = Field(default_factory=GridTheme, description="网格主题")
+    legend: LegendTheme = Field(default_factory=LegendTheme, description="图例主题")
+    plot: PlotTheme = Field(default_factory=PlotTheme, description="图层主题")
+
+
+DEFAULT_THEME = Theme()
