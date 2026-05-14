@@ -29,8 +29,7 @@ class PiePlotData(BaseAthenaModel):
         if not self.datums:
             raise ValueError("PiePlotData must contain at least one datum.")
 
-        total = sum(datum.value for datum in self.datums)
-        if total <= 0:
+        if sum(datum.value for datum in self.datums) <= 0:
             raise ValueError("PiePlotData total value must be greater than 0.")
 
         return self

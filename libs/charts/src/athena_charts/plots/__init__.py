@@ -5,10 +5,9 @@ from athena_core._import_utils import import_attr
 if TYPE_CHECKING:
     from athena_charts.plots.bar import BarPlot
     from athena_charts.plots.base import (
-        CartesianPlot,
         Plot,
         PlotKind,
-        PolarPlot,
+        PlotSpec,
     )
     from athena_charts.plots.data import (
         CategoricalDatum,
@@ -28,10 +27,9 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    "CartesianPlot",
     "Plot",
     "PlotKind",
-    "PolarPlot",
+    "PlotSpec",
     "CategoricalDatum",
     "PiePlotData",
     "XYPlotData",
@@ -48,10 +46,9 @@ __all__ = (
 
 
 _dynamic_imports = {
-    "CartesianPlot": "base",
     "Plot": "base",
     "PlotKind": "base",
-    "PolarPlot": "base",
+    "PlotSpec": "base",
     "CategoricalDatum": "data",
     "PiePlotData": "data",
     "XYPlotData": "data",
