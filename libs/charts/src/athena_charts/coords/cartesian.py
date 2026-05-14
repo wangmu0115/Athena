@@ -27,3 +27,12 @@ class CartesianCoord(Coord):
             raise ValueError("right_y_axis position must be right.")
 
         return self
+
+    def get_y_axis(self, side: Literal["left", "right"]) -> CartesianAxis | None:
+        if side == "left":
+            return self.left_y_axis
+
+        if side == "right":
+            return self.right_y_axis
+
+        raise ValueError("CartesianCoord.y_axis position must be left or right.")
