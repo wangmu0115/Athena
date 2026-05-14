@@ -3,7 +3,6 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_charts.charts import Chart
 from athena_core.models.base import BaseAthenaModel
 
 
@@ -26,11 +25,3 @@ class FigureGridLayout(BaseAthenaModel):
         cols = math.ceil(math.sqrt(chart_count))
         rows = math.ceil(chart_count / cols)
         return cls(rows=rows, cols=cols)
-
-
-class ChartPlacement(BaseAthenaModel):
-    chart: Chart = Field(..., description="需要放置的图表")
-    row: int | None = Field(None, gt=0, description="所在行号，从 1 开始")
-    col: int | None = Field(None, gt=0, description="所在列号，从 1 开始")
-    row_span: int = Field(1, gt=0, description="跨越的行数")
-    col_span: int = Field(1, gt=0, description="跨越的列数")

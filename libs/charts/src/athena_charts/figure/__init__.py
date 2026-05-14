@@ -3,24 +3,24 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.figure.figure import Figure
+    from athena_charts.figure.figure import ChartPlacement, Figure
     from athena_charts.figure.labels import FigureLabels
-    from athena_charts.figure.layout import ChartPlacement, FigureGridLayout
+    from athena_charts.figure.layout import FigureGridLayout
     from athena_charts.figure.options import FigureOptions
 
 
 __all__ = (
+    "ChartPlacement",
     "Figure",
     "FigureLabels",
-    "ChartPlacement",
     "FigureGridLayout",
     "FigureOptions",
 )
 
 _dynamic_imports = {
+    "ChartPlacement": "figure",
     "Figure": "figure",
     "FigureLabels": "labels",
-    "ChartPlacement": "layout",
     "FigureGridLayout": "layout",
     "FigureOptions": "options",
 }
