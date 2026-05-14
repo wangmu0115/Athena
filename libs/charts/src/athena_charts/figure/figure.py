@@ -1,12 +1,12 @@
 from typing import Self
 
-from athena_core.models import BaseAthenaModel
 from pydantic import Field, model_validator
 
-from athena_charts.chart import Chart
+from athena_charts.charts import Chart
 from athena_charts.figure.labels import FigureLabels
 from athena_charts.figure.layout import ChartPlacement, FigureGridLayout
 from athena_charts.figure.options import FigureOptions
+from athena_core.models import BaseAthenaModel
 
 
 class Figure(BaseAthenaModel):

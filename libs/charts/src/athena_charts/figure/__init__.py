@@ -7,6 +7,8 @@ if TYPE_CHECKING:
     from athena_charts.figure.labels import FigureLabels
     from athena_charts.figure.layout import ChartPlacement, FigureGridLayout
     from athena_charts.figure.options import FigureOptions
+
+
 __all__ = (
     "Figure",
     "FigureLabels",

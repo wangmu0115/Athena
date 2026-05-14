@@ -1,10 +1,10 @@
 import math
 from typing import Self
 
-from athena_core.models.base import BaseAthenaModel
 from pydantic import Field
 
-from athena_charts.chart import Chart
+from athena_charts.charts import Chart
+from athena_core.models.base import BaseAthenaModel
 
 
 class FigureGridLayout(BaseAthenaModel):

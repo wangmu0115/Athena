@@ -1,5 +1,6 @@
-from athena_core.models import BaseAthenaModel
 from pydantic import Field
+
+from athena_core.models import BaseAthenaModel
 
 
 class FigureOptions(BaseAthenaModel):

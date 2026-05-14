@@ -3,18 +3,44 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
+    from athena_charts.coords.axis import (
+        BaseAxis,
+        CartesianAxis,
+        PolarAxis,
+        TickFormatter,
+        TickOptions,
+    )
     from athena_charts.coords.base import Coord, CoordKind
+    from athena_charts.coords.cartesian import CartesianCoord
+    from athena_charts.coords.options import CartesianGridOptions
+    from athena_charts.coords.polar import PolarCoord
 
 
 __all__ = (
+    "BaseAxis",
+    "CartesianAxis",
+    "PolarAxis",
+    "TickFormatter",
+    "TickOptions",
     "CoordKind",
     "Coord",
+    "CartesianCoord",
+    "CartesianGridOptions",
+    "PolarCoord",
 )
 
 
 _dynamic_imports = {
+    "BaseAxis": "axis",
+    "CartesianAxis": "axis",
+    "PolarAxis": "axis",
+    "TickFormatter": "axis",
+    "TickOptions": "axis",
     "CoordKind": "base",
     "Coord": "base",
+    "CartesianCoord": "cartesian",
+    "CartesianGridOptions": "options",
+    "PolarCoord": "polar",
 }
 
 
