@@ -1,9 +1,8 @@
-
 from typing import Literal
 
-from athena_charts.plots.base import CartesianPlot
-from athena_charts.plots.options import LinePlotOptions
 from pydantic import Field
+
+from athena_charts.plots import CartesianPlot, LinePlotOptions
 
 
 class LinePlot(CartesianPlot):

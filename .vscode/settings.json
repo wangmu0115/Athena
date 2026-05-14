@@ -1,0 +1,57 @@
+{
+    // Font
+    "editor.fontFamily": "'Courier New', 'Fira Code', Menlo, Monaco, monospace",
+    "editor.fontSize": 15,
+    "terminal.integrated.fontSize": 15,
+    // AutoSave
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    // Workbench
+    "workbench.editor.showTabs": "single",
+    // Python/Jupyter Notebook
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnType": true,
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        },
+        
+    },
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.fixAll": ["source.unusedImports"],  
+    "editor.defaultFormatter": "charliermarsh.ruff",
+
+    
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.cache": true,
+        "**/.coverage": true,
+        "**/.coverage.*": true,
+        "**/.hypothesis": true,
+        "**/.ipynb_checkpoints": true,
+        "**/.mypy_cache": true,
+        "**/.nox": true,
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
+        "**/.tox": true,
+        "**/.vscode": true
+    },
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "ruff.lineLength": 160,
+    "spellcheck.allowedSymbolCharacters": "，。；：？！“”‘’【】《》（）、",
+    "editor.unicodeHighlight.allowedCharacters": {
+        "（": true,
+        "）": true,
+        "，": true,
+        "：": true,
+        "️": true
+    },
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "editor.links": false,
+    "notebook.lineNumbers": "on",
+    "editor.formatOnSave": true,
+    "ruff.nativeServer": "on"
+}

@@ -4,3 +4,41 @@ members=[
     "libs/charts",
     "libs/charts-matplotlib",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.12",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = [
+    "libs",
+    "apps",
+    "src",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle error
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = true
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "athena_core",
+    "athena_charts",
+    "athena_charts_matplotlib",
+]
