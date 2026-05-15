@@ -4,7 +4,7 @@ from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
     from athena_charts.coords.axis import (
-        Axis,
+        AxisSpec,
         CartesianAxis,
         PolarAxis,
         TickFormatter,
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    "Axis",
+    "AxisSpec",
     "CartesianAxis",
     "PolarAxis",
     "TickFormatter",
@@ -32,7 +32,7 @@ __all__ = (
 
 
 _dynamic_imports = {
-    "Axis": "axis",
+    "AxisSpec": "axis",
     "CartesianAxis": "axis",
     "PolarAxis": "axis",
     "TickFormatter": "axis",

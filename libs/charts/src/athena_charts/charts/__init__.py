@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.charts.chart import Chart
+    from athena_charts.charts.chart import ChartSpec
     from athena_charts.charts.labels import ChartLabels
     from athena_charts.charts.legend import ChartLegend
     from athena_charts.charts.options import ChartOptions
 
 
 __all__ = (
-    "Chart",
+    "ChartSpec",
     "ChartLabels",
     "ChartLegend",
     "ChartOptions",
@@ -18,7 +18,7 @@ __all__ = (
 
 
 _dynamic_imports = {
-    "Chart": "chart",
+    "ChartSpec": "chart",
     "ChartLabels": "labels",
     "ChartLegend": "legend",
     "ChartOptions": "options",

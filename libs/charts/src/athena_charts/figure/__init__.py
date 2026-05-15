@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.figure.figure import ChartPlacement, Figure
+    from athena_charts.figure.figure import ChartPlacement, FigureSpec
     from athena_charts.figure.labels import FigureLabels
     from athena_charts.figure.layout import FigureGridLayout
     from athena_charts.figure.options import FigureOptions
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 __all__ = (
     "ChartPlacement",
-    "Figure",
+    "FigureSpec",
     "FigureLabels",
     "FigureGridLayout",
     "FigureOptions",
@@ -19,7 +19,7 @@ __all__ = (
 
 _dynamic_imports = {
     "ChartPlacement": "figure",
-    "Figure": "figure",
+    "FigureSpec": "figure",
     "FigureLabels": "labels",
     "FigureGridLayout": "layout",
     "FigureOptions": "options",

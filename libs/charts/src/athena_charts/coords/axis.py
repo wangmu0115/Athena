@@ -44,7 +44,7 @@ class TickOptions(BaseAthenaModel):
         return self
 
 
-class Axis(BaseAthenaModel):
+class AxisSpec(BaseAthenaModel):
     label: str = Field("", description="坐标轴标题")
     visible: bool = Field(True, description="是否显示坐标轴")
     data_type: Literal[
@@ -72,7 +72,7 @@ class Axis(BaseAthenaModel):
         return self
 
 
-class CartesianAxis(Axis):
+class CartesianAxis(AxisSpec):
     """笛卡尔坐标轴，X 轴通常是 bottom/top，Y 轴通常是 left/right"""
 
     position: Literal[
@@ -89,7 +89,7 @@ class CartesianAxis(Axis):
         return self
 
 
-class PolarAxis(Axis):
+class PolarAxis(AxisSpec):
     """极坐标轴：角度轴 (theta) 和半径轴 (radius)"""
 
     role: Literal["theta", "radius"] = Field(..., description="极坐标轴角色")

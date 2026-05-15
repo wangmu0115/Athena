@@ -9,7 +9,7 @@ from athena_charts.plots import PlotSpec
 from athena_core.models import BaseAthenaModel
 
 
-class Chart(BaseAthenaModel):
+class ChartSpec(BaseAthenaModel):
     labels: ChartLabels = Field(default_factory=ChartLabels, description="图表文本标签")
     coord: CoordSpec = Field(..., description="坐标系统")
     plots: list[PlotSpec] = Field(default_factory=list, description="图层列表")
