@@ -13,16 +13,16 @@ class CartesianGridOptions(BaseAthenaModel):
 
     @classmethod
     def show_none(cls) -> Self:
-        return Self(visible=False)
+        return cls(visible=False)
 
     @classmethod
     def show_x(cls, alpha: float = 0.25) -> Self:
-        return Self(visible=True, x=True, y=False, alpha=alpha)
+        return cls(visible=True, x=True, y=False, alpha=alpha)
 
     @classmethod
     def show_y(cls, alpha: float = 0.25) -> Self:
-        return Self(visible=True, x=False, y=True, alpha=alpha)
+        return cls(visible=True, x=False, y=True, alpha=alpha)
 
     @classmethod
     def show_both(cls, alpha: float = 0.25) -> Self:
-        return Self(visible=True, x=True, y=True, alpha=alpha)
+        return cls(visible=True, x=True, y=True, alpha=alpha)
