@@ -7,8 +7,4 @@ athena_charts 模块是对绘图的抽象，包括以下几个层级：
 
 每种类型组件的抽象都有全局配置和组件配置，全局配置在主题 `theme` 中，而组件配置通常放在 xxxOptions 中。
 
-
-
-├── engines/
-├── outputs/
-└── pipeline/
+在 engine 中包含了完整的渲染图片的流程，从 RenderSpec -> RenderResult[TArtifact] -> WriteResult[TValue]
