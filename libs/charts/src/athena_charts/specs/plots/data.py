@@ -1,4 +1,4 @@
-from typing import Any, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import Field, model_validator
 
@@ -14,10 +14,12 @@ class XYPoint(BaseAthenaModel):
 
 class CategoricalDatum(BaseAthenaModel):
     category: str = Field(..., description="分类名称")
-    value: float = Field(..., ge=0, description="分类数值")
+    value: float | None = Field(None, description="分类数值")
 
 
 class XYSeriesData(BaseAthenaModel):
+    kind: Literal["xy"] = "xy"  # For Serialization and Deserialization in BarPlotData
+
     x: list[Any] = Field(..., description="X 轴数据")
     y: list[float | None] = Field(..., description="Y 轴数据")
 
@@ -32,13 +34,23 @@ class XYSeriesData(BaseAthenaModel):
 
     @model_validator(mode="after")
     def validate_lengths(self) -> Self:
+        if not self.x or not self.y:
+            raise ValueError("XYSeriesData cannot be empty.")
         if len(self.x) != len(self.y):
             raise ValueError("XYSeriesData.x and XYSeriesData.y must have the same length.")
         return self
 
 
 class CategoricalSeriesData(BaseAthenaModel):
+    kind: Literal["categorical"] = "categorical"  # For Serialization and Deserialization in BarPlotData
+
     datums: list[CategoricalDatum] = Field(..., description="分类项列表")
+
+    @model_validator(mode="after")
+    def validate_datums(self) -> Self:
+        if not self.datums:
+            raise ValueError("CategoricalSeriesData cannot be empty.")
+        return self
 
     @property
     def categories(self) -> list[str]:
@@ -53,8 +65,11 @@ class LinePlotData(BaseAthenaModel):
     data: XYSeriesData = Field(..., description="XY 序列数据")
 
 
+type BarPlotDataValue = Annotated[XYSeriesData | CategoricalSeriesData, Field(discriminator="kind")]
+
+
 class BarPlotData(BaseAthenaModel):
-    data: XYSeriesData | CategoricalSeriesData = Field(..., description="柱状图数据")
+    data: BarPlotDataValue = Field(..., description="柱状图数据")
 
 
 class PiePlotData(BaseAthenaModel):
@@ -62,6 +77,11 @@ class PiePlotData(BaseAthenaModel):
 
     @model_validator(mode="after")
     def validate_datums(self) -> Self:
+        if any(datum.value is None for datum in self.data.datums):
+            raise ValueError("PiePlotData values cannot be None.")
+
+        if any(datum.value < 0 for datum in self.data.datums):
+            raise ValueError("PiePlotData values cannot be negative.")
 
         if sum(datum.value for datum in self.data.datums) <= 0:
             raise ValueError("PiePlotData total value must be greater than 0.")

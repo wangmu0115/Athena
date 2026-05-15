@@ -28,14 +28,14 @@ class WritableArtifact(Protocol):
 
 
 @runtime_checkable
-class Writer[TValue](Protocol):
+class Writer[TArtifact, TValue](Protocol):
     """输出器"""
 
-    def write(self, rendered: RenderResult, *, filename: str | None = None) -> WriteResult[TValue]: ...
+    def write(self, rendered: RenderResult[TArtifact], *, filename: str | None = None) -> WriteResult[TValue]: ...
 
 
 class BaseWriter[TValue](ABC):
-    def write(self, rendered: RenderResult, *, filename: str | None = None) -> WriteResult[TValue]:
+    def write(self, rendered: RenderResult[object], *, filename: str | None = None) -> WriteResult[TValue]:
         artifact = rendered.artifact
 
         if not isinstance(rendered.artifact, WritableArtifact):
@@ -99,6 +99,7 @@ class MemoryWriter(BaseWriter[bytes]):
 
 
 def ensure_filename(filename: str | None, *, suffix: str) -> str:
+    suffix = suffix if suffix.startswith(".") else f".{suffix}"
     if filename:
         return filename if filename.endswith(suffix) else f"{filename}{suffix}"
     return f"{uuid4().hex}{suffix}"

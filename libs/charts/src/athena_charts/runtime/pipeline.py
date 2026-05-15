@@ -6,7 +6,7 @@ from athena_charts.runtime.writers import Writer, WriteResult
 from athena_charts.themes.base import Theme
 
 
-class Pipeline[TValue]:
+class Pipeline[TArtifact, TValue]:
     """渲染输出流水线。Pipeline 本身不关心具体绘图库，也不关心输出目标，只负责流程编排。
 
     负责串联 Renderer 与 Writer：
@@ -15,11 +15,11 @@ class Pipeline[TValue]:
 
     def __init__(
         self,
-        renderer: Renderer,
-        writer: Writer[TValue],
+        renderer: Renderer[TArtifact],
+        writer: Writer[TArtifact, TValue],
         *,
         context_provider: PipelineContextProvider | None = None,
-        artifact_finalizer: Callable[[RenderResult], None] | None = None,
+        artifact_finalizer: Callable[[RenderResult[TArtifact]], None] | None = None,
     ):
         self._renderer = renderer
         self._writer = writer

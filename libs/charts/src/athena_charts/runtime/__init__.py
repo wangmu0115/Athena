@@ -5,12 +5,13 @@ from athena_core._import_utils import import_attr
 if TYPE_CHECKING:
     from athena_charts.runtime.context import DefaultPipelineContext, PipelineContextProvider
     from athena_charts.runtime.pipeline import Pipeline
-    from athena_charts.runtime.renderers import Renderer, RenderResult, RenderSpec, WritableArtifact
+    from athena_charts.runtime.renderers import Renderer, RenderResult, RenderSpec
     from athena_charts.runtime.writers import (
         BaseWriter,
         FileWriter,
         MemoryWriter,
         TempFileWriter,
+        WritableArtifact,
         Writer,
         WriteResult,
     )
@@ -40,11 +41,11 @@ _dynamic_imports = {
     "TempFileWriter": "writers",
     "Writer": "writers",
     "WriteResult": "writers",
+    "WritableArtifact": "writers",
     "Pipeline": "pipeline",
     "Renderer": "renderers",
     "RenderResult": "renderers",
     "RenderSpec": "renderers",
-    "WritableArtifact": "renderers",
     "DefaultPipelineContext": "context",
     "PipelineContextProvider": "context",
 }
