@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from pydantic import Field
 
-from athena_charts.runtime.renderers import RenderResult, WritableArtifact
+from athena_charts.runtime.renderers import RenderResult
 from athena_core.models import BaseAthenaModel
 
 
@@ -15,6 +15,16 @@ class WriteResult[TValue](BaseAthenaModel):
     media_type: str = Field(..., description="输出媒体类型")
     filename: str | None = Field(None, description="文件名")
     metadata: dict[str, object] = Field(default_factory=dict, description="元数据信息")
+
+
+@runtime_checkable
+class WritableArtifact(Protocol):
+    media_type: str
+    suffix: str
+
+    def to_bytes(self) -> bytes:
+        """转换为二进制内容"""
+        ...
 
 
 @runtime_checkable
@@ -64,7 +74,7 @@ class TempFileWriter(BaseWriter[Path]):
         final_name = ensure_filename(filename, suffix=artifact.suffix)
 
         with NamedTemporaryFile(delete=False, suffix=artifact.suffix) as file:
-            file.write_bytes(artifact.to_bytes())
+            file.write(artifact.to_bytes())
             path = Path(file.name)
 
             return WriteResult(
@@ -75,7 +85,7 @@ class TempFileWriter(BaseWriter[Path]):
             )
 
 
-class MemoryWriter:
+class MemoryWriter(BaseWriter[bytes]):
     """写出到内存。"""
 
     def _write_artifact(self, artifact: WritableArtifact, *, filename: str | None = None) -> WriteResult[bytes]:

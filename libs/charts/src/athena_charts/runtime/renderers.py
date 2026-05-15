@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Protocol, runtime_checkable
 
 from pydantic import Field
@@ -9,16 +9,6 @@ from athena_charts.themes import DEFAULT_THEME, Theme
 from athena_core.models import BaseAthenaModel
 
 type RenderSpec = ChartSpec | FigureSpec
-
-
-@runtime_checkable
-class WritableArtifact(Protocol):
-    media_type: str
-    suffix: str
-
-    def to_bytes(self) -> bytes:
-        """转换为二进制内容"""
-        ...
 
 
 class RenderResult(BaseAthenaModel):
@@ -33,7 +23,7 @@ class Renderer(Protocol):
     def render(self, spec: RenderSpec, *, theme: Theme | None = None) -> RenderResult: ...
 
 
-class BaseRenderer:
+class BaseRenderer(ABC):
     def __init__(self, name: str = "", theme: Theme | None = None):
         self._name = name  # tracing
         self._theme = theme or DEFAULT_THEME
