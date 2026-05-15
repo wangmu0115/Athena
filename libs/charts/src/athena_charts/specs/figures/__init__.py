@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.figure.figure import ChartPlacement, FigureSpec
-    from athena_charts.figure.labels import FigureLabels
-    from athena_charts.figure.layout import FigureGridLayout
-    from athena_charts.figure.options import FigureOptions
+    from athena_charts.specs.figures.figure import ChartPlacement, FigureSpec
+    from athena_charts.specs.figures.labels import FigureLabels
+    from athena_charts.specs.figures.layout import FigureGridLayout
+    from athena_charts.specs.figures.options import FigureOptions
 
 
 __all__ = (

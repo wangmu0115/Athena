@@ -1,18 +1,11 @@
-from typing import Annotated, Literal
+from typing import Literal
 
 from pydantic import Field
 
-from athena_charts.coords import CoordKind
-from athena_charts.plots import (
-    BarPlot,
-    LinePlot,
-    PiePlot,
-)
+from athena_charts.specs.coords import CoordKind
 from athena_core.models import BaseAthenaModel
 
 type PlotKind = Literal["line", "bar", "pie"]
-
-type PlotSpec = Annotated[LinePlot | BarPlot | PiePlot, Field(discriminator="kind")]
 
 
 class Plot(BaseAthenaModel):

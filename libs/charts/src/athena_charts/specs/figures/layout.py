@@ -3,7 +3,7 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_core.models.base import BaseAthenaModel
+from athena_core.models import BaseAthenaModel
 
 
 class FigureGridLayout(BaseAthenaModel):

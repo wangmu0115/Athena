@@ -2,8 +2,8 @@ from typing import Protocol, runtime_checkable
 
 from pydantic import Field
 
-from athena_charts.engine.renderers import RenderResult
-from athena_core.models.base import BaseAthenaModel
+from athena_charts.runtime.renderers import RenderResult
+from athena_core.models import BaseAthenaModel
 
 
 class WriteResult[TValue](BaseAthenaModel):

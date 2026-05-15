@@ -1,7 +1,7 @@
 [project]
 name = "athena-charts"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "声明式图表规范、主题、运行时协议和通用输出"
 readme = "README.md"
 authors = [
     { name = "wangmu0115", email = "wangmu8889@gmail.com" }
@@ -10,9 +10,6 @@ requires-python = ">=3.12"
 dependencies = [
     "athena-core",
 ]
-
-[project.scripts]
-charts = "athena_charts:main"
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]

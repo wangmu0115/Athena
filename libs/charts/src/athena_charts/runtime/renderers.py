@@ -3,11 +3,10 @@ from typing import Protocol, runtime_checkable
 
 from pydantic import Field
 
-from athena_charts.charts.chart import ChartSpec
-from athena_charts.figure import FigureSpec
-from athena_charts.themes import Theme
-from athena_charts.themes.base import DEFAULT_THEME
-from athena_core.models.base import BaseAthenaModel
+from athena_charts.specs.charts import ChartSpec
+from athena_charts.specs.figures import FigureSpec
+from athena_charts.themes import DEFAULT_THEME, Theme
+from athena_core.models import BaseAthenaModel
 
 type RenderSpec = ChartSpec | FigureSpec
 

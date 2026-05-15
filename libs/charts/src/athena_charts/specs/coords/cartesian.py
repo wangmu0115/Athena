@@ -2,7 +2,9 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.coords import CartesianAxis, CartesianGridOptions, Coord
+from athena_charts.specs.coords.axis import CartesianAxis
+from athena_charts.specs.coords.base import Coord
+from athena_charts.specs.coords.options import CartesianGridOptions
 
 
 class CartesianCoord(Coord):

@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.engine.outputs import Writer, WriteResult
-    from athena_charts.engine.pipeline import Pipeline
-    from athena_charts.engine.renderers import Renderer, RenderResult, RenderSpec
-    from athena_charts.engine.runtime import DefaultPipelineContext, PipelineContextProvider
+    from athena_charts.runtime.context import DefaultPipelineContext, PipelineContextProvider
+    from athena_charts.runtime.pipeline import Pipeline
+    from athena_charts.runtime.renderers import Renderer, RenderResult, RenderSpec
+    from athena_charts.runtime.writers import Writer, WriteResult
 
 
 __all__ = (
@@ -22,14 +22,14 @@ __all__ = (
 
 
 _dynamic_imports = {
-    "Writer": "outputs",
-    "WriteResult": "outputs",
+    "Writer": "writers",
+    "WriteResult": "writers",
     "Pipeline": "pipeline",
     "Renderer": "renderers",
     "RenderResult": "renderers",
     "RenderSpec": "renderers",
-    "DefaultPipelineContext": "runtime",
-    "PipelineContextProvider": "runtime",
+    "DefaultPipelineContext": "context",
+    "PipelineContextProvider": "context",
 }
 
 

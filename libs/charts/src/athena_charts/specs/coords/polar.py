@@ -2,7 +2,8 @@ from typing import Literal
 
 from pydantic import Field
 
-from athena_charts.coords import Coord, PolarAxis
+from athena_charts.specs.coords.axis import PolarAxis
+from athena_charts.specs.coords.base import Coord
 
 
 class PolarCoord(Coord):

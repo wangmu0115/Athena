@@ -2,10 +2,10 @@ from typing import Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.charts import ChartLabels, ChartOptions
-from athena_charts.coords import CoordSpec
-from athena_charts.coords.cartesian import CartesianCoord
-from athena_charts.plots import PlotSpec
+from athena_charts.specs.charts.labels import ChartLabels
+from athena_charts.specs.charts.options import ChartOptions
+from athena_charts.specs.coords import CartesianCoord, CoordSpec
+from athena_charts.specs.plots import PlotSpec
 from athena_core.models import BaseAthenaModel
 
 

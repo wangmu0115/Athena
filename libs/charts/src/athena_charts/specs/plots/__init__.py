@@ -3,19 +3,19 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.plots.bar import BarPlot
-    from athena_charts.plots.base import (
-        Plot,
-        PlotKind,
-        PlotSpec,
-    )
-    from athena_charts.plots.data import (
+    from athena_charts.specs.plots.bar import BarPlot
+    from athena_charts.specs.plots.base import Plot, PlotKind
+    from athena_charts.specs.plots.data import (
+        BarPlotData,
         CategoricalDatum,
+        CategoricalSeriesData,
+        LinePlotData,
         PiePlotData,
-        XYPlotData,
+        XYPoint,
+        XYSeriesData,
     )
-    from athena_charts.plots.line import LinePlot
-    from athena_charts.plots.options import (
+    from athena_charts.specs.plots.line import LinePlot
+    from athena_charts.specs.plots.options import (
         BarPlotOptions,
         CartesianPlotOptions,
         LinePlotOptions,
@@ -23,16 +23,21 @@ if TYPE_CHECKING:
         PlotOptions,
         PolarPlotOptions,
     )
-    from athena_charts.plots.pie import PiePlot
+    from athena_charts.specs.plots.pie import PiePlot
+    from athena_charts.specs.plots.union import PlotSpec
 
 
 __all__ = (
     "Plot",
     "PlotKind",
     "PlotSpec",
+    "BarPlotData",
     "CategoricalDatum",
+    "CategoricalSeriesData",
+    "LinePlotData",
     "PiePlotData",
-    "XYPlotData",
+    "XYPoint",
+    "XYSeriesData",
     "BarPlotOptions",
     "CartesianPlotOptions",
     "LinePlotOptions",
@@ -48,10 +53,14 @@ __all__ = (
 _dynamic_imports = {
     "Plot": "base",
     "PlotKind": "base",
-    "PlotSpec": "base",
+    "PlotSpec": "union",
+    "BarPlotData": "data",
     "CategoricalDatum": "data",
+    "CategoricalSeriesData": "data",
+    "LinePlotData": "data",
     "PiePlotData": "data",
-    "XYPlotData": "data",
+    "XYPoint": "data",
+    "XYSeriesData": "data",
     "BarPlotOptions": "options",
     "CartesianPlotOptions": "options",
     "LinePlotOptions": "options",

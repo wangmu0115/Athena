@@ -1,13 +1,9 @@
 from pydantic import Field
 
-from athena_charts.themes import (
-    AxisTheme,
-    ChartTheme,
-    FigureTheme,
-    GridTheme,
-    LegendTheme,
-    PlotTheme,
-)
+from athena_charts.themes.chart import ChartTheme, GridTheme, LegendTheme
+from athena_charts.themes.coord import AxisTheme
+from athena_charts.themes.figure import FigureTheme
+from athena_charts.themes.plot import PlotTheme
 from athena_core.models import BaseAthenaModel
 
 
