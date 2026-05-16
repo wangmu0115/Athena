@@ -1,10 +1,10 @@
 [project]
 name = "athena-core"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "Athena Core"
 readme = "README.md"
 authors = [
-    { name = "wangmu0115", email = "wangmu8889@gmail.com" }
+    { name = "wangmu", email = "wangmu8889@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [

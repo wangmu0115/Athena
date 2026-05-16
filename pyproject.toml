@@ -1,8 +1,6 @@
 [tool.uv.workspace]
 members=[
-    "libs/core",
-    "libs/charts",
-    "libs/charts-matplotlib",
+    "libs/*",
 ]
 
 [dependency-groups]

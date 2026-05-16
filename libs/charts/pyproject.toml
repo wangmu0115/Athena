@@ -4,11 +4,11 @@ version = "1.0.0"
 description = "声明式图表规范、主题、运行时协议和通用输出"
 readme = "README.md"
 authors = [
-    { name = "wangmu0115", email = "wangmu8889@gmail.com" }
+    { name = "wangmu", email = "wangmu8889@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "athena-core",
+    "athena-core>=1.0.0",
 ]
 
 [build-system]
