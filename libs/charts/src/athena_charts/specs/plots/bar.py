@@ -2,10 +2,10 @@ from typing import Literal
 
 from pydantic import Field
 
+from athena_charts.data import BarPlotData
+from athena_charts.options import BarPlotOptions
 from athena_charts.specs.coords import Coord
 from athena_charts.specs.plots.base import Plot
-from athena_charts.specs.plots.data import BarPlotData
-from athena_charts.specs.plots.options import BarPlotOptions
 
 
 class BarPlot(Plot):

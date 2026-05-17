@@ -5,22 +5,17 @@ from athena_core._import_utils import import_attr
 if TYPE_CHECKING:
     from athena_charts.specs.charts.chart import ChartSpec
     from athena_charts.specs.charts.labels import ChartLabels
-    from athena_charts.specs.charts.options import ChartOptions, LegendOptions
 
 
 __all__ = (
     "ChartSpec",
     "ChartLabels",
-    "LegendOptions",
-    "ChartOptions",
 )
 
 
 _dynamic_imports = {
     "ChartSpec": "chart",
     "ChartLabels": "labels",
-    "LegendOptions": "options",
-    "ChartOptions": "options",
 }
 
 

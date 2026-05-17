@@ -2,14 +2,14 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_core.models import BaseAthenaModel
+from athena_charts.options.base import Options
 
 
-class CartesianGridOptions(BaseAthenaModel):
-    visible: bool = Field(True, description="是否显示网格")
-    x: bool = Field(True, description="是否显示 X 方向网格")
-    y: bool = Field(True, description="是否显示 Y 方向网格")
-    alpha: float = Field(0.25, ge=0, le=1, description="网格透明度")
+class CartesianGridOptions(Options):
+    visible: bool | None = Field(None, description="是否显示网格")
+    x: bool | None = Field(None, description="是否显示 X 方向网格")
+    y: bool | None = Field(None, description="是否显示 Y 方向网格")
+    alpha: float | None = Field(None, ge=0, le=1, description="网格透明度")
 
     @classmethod
     def show_none(cls) -> Self:

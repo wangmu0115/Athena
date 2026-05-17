@@ -2,9 +2,9 @@ from typing import Literal
 
 from pydantic import Field
 
+from athena_charts.data import PiePlotData
+from athena_charts.options import PiePlotOptions
 from athena_charts.specs.plots.base import Plot
-from athena_charts.specs.plots.data import PiePlotData
-from athena_charts.specs.plots.options import PiePlotOptions
 
 
 class PiePlot(Plot):

@@ -18,9 +18,18 @@ class RenderResult[TArtifact](BaseAthenaModel):
 
 @runtime_checkable
 class Renderer[TArtifact](Protocol):
-    """绘图渲染器"""
+    """Renderer Protocol
 
-    def render(self, spec: RenderSpec, *, theme: Theme | None = None) -> RenderResult[TArtifact]: ...
+    渲染器最小协议：接收 RenderSpec 并返回 RenderResult
+    """
+
+    @property
+    def name(self) -> str: ...
+
+    @property
+    def theme(self) -> Theme: ...
+
+    def render(self, spec: RenderSpec) -> RenderResult[TArtifact]: ...
 
 
 class BaseRenderer[TArtifact](ABC):
@@ -29,15 +38,16 @@ class BaseRenderer[TArtifact](ABC):
         self._theme = theme or DEFAULT_THEME
 
     @property
+    def name(self) -> str:
+        return self._name
+
+    @property
     def theme(self) -> Theme:
         return self._theme
 
-    def render(self, spec: RenderSpec, *, theme: Theme | None = None) -> RenderResult[TArtifact]:
+    def render(self, spec: RenderSpec) -> RenderResult[TArtifact]:
         figure_spec = FigureSpec.from_chart(spec) if isinstance(spec, ChartSpec) else spec
-        return self._render_figure(
-            figure_spec,
-            theme=theme or self._theme,
-        )
+        return self._render_figure(figure_spec)
 
     @abstractmethod
-    def _render_figure(self, spec: FigureSpec, *, theme: Theme) -> RenderResult[TArtifact]: ...
+    def _render_figure(self, spec: FigureSpec) -> RenderResult[TArtifact]: ...

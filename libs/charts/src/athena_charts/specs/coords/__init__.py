@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     )
     from athena_charts.specs.coords.base import Coord, CoordKind
     from athena_charts.specs.coords.cartesian import CartesianCoord
-    from athena_charts.specs.coords.options import CartesianGridOptions
+    from athena_charts.options.coord import CartesianGridOptions
     from athena_charts.specs.coords.polar import PolarCoord
     from athena_charts.specs.coords.union import CoordSpec
 

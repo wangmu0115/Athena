@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from athena_charts.specs.figures.figure import ChartPlacement, FigureSpec
     from athena_charts.specs.figures.labels import FigureLabels
     from athena_charts.specs.figures.layout import FigureGridLayout
-    from athena_charts.specs.figures.options import FigureOptions
+    from athena_charts.options.figure import FigureOptions
 
 
 __all__ = (

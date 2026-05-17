@@ -3,11 +3,18 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.themes.base import DEFAULT_THEME, PaletteTheme, TextTheme, Theme
-    from athena_charts.themes.chart import ChartTheme, GridTheme, LegendTheme
-    from athena_charts.themes.coord import AxisTheme
-    from athena_charts.themes.figure import FigureTheme
-    from athena_charts.themes.plot import PlotTheme
+    from athena_charts.themes.base import (
+        AxisTheme,
+        ChartTheme,
+        FigureTheme,
+        GridTheme,
+        LegendTheme,
+        PaletteTheme,
+        PlotTheme,
+        TextTheme,
+        Theme,
+    )
+    from athena_charts.themes.default import DEFAULT_THEME
 
 
 __all__ = (
@@ -25,16 +32,16 @@ __all__ = (
 
 
 _dynamic_imports = {
-    "DEFAULT_THEME": "base",
+    "DEFAULT_THEME": "default",
     "TextTheme": "base",
     "Theme": "base",
     "PaletteTheme": "base",
-    "FigureTheme": "figure",
-    "ChartTheme": "chart",
-    "GridTheme": "chart",
-    "LegendTheme": "chart",
-    "AxisTheme": "coord",
-    "PlotTheme": "plot",
+    "FigureTheme": "base",
+    "ChartTheme": "base",
+    "GridTheme": "base",
+    "LegendTheme": "base",
+    "AxisTheme": "base",
+    "PlotTheme": "base",
 }
 
 
