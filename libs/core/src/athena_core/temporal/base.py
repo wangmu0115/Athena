@@ -5,5 +5,3 @@ from typing import Literal
 # - end: 当天结束时间 `time.max`
 # - noon: 当天中午时间 `time(hour=12, minute=0, second=0)`
 type DateBoundaryPolicy = Literal["start", "end", "noon"]
-
-class DateBoundaryPolicy(LabelStrE)

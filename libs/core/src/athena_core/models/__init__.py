@@ -4,11 +4,18 @@ from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
     from athena_core.models.base import BaseAthenaModel
+    from athena_core.models.enums import LabelIntEnum, LabelStrEnum
 
-__all__ = ("BaseAthenaModel",)
+__all__ = (
+    "BaseAthenaModel",
+    "LabelIntEnum",
+    "LabelStrEnum",
+)
 
 _dynamic_imports = {
     "BaseAthenaModel": "base",
+    "LabelIntEnum": "enums",
+    "LabelStrEnum": "enums",
 }
 
 
