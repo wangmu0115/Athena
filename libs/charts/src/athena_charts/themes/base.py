@@ -1,25 +1,25 @@
-from pydantic import Field
+from typing import Literal
 
+from pydantic import BaseModel, ConfigDict, Field
+
+from athena_charts.themes.figure import FigureTheme
+from athena_charts.themes.font import FontTheme
 from athena_core.models import BaseAthenaModel
 
-
-class TextTheme(BaseAthenaModel):
-    color: str = Field(..., description="默认文本颜色")
-    font_family: str = Field(..., description="默认字体族")
-    sans_serif_fonts: list[str] = Field(default_factory=list)
+type FontWeight = Literal["ultralight", "light", "normal", "medium", "semibold", "bold", "heavy", "black"]
 
 
-class PaletteTheme(BaseAthenaModel):
-    colors: list[str] = Field(default_factory=list, description="默认颜色调色板")
+class BaseTheme(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",  # 禁止未知字段
+        arbitrary_types_allowed=True,  # 允许自定义对象
+        validate_assignment=True,  # 修改字段重新校验
+        str_strip_whitespace=True,  # 自动 trim
+    )
 
 
-class FigureTheme(BaseAthenaModel):
-    width: int | None = Field(None, gt=0, description="画布宽度，单位 px")
-    height: int | None = Field(None, gt=0, description="画布高度，单位 px")
-    background_color: str | None = Field(None, description="画布背景颜色")
-    edge_color: str | None = Field(None, description="画布边框颜色")
-    title_font_size: int | None = Field(None, gt=0, description="画布标题字号")
-    subtitle_font_size: int | None = Field(None, gt=0, description="画布副标题字号")
+class PaletteTheme(BaseTheme):
+    sequence: list[str] | None = Field(None, description="默认颜色调色板")
 
 
 class ChartTheme(BaseAthenaModel):
@@ -57,7 +57,7 @@ class PlotTheme(BaseAthenaModel):
 
 
 class Theme(BaseAthenaModel):
-    text: TextTheme = Field(default_factory=TextTheme, description="全局文本主题")
+    font: FontTheme = Field(default_factory=FontTheme, description="全局文本主题")
     palette: PaletteTheme = Field(default_factory=PaletteTheme, description="调色板主题")
     figure: FigureTheme = Field(default_factory=FigureTheme, description="画布主题")
     chart: ChartTheme = Field(default_factory=ChartTheme, description="图表主题")

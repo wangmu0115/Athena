@@ -1,42 +1,25 @@
-from typing import Literal
+from pydantic import BaseModel, ConfigDict, Field
 
-from pydantic import Field
-
-from athena_core.models.base import BaseAthenaModel
-
-FontWeight = Literal["ultralight", "light", "normal", "medium", "semibold", "bold", "heavy", "black"]
+from athena_charts_matplotlib.options.figure import MatplotlibFigureOptions
+from athena_charts_matplotlib.options.font import MatplotlibFontOptions
+from athena_charts_matplotlib.options.saving import MatplotlibSavingOptions
 
 
-class Options(BaseAthenaModel):
-    """配置基础类"""
+class BaseOptions(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",  # 禁止未知字段
+        arbitrary_types_allowed=True,  # 允许自定义对象
+        validate_assignment=True,  # 修改字段重新校验
+        str_strip_whitespace=True,  # 自动 trim
+    )
 
 
-class MatplotlibFigureOptions(Options):
-    width: int | None = Field(None, gt=0, description="画布宽度，单位 px")
-    height: int | None = Field(None, gt=0, description="画布高度，单位 px")
-    dpi: int | None = Field(None, gt=0, description="分辨率，每英寸点数")
-    background_color: str | None = Field(None, description="画布背景颜色")
-    edge_color: str | None = Field(None, description="画布边框颜色")
-    title_font_size: int | None = Field(None, gt=0, description="画布标题字号")
-    title_font_weight: FontWeight | None = Field(None, description="画布标题字体粗细")
+class MatplotlibPaletteOptions(BaseOptions):
+    sequence: list[str] | None = Field(None, description="默认颜色调色板")
 
 
-ImageFormat = Literal["png", "svg", "pdf"]
-
-
-class MatplotlibRenderOptions(BaseAthenaModel):
-    """Matplotlib 渲染参数。
-
-    这里只放 Matplotlib 实现细节，不放通用视觉样式。
-    """
-
-    dpi: int = Field(144, gt=0, description="输出 DPI")
-    image_format: ImageFormat = Field("png", description="输出图片格式")
-    bbox_inches: Literal["tight"] | None = Field("tight", description="savefig 的 bbox_inches 参数")
-    constrained_layout: bool = Field(False, description="是否启用 constrained_layout")
-    tight_layout: bool = Field(True, description="是否调用 figure.tight_layout()")
-    rc_params: dict[str, object] = Field(default_factory=dict, description="额外 Matplotlib rcParams")
-
-
-class MatplotlibOptions(Options):
-    figure: MatplotlibFigureOptions
+class MatplotlibOptions(BaseOptions):
+    palette: MatplotlibPaletteOptions | None = Field(None, description="颜色调色板配置")
+    font: MatplotlibFontOptions | None = Field(None, description="字体配置")
+    figure: MatplotlibFigureOptions | None = Field(None, description="画布配置")
+    saving: MatplotlibSavingOptions | None = Field(None, description="保存 Figure 的配置")

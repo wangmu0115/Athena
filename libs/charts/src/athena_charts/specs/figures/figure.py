@@ -2,7 +2,7 @@ from typing import Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.options import FigureOptions
+from athena_charts.options.figure import FigureOptions
 from athena_charts.specs.charts import ChartSpec
 from athena_charts.specs.figures.labels import FigureLabels
 from athena_charts.specs.figures.layout import FigureGridLayout

@@ -1,17 +1,17 @@
 from athena_charts.themes.base import (
     AxisTheme,
     ChartTheme,
-    FigureTheme,
     GridTheme,
     LegendTheme,
     PaletteTheme,
     PlotTheme,
-    TextTheme,
     Theme,
 )
+from athena_charts.themes.figure import FigureTheme
+from athena_charts.themes.font import FontTheme
 
-DEFAULT_THEME = Theme(
-    text=TextTheme(
+DEFAULT_THEME_1 = Theme(
+    font=FontTheme(
         color="#111111",
         font_family="sans-serif",
         sans_serif_fonts=[
@@ -26,7 +26,7 @@ DEFAULT_THEME = Theme(
         ],
     ),
     palette=PaletteTheme(
-        colors=[
+        sequence=[
             "#1f77b4",
             "#ff7f0e",
             "#2ca02c",
@@ -75,4 +75,33 @@ DEFAULT_THEME = Theme(
         marker_size=3.0,
         bar_width=0.8,
     ),
+)
+
+DEFAULT_FONT_THEME = FontTheme(
+    family="sans-serif",
+    fallbacks=[
+        "Hiragino Sans GB",
+        "Arial Unicode MS",
+        "PingFang SC",
+        "Noto Sans CJK SC",
+        "Microsoft YaHei",
+        "SimHei",
+        "DejaVu Sans",
+    ],
+    color="#111111",
+    wight="normal",
+)
+
+DEFAULT_FIGURE_THEME = FigureTheme(
+    background_color="white",
+    edge_color="white",
+    title_font_size=14,
+    subtitle_font_size=12,
+    title_font_weight="normal",
+)
+
+
+DEFAULT_THEME = Theme(
+    font=DEFAULT_FONT_THEME,
+    figure=DEFAULT_FIGURE_THEME,
 )
