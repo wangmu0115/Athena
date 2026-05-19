@@ -3,10 +3,24 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
+    from athena_core.temporal.codec.date import (
+        DateCodec,
+        DateInput,
+        DateOutput,
+        format_date,
+        parse_date,
+    )
     from athena_core.temporal.codec.datetime import (
         DateTimeCodec,
+        DateTimeInput,
+        DateTimeOutput,
         format_datetime,
         parse_datetime,
+    )
+    from athena_core.temporal.codec.options import (
+        DateCodecOptions,
+        DatetimeCodecOptions,
+        TimeCodecOptions,
     )
     from athena_core.temporal.codec.time import (
         TimeCodec,
@@ -17,7 +31,14 @@ if TYPE_CHECKING:
     )
 
 __all__ = (
+    "DateCodec",
+    "DateInput",
+    "DateOutput",
+    "format_date",
+    "parse_date",
     "DateTimeCodec",
+    "DateTimeInput",
+    "DateTimeOutput",
     "format_datetime",
     "parse_datetime",
     "TimeCodec",
@@ -25,10 +46,20 @@ __all__ = (
     "TimeOutput",
     "format_time",
     "parse_time",
+    "DateCodecOptions",
+    "DatetimeCodecOptions",
+    "TimeCodecOptions",
 )
 
 _dynamic_imports = {
+    "DateCodec": "date",
+    "DateInput": "date",
+    "DateOutput": "date",
+    "format_date": "date",
+    "parse_date": "date",
     "DateTimeCodec": "datetime",
+    "DateTimeInput": "datetime",
+    "DateTimeOutput": "datetime",
     "format_datetime": "datetime",
     "parse_datetime": "datetime",
     "TimeCodec": "time",
@@ -36,6 +67,9 @@ _dynamic_imports = {
     "TimeOutput": "time",
     "format_time": "time",
     "parse_time": "time",
+    "DateCodecOptions": "options",
+    "DatetimeCodecOptions": "options",
+    "TimeCodecOptions": "options",
 }
 
 

@@ -1,18 +1,13 @@
-from typing import Literal
-
 from pydantic import BaseModel, ConfigDict, Field
 
-from athena_core.temporal.base import TimeOutputFormat
-
-type TimestampUnit = Literal["s", "ms"]
-type NaiveDateTimePolicy = Literal["assume_local", "raise"]
-type DateBoundaryPolicy = Literal["start", "end", "noon"]
-
-type TimeDecodeTarget = Literal["time", "string", "iso"]
-type DateDecodeTarget = Literal["date", "datetime", "string", "iso", "timestamp_s", "timestamp_ms"]
-type DateTimeDecodeTarget = Literal["datetime", "timestamp_s", "timestamp_ms", "string", "iso", "rfc5322"]
-
-type TemporalDecodeTarget = DateDecodeTarget | TimeDecodeTarget | DateTimeDecodeTarget
+from athena_core.temporal.base import (
+    DateBoundaryPolicy,
+    DateOutputFormat,
+    DateTimeOutputFormat,
+    NaiveDateTimeHandling,
+    TimeOutputFormat,
+    TimestampUnit,
+)
 
 DEFAULT_DATE_FORMATS: tuple[str, ...] = (
     "iso",
@@ -34,16 +29,12 @@ DEFAULT_DATETIME_FORMATS: tuple[str, ...] = (
     "rfc5322",
     "%Y-%m-%d %H:%M:%S",
     "%Y-%m-%d %H:%M",
-    "%Y-%m-%d",
     "%Y/%m/%d %H:%M:%S",
     "%Y/%m/%d %H:%M",
-    "%Y/%m/%d",
     "%Y%m%d %H%M%S",
     "%Y%m%d %H%M",
-    "%Y%m%d",
     "%Y%m%d_%H%M%S",
     "%Y%m%d_%H%M",
-    "%Y%m%d",
 )
 
 
@@ -57,22 +48,15 @@ class BaseOptions(BaseModel):
 
 
 class DateCodecOptions(BaseOptions):
-    """Options for `DateCodec`.
-
-    `DateCodec` 的配置。
-    """
-
-    date_formats: tuple[str, ...] = Field(
+    parse_patterns: tuple[str, ...] = Field(
         DEFAULT_DATE_FORMATS,
         min_length=1,
-        description="日期字符串解析格式",
+        description="用于解析日期字符串的 `strptime` 格式列表",
     )
-    decode_target: DateDecodeTarget = Field("string", description="date 解码目标")
-    date_string_format: str = Field("%Y-%m-%d", description="解码为 string 时的日期格式")
-    date_boundary_policy: DateBoundaryPolicy = Field(
-        "start",
-        description="date 转换为 datetime 时映射到一天中的时间点",
-    )
+    output_format: DateOutputFormat = Field("formatted", description="日期输出格式")
+    format_pattern: str = Field("%Y-%m-%d", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
+
+    boundary_policy: DateBoundaryPolicy = Field("start", description="`date` 补全为 `datetime` 时使用的时间边界策略")
     timestamp_unit: TimestampUnit = Field("ms", description="时间戳单位")
 
 
@@ -83,32 +67,24 @@ class TimeCodecOptions(BaseOptions):
         description="用于解析时间字符串的 `strptime` 格式列表",
     )
     output_format: TimeOutputFormat = Field("formatted", description="时间输出格式")
-    format_pattern: str = Field(
-        "%H:%M:%S",
-        description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式",
-    )
+    format_pattern: str = Field("%H:%M:%S", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
 
 class DatetimeCodecOptions(BaseOptions):
-    naive_policy: NaiveDateTimePolicy = Field("assume_local", description="无时区 datetime 处理方式")
-    date_boundary_policy: DateBoundaryPolicy = Field("start", description="date 转换为 datetime 时，映射到一天的时间点")
-    timestamp_unit: TimestampUnit = Field("ms", description="时间戳单位")
-    datetime_formats: tuple[str, ...] = Field(
+    parse_patterns: tuple[str, ...] = Field(
         DEFAULT_DATETIME_FORMATS,
         min_length=1,
-        description="日期时间字符串转换为 datetime 的格式",
+        description="用于解析日期时间字符串的 `strptime` 格式列表",
     )
+    output_format: DateTimeOutputFormat = Field("string", description="datetime 解码目标")
+    format_pattern: str = Field("%Y-%m-%d %H:%M:%S", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
-    decode_target: DateTimeDecodeTarget = Field("string", description="datetime 解码目标")
-    datetime_string_format: str = Field("%Y-%m-%d %H:%M:%S", description="解码为 string 时的格式")
+    naive_handling: NaiveDateTimeHandling = Field("assume_timezone", description="naive datetime 处理策略")
+    boundary_policy: DateBoundaryPolicy = Field("start", description="`date` 补全为 `datetime` 时使用的时间边界策略")
+    timestamp_unit: TimestampUnit = Field("ms", description="时间戳单位")
 
 
 class TemporalCodecOptions(BaseOptions):
-    """Options for `TemporalCodec`.
-
-    `TemporalCodec` 的组合配置。
-    """
-
-    date: DateCodecOptions = Field(default_factory=DateCodecOptions)
-    time: TimeCodecOptions = Field(default_factory=TimeCodecOptions)
-    datetime: DatetimeCodecOptions = Field(default_factory=DatetimeCodecOptions)
+    date: DateCodecOptions = Field(default_factory=DateCodecOptions, description="日期解编码器配置")
+    time: TimeCodecOptions = Field(default_factory=TimeCodecOptions, description="时间解编码器配置")
+    datetime: DatetimeCodecOptions = Field(default_factory=DatetimeCodecOptions, description="日期时间解编码器配置")

@@ -1,8 +1,10 @@
-from datetime import date, datetime, time
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from athena_core.temporal.codec.options import DateBoundaryPolicy, DateCodecOptions, DateDecodeTarget, TimestampUnit
-from athena_core.temporal.timezone import coerce_timezone, get_timezone, normalize_datetime_timezone
+from athena_core.temporal.base import DateBoundaryPolicy, DateOutputFormat, TimestampUnit
+from athena_core.temporal.codec.options import DateCodecOptions
+from athena_core.temporal.normalize import normalize_datetime_timezone, resolve_date_boundary
+from athena_core.temporal.timezone import coerce_timezone, get_timezone
 from athena_core.values.fallbacks import first_non_empty
 
 type DateInput = str | int | float | datetime | date
@@ -20,7 +22,7 @@ class DateCodec:
         value: DateInput,
         timezone: str | ZoneInfo | None = None,
         *,
-        formats: list[str] | tuple[str, ...] | None = None,
+        parse_patterns: list[str] | tuple[str, ...] | None = None,
         timestamp_unit: TimestampUnit | None = None,
     ) -> date:
         tz = coerce_timezone(timezone or get_timezone())
@@ -32,7 +34,7 @@ class DateCodec:
             case int() | float():
                 return self._from_timestamp(value, tz, unit=timestamp_unit)
             case str():
-                return self._parse(value.strip(), formats)
+                return self._parse(value.strip(), patterns=parse_patterns)
             case _:
                 raise ValueError(f"Unsupported date value type: {type(value).__name__}.")
 
@@ -41,75 +43,88 @@ class DateCodec:
         value: date,
         timezone: str | ZoneInfo | None = None,
         *,
-        target: DateDecodeTarget | None = None,
-        format: str | None = None,
-        date_boundary_policy: DateBoundaryPolicy | None = None,
-        timestamp_unit: TimestampUnit | None = None,
+        output_format: DateOutputFormat | None = None,
+        format_pattern: str | None = None,
+        boundary_policy: DateBoundaryPolicy | None = None,
     ) -> DateOutput:
-        resolved_target = target or self._options.decode_target
-        match resolved_target:
-            case "date":
+        tz = coerce_timezone(timezone or get_timezone())
+
+        resolved = output_format or self._options.output_format
+        match resolved:
+            case "native":
                 return value
-            case "datetime":
-                return self._to_datetime(value, timezone, date_boundary_policy=date_boundary_policy)
-            case "timestamp_s":
-                dt = self._to_datetime(value, timezone, date_boundary_policy=date_boundary_policy)
-                return int(dt.timestamp())
-            case "timestamp_ms":
-                dt = self._to_datetime(value, timezone, date_boundary_policy=date_boundary_policy)
-                return int(dt.timestamp() * 1000)
-            case "string":
-                return value.strftime(format or self._options.date_string_format)
             case "iso":
                 return value.isoformat()
+            case "formatted":
+                return value.strftime(format_pattern or self._options.format_pattern)
+            case "datetime":
+                return resolve_date_boundary(value, tz, boundary_policy=boundary_policy or self._options.boundary_policy)
+            case "timestamp_s" | "timestamp_ms":
+                dt = resolve_date_boundary(value, tz, boundary_policy=boundary_policy or self._options.boundary_policy)
+                return int(dt.timestamp()) if resolved == "timestamp_s" else int(dt.timestamp() * 1000)
             case _:
-                raise ValueError(f"Unsupported date decode target: {resolved_target}.")
+                raise ValueError(f"Unsupported date decode target: {resolved}.")
 
-    def _from_timestamp(self, timestamp: int | float, tz: ZoneInfo, *, unit: TimestampUnit | None) -> date:
-        resolved_unit = unit or self._options.timestamp_unit
-
-        if resolved_unit == "ms":
+    def _from_timestamp(
+        self,
+        timestamp: int | float,
+        tz: ZoneInfo,
+        *,
+        timestamp_unit: TimestampUnit | None,
+    ) -> date:
+        resolved = timestamp_unit or self._options.timestamp_unit
+        if resolved == "ms":
             return datetime.fromtimestamp(timestamp / 1000, tz=tz).date()
-        if resolved_unit == "s":
+        if resolved == "s":
             return datetime.fromtimestamp(timestamp, tz=tz).date()
+        raise ValueError(f"Unsupported timestamp unit: {resolved}.")
 
-        raise ValueError(f"Unsupported timestamp unit: {resolved_unit}.")
-
-    def _parse(self, d_str: str, *, formats: list[str] | tuple[str, ...] | None) -> date:
+    def _parse(self, d_str: str, *, patterns: list[str] | tuple[str, ...] | None) -> date:
         if not d_str:
             raise ValueError("Date string cannot be empty.")
 
-        candidate_formats = first_non_empty(formats, self._options.date_formats)
-        for fmt in candidate_formats:
+        candidate_patterns = first_non_empty(patterns, self._options.parse_patterns)
+        for fmt in candidate_patterns:
             try:
                 if fmt == "iso":
                     return date.fromisoformat(d_str)
                 return datetime.strptime(d_str, fmt).date()
             except ValueError:
                 continue
-
         raise ValueError(f"Unsupported date string format: {d_str}.")
 
-    def _to_datetime(
-        self,
-        value: date,
-        timezone: str | ZoneInfo | None,
-        *,
-        date_boundary_policy: DateBoundaryPolicy | None,
-    ) -> datetime:
-        """Convert `date` into timezone-aware `datetime`.
 
-        将 `date` 转换为带时区的 `datetime`。
-        """
-        tz = coerce_timezone(timezone or get_timezone())
-        resolved_policy = date_boundary_policy or self._options.date_boundary_policy
+def parse_date(
+    value: DateInput,
+    timezone: str | ZoneInfo | None = None,
+    *,
+    options: DateCodecOptions | None = None,
+    parse_patterns: list[str] | tuple[str, ...] | None = None,
+    timestamp_unit: TimestampUnit | None = None,
+) -> date:
+    """将输入值解析或归一化为 `date`"""
+    return DateCodec(options).encode(
+        value,
+        timezone,
+        parse_patterns=parse_patterns,
+        timestamp_unit=timestamp_unit,
+    )
 
-        match resolved_policy:
-            case "start":
-                return datetime.combine(value, time.min, tzinfo=tz)
-            case "end":
-                return datetime.combine(value, time.max, tzinfo=tz)
-            case "noon":
-                return datetime.combine(value, time(12, 0, 0), tzinfo=tz)
-            case _:
-                raise ValueError(f"Unsupported date boundary policy: {resolved_policy}.")
+
+def format_date(
+    value: date,
+    timezone: str | ZoneInfo | None = None,
+    *,
+    options: DateCodecOptions | None = None,
+    output_format: DateOutputFormat | None = None,
+    format_pattern: str | None = None,
+    boundary_policy: DateBoundaryPolicy | None = None,
+) -> DateOutput:
+    """将 `date` 格式化为配置指定的外部表示"""
+    return DateCodec(options).decode(
+        value,
+        timezone,
+        output_format=output_format,
+        format_pattern=format_pattern,
+        boundary_policy=boundary_policy,
+    )

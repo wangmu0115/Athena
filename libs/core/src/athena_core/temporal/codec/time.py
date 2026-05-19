@@ -53,19 +53,19 @@ class TimeCodec:
             case _:
                 raise ValueError(f"Unsupported time decode target: {resolved}.")
 
-    def _parse(self, value: str, *, patterns: list[str] | tuple[str, ...] | None) -> time:
-        if not value:
+    def _parse(self, t_str: str, *, patterns: list[str] | tuple[str, ...] | None) -> time:
+        if not t_str:
             raise ValueError("Time string cannot be empty.")
 
         candidate_patterns = first_non_empty(patterns, self._options.parse_patterns)
         for fmt in candidate_patterns:
             try:
                 if fmt == "iso":
-                    return time.fromisoformat(value)
-                return datetime.strptime(value, fmt).time()
+                    return time.fromisoformat(t_str)
+                return datetime.strptime(t_str, fmt).time()
             except ValueError:
                 continue
-        raise ValueError(f"Unsupported time string format: {value}.")
+        raise ValueError(f"Unsupported time string format: {t_str}.")
 
 
 def parse_time(
