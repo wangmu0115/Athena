@@ -10,7 +10,7 @@ from athena_core.temporal.timezone import coerce_timezone, get_timezone
 from athena_core.temporal.types import (
     DateBoundaryPolicy,
     DateTimeOutputFormat,
-    NaiveInputDateTimeHanding,
+    NaiveInputDateTimeHandling,
     TimestampUnit,
 )
 from athena_core.values.fallbacks import first_non_empty
@@ -32,12 +32,13 @@ class DateTimeCodec:
         *,
         parse_patterns: list[str] | tuple[str, ...] | None = None,
         timestamp_unit: TimestampUnit | None = None,
-        naive_handling: NaiveInputDateTimeHanding | None = None,
+        naive_handling: NaiveInputDateTimeHandling | None = None,
         boundary_policy: DateBoundaryPolicy | None = None,
     ) -> datetime:
         """将外部日期时间值转换为带时区的 `datetime`"""
         tz = coerce_timezone(timezone or get_timezone())  # Always has a timezone
         match value:
+            # `datetime` is a subclass of `date`, so this case must appear first.
             case datetime():
                 return self._from_datetime(value, tz, naive_handling=naive_handling)
             case date():
@@ -83,7 +84,7 @@ class DateTimeCodec:
         dt: datetime,
         tz: ZoneInfo,
         *,
-        naive_handling: NaiveInputDateTimeHanding | None,
+        naive_handling: NaiveInputDateTimeHandling | None,
     ) -> datetime:
         if is_naive_datetime(dt) and (naive_handling or self._options.naive_handling) == "raise":
             raise ValueError("Naive datetime is not allowd.")
@@ -97,7 +98,7 @@ class DateTimeCodec:
             return datetime.fromtimestamp(timestamp, tz=tz)
         raise ValueError(f"Unsupported timestamp unit: {resolved}")
 
-    def _parse(self, dt_str: str, tz: ZoneInfo, *, patterns: list[str] | None):
+    def _parse(self, dt_str: str, tz: ZoneInfo, *, patterns: list[str] | tuple[str, ...] | None):
         if not dt_str:
             raise ValueError("DateTime string cannot be empty.")
 
@@ -111,7 +112,7 @@ class DateTimeCodec:
                 else:
                     dt = datetime.strptime(dt_str, fmt)
                 return normalize_datetime_timezone(dt, tz=tz)
-            except (TypeError, ValueError):
+            except ValueError:
                 continue
         raise ValueError(f"Unsupported datetime string format: {dt_str}")
 
@@ -123,7 +124,7 @@ def parse_datetime(
     options: DateTimeCodecOptions | None = None,
     parse_patterns: list[str] | tuple[str, ...] | None = None,
     timestamp_unit: TimestampUnit | None = None,
-    naive_handling: NaiveInputDateTimeHanding | None = None,
+    naive_handling: NaiveInputDateTimeHandling | None = None,
     boundary_policy: DateBoundaryPolicy | None = None,
 ) -> datetime:
     """将输入值解析或归一化为带时区的 `datetime`"""
@@ -145,10 +146,7 @@ def format_datetime(
     output_format: DateTimeOutputFormat | None = None,
     format_pattern: str | None = None,
 ) -> DateTimeOutput:
-    """将 `datetime` 格式化为配置指定的外部表示
-
-    这是 `DateTimeCodec.decode()` 的函数式快捷入口。
-    """
+    """将 `datetime` 格式化为配置指定的外部表示"""
     return DateTimeCodec(options).format(
         value,
         timezone,

@@ -13,6 +13,8 @@ def resolve_date_boundary(d: date, tz: ZoneInfo, *, boundary_policy: DateBoundar
         case "start":
             return datetime.combine(d, time.min, tzinfo=tz)
         case "end":
+            return datetime.combine(d, time(23, 59, 59), tzinfo=tz)
+        case "end_max":
             return datetime.combine(d, time.max, tzinfo=tz)
         case "noon":
             return datetime.combine(d, time(12, 0, 0), tzinfo=tz)

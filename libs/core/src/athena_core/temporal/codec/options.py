@@ -4,7 +4,7 @@ from athena_core.temporal.types import (
     DateBoundaryPolicy,
     DateOutputFormat,
     DateTimeOutputFormat,
-    NaiveInputDateTimeHanding,
+    NaiveInputDateTimeHandling,
     TimeOutputFormat,
     TimestampUnit,
 )
@@ -79,7 +79,7 @@ class DateTimeCodecOptions(BaseOptions):
     output_format: DateTimeOutputFormat = Field("formatted", description="日期时间输出格式")
     format_pattern: str = Field("%Y-%m-%d %H:%M:%S", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
-    naive_handling: NaiveInputDateTimeHanding = Field(
+    naive_handling: NaiveInputDateTimeHandling = Field(
         "assume_timezone",
         description="naive datetime 处理策略，该选项不适用于按已配置模式解析的字符串输入",
     )
