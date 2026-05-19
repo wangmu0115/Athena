@@ -1,10 +1,10 @@
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from athena_core.temporal.base import DateBoundaryPolicy, DateOutputFormat, TimestampUnit
 from athena_core.temporal.codec.options import DateCodecOptions
 from athena_core.temporal.normalize import normalize_datetime_timezone, resolve_date_boundary
 from athena_core.temporal.timezone import coerce_timezone, get_timezone
+from athena_core.temporal.types import DateBoundaryPolicy, DateOutputFormat, TimestampUnit
 from athena_core.values.fallbacks import first_non_empty
 
 type DateInput = str | int | float | datetime | date
@@ -17,7 +17,7 @@ class DateCodec:
     def __init__(self, options: DateCodecOptions | None = None):
         self._options = options or DateCodecOptions()
 
-    def encode(
+    def parse(
         self,
         value: DateInput,
         timezone: str | ZoneInfo | None = None,
@@ -32,13 +32,13 @@ class DateCodec:
             case date():
                 return value
             case int() | float():
-                return self._from_timestamp(value, tz, unit=timestamp_unit)
+                return self._from_timestamp(value, tz, timestamp_unit=timestamp_unit)
             case str():
                 return self._parse(value.strip(), patterns=parse_patterns)
             case _:
                 raise ValueError(f"Unsupported date value type: {type(value).__name__}.")
 
-    def decode(
+    def format(
         self,
         value: date,
         timezone: str | ZoneInfo | None = None,
@@ -103,7 +103,7 @@ def parse_date(
     timestamp_unit: TimestampUnit | None = None,
 ) -> date:
     """将输入值解析或归一化为 `date`"""
-    return DateCodec(options).encode(
+    return DateCodec(options).parse(
         value,
         timezone,
         parse_patterns=parse_patterns,
@@ -121,7 +121,7 @@ def format_date(
     boundary_policy: DateBoundaryPolicy | None = None,
 ) -> DateOutput:
     """将 `date` 格式化为配置指定的外部表示"""
-    return DateCodec(options).decode(
+    return DateCodec(options).format(
         value,
         timezone,
         output_format=output_format,

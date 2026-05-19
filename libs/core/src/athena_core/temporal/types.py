@@ -14,7 +14,7 @@ type DateBoundaryPolicy = Literal["start", "end", "noon"]
 # naive datetime 处理策略：
 # - assume_timezone: 将 naive datetime 视为属于当前有效时区
 # - raise: 遇到 naive datetime 时抛出异常
-type NaiveDateTimeHandling = Literal["assume_timezone", "raise"]
+type NaiveInputDateTimeHanding = Literal["assume_timezone", "raise"]
 
 # 时间输出格式：
 # - native: 返回 `datetime.time` 原生对象

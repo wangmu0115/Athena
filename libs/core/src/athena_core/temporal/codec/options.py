@@ -1,10 +1,9 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from athena_core.temporal.base import (
+from athena_core.temporal.types import (
     DateBoundaryPolicy,
     DateOutputFormat,
-    DateTimeOutputFormat,
-    NaiveDateTimeHandling,
+    NaiveInputDateTimeHanding,
     TimeOutputFormat,
     TimestampUnit,
 )
@@ -57,7 +56,7 @@ class DateCodecOptions(BaseOptions):
     format_pattern: str = Field("%Y-%m-%d", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
     boundary_policy: DateBoundaryPolicy = Field("start", description="`date` 补全为 `datetime` 时使用的时间边界策略")
-    timestamp_unit: TimestampUnit = Field("ms", description="时间戳单位")
+    timestamp_unit: TimestampUnit = Field("s", description="时间戳单位")
 
 
 class TimeCodecOptions(BaseOptions):
@@ -70,21 +69,18 @@ class TimeCodecOptions(BaseOptions):
     format_pattern: str = Field("%H:%M:%S", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
 
-class DatetimeCodecOptions(BaseOptions):
+class DateTimeCodecOptions(BaseOptions):
     parse_patterns: tuple[str, ...] = Field(
         DEFAULT_DATETIME_FORMATS,
         min_length=1,
         description="用于解析日期时间字符串的 `strptime` 格式列表",
     )
-    output_format: DateTimeOutputFormat = Field("string", description="datetime 解码目标")
+    output_format: NaiveInputDateTimeHanding = Field("formatted", description="日期时间输出格式")
     format_pattern: str = Field("%Y-%m-%d %H:%M:%S", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
-    naive_handling: NaiveDateTimeHandling = Field("assume_timezone", description="naive datetime 处理策略")
+    naive_handling: NaiveInputDateTimeHanding = Field(
+        "assume_timezone",
+        description="naive datetime 处理策略，该选项不适用于按已配置模式解析的字符串输入",
+    )
     boundary_policy: DateBoundaryPolicy = Field("start", description="`date` 补全为 `datetime` 时使用的时间边界策略")
-    timestamp_unit: TimestampUnit = Field("ms", description="时间戳单位")
-
-
-class TemporalCodecOptions(BaseOptions):
-    date: DateCodecOptions = Field(default_factory=DateCodecOptions, description="日期解编码器配置")
-    time: TimeCodecOptions = Field(default_factory=TimeCodecOptions, description="时间解编码器配置")
-    datetime: DatetimeCodecOptions = Field(default_factory=DatetimeCodecOptions, description="日期时间解编码器配置")
+    timestamp_unit: TimestampUnit = Field("s", description="时间戳单位")

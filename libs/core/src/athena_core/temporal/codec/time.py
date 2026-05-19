@@ -1,10 +1,10 @@
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
-from athena_core.temporal.base import TimeOutputFormat
 from athena_core.temporal.codec.options import TimeCodecOptions
 from athena_core.temporal.normalize import normalize_datetime_timezone
 from athena_core.temporal.timezone import coerce_timezone, get_timezone
+from athena_core.temporal.types import TimeOutputFormat
 from athena_core.values.fallbacks import first_non_empty
 
 type TimeInput = str | datetime | time
@@ -17,7 +17,7 @@ class TimeCodec:
     def __init__(self, options: TimeCodecOptions | None = None) -> None:
         self._options = options or TimeCodecOptions()
 
-    def encode(
+    def parse(
         self,
         value: TimeInput,
         timezone: str | ZoneInfo | None = None,
@@ -35,7 +35,7 @@ class TimeCodec:
             case _:
                 raise ValueError(f"Unsupported time value type: {type(value).__name__}.")
 
-    def decode(
+    def format(
         self,
         value: time,
         *,
@@ -76,7 +76,7 @@ def parse_time(
     parse_patterns: list[str] | tuple[str, ...] | None = None,
 ) -> time:
     """将输入值解析或归一化为 `time`"""
-    return TimeCodec(options).encode(
+    return TimeCodec(options).parse(
         value,
         timezone,
         parse_patterns=parse_patterns,
@@ -91,7 +91,7 @@ def format_time(
     format_pattern: str | None = None,
 ) -> TimeOutput:
     """将 `time` 格式化为配置指定的外部表示"""
-    return TimeCodec(options).decode(
+    return TimeCodec(options).format(
         value,
         output_format=output_format,
         format_pattern=format_pattern,

@@ -3,16 +3,16 @@ from email.utils import format_datetime as format_rfc5322_datetime
 from email.utils import parsedate_to_datetime
 from zoneinfo import ZoneInfo
 
-from athena_core.temporal.base import (
-    DateBoundaryPolicy,
-    DateTimeOutputFormat,
-    NaiveDateTimeHandling,
-    TimestampUnit,
-)
-from athena_core.temporal.codec.options import DatetimeCodecOptions
+from athena_core.temporal.codec.options import DateTimeCodecOptions
 from athena_core.temporal.normalize import normalize_datetime_timezone, resolve_date_boundary
 from athena_core.temporal.predicates import is_naive_datetime
 from athena_core.temporal.timezone import coerce_timezone, get_timezone
+from athena_core.temporal.types import (
+    DateBoundaryPolicy,
+    DateTimeOutputFormat,
+    NaiveInputDateTimeHanding,
+    TimestampUnit,
+)
 from athena_core.values.fallbacks import first_non_empty
 
 type DateTimeInput = str | int | float | datetime | date
@@ -22,17 +22,17 @@ type DateTimeOutput = datetime | int | str
 class DateTimeCodec:
     """用于在外部日期时间值和 `datetime.datetime` 之间进行转换的编解码器"""
 
-    def __init__(self, options: DatetimeCodecOptions | None = None):
-        self._options = options or DatetimeCodecOptions()
+    def __init__(self, options: DateTimeCodecOptions | None = None):
+        self._options = options or DateTimeCodecOptions()
 
-    def encode(
+    def parse(
         self,
         value: DateTimeInput,
         timezone: str | ZoneInfo | None = None,
         *,
         parse_patterns: list[str] | tuple[str, ...] | None = None,
         timestamp_unit: TimestampUnit | None = None,
-        naive_handling: NaiveDateTimeHandling | None = None,
+        naive_handling: NaiveInputDateTimeHanding | None = None,
         boundary_policy: DateBoundaryPolicy | None = None,
     ) -> datetime:
         """将外部日期时间值转换为带时区的 `datetime`"""
@@ -49,7 +49,7 @@ class DateTimeCodec:
             case _:
                 raise ValueError(f"Unsupported value type: {type(value).__name__}.")
 
-    def decode(
+    def format(
         self,
         value: datetime,
         timezone: str | ZoneInfo | None = None,
@@ -83,7 +83,7 @@ class DateTimeCodec:
         dt: datetime,
         tz: ZoneInfo,
         *,
-        naive_handling: NaiveDateTimeHandling | None,
+        naive_handling: NaiveInputDateTimeHanding | None,
     ) -> datetime:
         if is_naive_datetime(dt) and (naive_handling or self._options.naive_handling) == "raise":
             raise ValueError("Naive datetime is not allowd.")
@@ -120,14 +120,14 @@ def parse_datetime(
     value: DateTimeInput,
     timezone: str | ZoneInfo | None = None,
     *,
-    options: DatetimeCodecOptions | None = None,
+    options: DateTimeCodecOptions | None = None,
     parse_patterns: list[str] | tuple[str, ...] | None = None,
     timestamp_unit: TimestampUnit | None = None,
-    naive_handling: NaiveDateTimeHandling | None = None,
+    naive_handling: NaiveInputDateTimeHanding | None = None,
     boundary_policy: DateBoundaryPolicy | None = None,
 ) -> datetime:
     """将输入值解析或归一化为带时区的 `datetime`"""
-    return DateTimeCodec(options).encode(
+    return DateTimeCodec(options).parse(
         value,
         timezone,
         parse_patterns=parse_patterns,
@@ -141,7 +141,7 @@ def format_datetime(
     value: datetime,
     timezone: str | ZoneInfo | None = None,
     *,
-    options: DatetimeCodecOptions | None = None,
+    options: DateTimeCodecOptions | None = None,
     output_format: DateTimeOutputFormat | None = None,
     format_pattern: str | None = None,
 ) -> DateTimeOutput:
@@ -149,7 +149,7 @@ def format_datetime(
 
     这是 `DateTimeCodec.decode()` 的函数式快捷入口。
     """
-    return DateTimeCodec(options).decode(
+    return DateTimeCodec(options).format(
         value,
         timezone,
         output_format=output_format,

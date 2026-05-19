@@ -1,9 +1,9 @@
 from datetime import date, datetime, time
 from zoneinfo import ZoneInfo
 
-from athena_core.temporal.base import DateBoundaryPolicy
 from athena_core.temporal.predicates import is_aware_datetime
 from athena_core.temporal.timezone import coerce_timezone, get_timezone
+from athena_core.temporal.types import DateBoundaryPolicy
 from athena_core.values.optional import optional_or_else
 
 
@@ -26,7 +26,7 @@ def normalize_datetime_timezone(dt: datetime, *, tz: str | ZoneInfo | None = Non
     - 如果 `dt` 是 naive datetime，则会被视为已经属于目标时区，并直接附加目标时区信息。
     - 如果 `dt` 是 aware datetime，则会被转换到目标时区。
     """
-    target_tz = coerce_timezone(optional_or_else(tz, lambda: get_timezone()))
+    target_tz = coerce_timezone(optional_or_else(tz, default_factory=get_timezone))
     if is_aware_datetime(dt):
         return dt.astimezone(target_tz)
     return dt.replace(tzinfo=target_tz)
