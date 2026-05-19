@@ -24,7 +24,7 @@ class TimeCodec:
         *,
         parse_patterns: list[str] | tuple[str, ...] | None = None,
     ) -> time:
-        tz = coerce_timezone(timezone or get_timezone())  # Always has a timezone
+        tz = coerce_timezone(timezone) if timezone is not None else get_timezone()  # Always has a timezone
         match value:
             case datetime():
                 return normalize_datetime_timezone(value, tz=tz).time()

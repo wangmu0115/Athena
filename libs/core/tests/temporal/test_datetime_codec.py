@@ -12,11 +12,11 @@ def test_parse_datetime_string_without_timezone_assumes_target_timezone():
     assert dt == datetime(2026, 5, 19, 12, 30, tzinfo=ZoneInfo("Asia/Shanghai"))
 
 
-def test_parse_datetime_string_ignores_naive_handling_raise():
+def test_parse_datetime_string_ignores_naive_datetime_policy_raise():
     dt = parse_datetime(
         "2026-05-19 12:30:00",
         timezone="Asia/Shanghai",
-        naive_handling="raise",
+        naive_datetime_policy="raise",
     )
 
     assert dt.tzinfo == ZoneInfo("Asia/Shanghai")
@@ -27,7 +27,7 @@ def test_parse_native_naive_datetime_raise():
         parse_datetime(
             datetime(2026, 5, 19, 12, 30),
             timezone="Asia/Shanghai",
-            naive_handling="raise",
+            naive_datetime_policy="raise",
         )
 
 
@@ -35,7 +35,7 @@ def test_parse_native_naive_datetime_assume_timezone():
     dt = parse_datetime(
         datetime(2026, 5, 19, 12, 30),
         timezone="Asia/Shanghai",
-        naive_handling="assume_timezone",
+        naive_datetime_policy="assume_timezone",
     )
 
     assert dt == datetime(2026, 5, 19, 12, 30, tzinfo=ZoneInfo("Asia/Shanghai"))

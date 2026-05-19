@@ -4,7 +4,7 @@ codec = DateTimeCodec(
     DateTimeCodecOptions(
         output_format="iso",
         timestamp_unit="ms",
-        naive_handling="assume_timezone",
+        naive_datetime_policy="assume_timezone",
     )
 )
 

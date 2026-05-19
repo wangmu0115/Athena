@@ -25,7 +25,7 @@ class DateCodec:
         parse_patterns: list[str] | tuple[str, ...] | None = None,
         timestamp_unit: TimestampUnit | None = None,
     ) -> date:
-        tz = coerce_timezone(timezone or get_timezone())
+        tz = coerce_timezone(timezone) if timezone is not None else get_timezone()
         match value:
             case datetime():
                 return normalize_datetime_timezone(value, tz=tz).date()
@@ -47,7 +47,7 @@ class DateCodec:
         format_pattern: str | None = None,
         boundary_policy: DateBoundaryPolicy | None = None,
     ) -> DateOutput:
-        tz = coerce_timezone(timezone or get_timezone())
+        tz = coerce_timezone(timezone) if timezone is not None else get_timezone()
 
         resolved = output_format or self._options.output_format
         match resolved:
