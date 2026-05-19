@@ -63,7 +63,7 @@ class DateCodec:
                 dt = resolve_date_boundary(value, tz, boundary_policy=boundary_policy or self._options.boundary_policy)
                 return int(dt.timestamp()) if resolved == "timestamp_s" else int(dt.timestamp() * 1000)
             case _:
-                raise ValueError(f"Unsupported date decode target: {resolved}.")
+                raise ValueError(f"Unsupported date output format: {resolved}.")
 
     def _from_timestamp(
         self,

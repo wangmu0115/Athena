@@ -33,7 +33,7 @@ class TimeCodec:
             case str():
                 return self._parse(value.strip(), patterns=parse_patterns)
             case _:
-                raise ValueError(f"Unsupported time value type: {type(value).__name__}.")
+                raise ValueError(f"Unsupported time output format: {type(value).__name__}.")
 
     def format(
         self,

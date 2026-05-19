@@ -77,7 +77,7 @@ class DateTimeCodec:
             case "timestamp_s":
                 return int(dt.timestamp())
             case _:
-                raise ValueError(f"Unsupported datetime decode target: {resolved}.")
+                raise ValueError(f"Unsupported datetime output format: {resolved}.")
 
     def _from_datetime(
         self,
@@ -87,7 +87,7 @@ class DateTimeCodec:
         naive_datetime_policy: NaiveDateTimePolicy | None,
     ) -> datetime:
         if is_naive_datetime(dt) and (naive_datetime_policy or self._options.naive_datetime_policy) == "raise":
-            raise ValueError("Naive datetime is not allowd.")
+            raise ValueError("Naive datetime is not allowed.")
         return normalize_datetime_timezone(dt, tz=tz)
 
     def _from_timestamp(self, timestamp: int | float, tz: ZoneInfo, *, timestamp_unit: TimestampUnit | None):
