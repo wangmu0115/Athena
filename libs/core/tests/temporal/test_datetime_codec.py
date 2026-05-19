@@ -8,7 +8,6 @@ from athena_core.temporal.codec import DateTimeCodecOptions, format_datetime, pa
 
 def test_parse_datetime_string_without_timezone_assumes_target_timezone():
     dt = parse_datetime("2026-05-19 12:30:00", timezone="Asia/Shanghai")
-
     assert dt == datetime(2026, 5, 19, 12, 30, tzinfo=ZoneInfo("Asia/Shanghai"))
 
 

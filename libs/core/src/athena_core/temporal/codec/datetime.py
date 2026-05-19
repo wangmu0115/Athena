@@ -20,7 +20,19 @@ type DateTimeOutput = datetime | int | str
 
 
 class DateTimeCodec:
-    """用于在外部日期时间值和 `datetime.datetime` 之间进行转换的编解码器"""
+    """日期时间解码器&编码器，该类负责外部日期时间表示与 Python `datetime.datetime` 之间转换。
+
+    支持的输入包括：
+    - `datetime`：会被归一化到目标时区。
+    - `date`：会按照 `boundary_policy` 补全为 `datetime`。
+    - `int` / `float`：会按照 `timestamp_unit` 解释为 Unix 时间戳。
+    - `str`：会按照 `parse_patterns` 依次尝试解析。
+
+    时区语义：
+    - aware datetime 会转换到目标时区。
+    - naive datetime 会根据 `naive_datetime_policy` 处理。
+    - 字符串解析得到的 naive datetime 不受 `naive_datetime_policy` 影响，会被视为目标时区下的本地时间。
+    """
 
     def __init__(self, options: DateTimeCodecOptions | None = None):
         self._options = options or DateTimeCodecOptions()
@@ -35,7 +47,22 @@ class DateTimeCodec:
         naive_datetime_policy: NaiveDateTimePolicy | None = None,
         boundary_policy: DateBoundaryPolicy | None = None,
     ) -> datetime:
-        """将外部日期时间值转换为带时区的 `datetime`"""
+        """将输入值解析或归一化为带时区信息的 `datetime`。
+
+        Args:
+            value: 日期时间输入值。
+            timezone: 目标时区，未传入时使用当前有效时区。
+            parse_patterns: 字符串解析格式列表，未传入时使用配置中的默认格式。
+            timestamp_unit: 数字时间戳单位，未传入时使用配置中的默认单位。
+            naive_datetime_policy: 原生 naive datetime 输入处理策略。
+            boundary_policy: `date` 补全为 `datetime` 时使用的边界策略。
+
+        Returns:
+            带有时区信息的 `datetime`。
+
+        Raises:
+            ValueError: 当输入类型不受支持、字符串格式无法解析，或 naive datetime 被禁止时抛出。
+        """
         tz = coerce_timezone(timezone) if timezone is not None else get_timezone()
         match value:
             # `datetime` is a subclass of `date`, so this case must appear first.
@@ -58,7 +85,20 @@ class DateTimeCodec:
         output_format: DateTimeOutputFormat | None = None,
         format_pattern: str | None = None,
     ) -> DateTimeOutput:
-        """将 `datetime` 转换为配置指定的外部表示"""
+        """将 `datetime` 格式化为指定外部表示，格式化前会先将输入时间归一化到目标时区。
+
+        Args:
+            value: 需要格式化的 `datetime`。
+            timezone: 目标时区，未传入时使用当前有效时区。
+            output_format: 输出表示格式，未传入时使用配置中的默认格式。
+            format_pattern: 当 `output_format` 为 `formatted` 时使用的 `strftime` 格式。
+
+        Returns:
+            根据 `output_format` 返回 `datetime`、字符串或时间戳。
+
+        Raises:
+            ValueError: 当输出表示格式不受支持时抛出。
+        """
         tz = coerce_timezone(timezone) if timezone is not None else get_timezone()  # Always has a timezone
         dt = normalize_datetime_timezone(value, tz=tz)
 
@@ -127,7 +167,10 @@ def parse_datetime(
     naive_datetime_policy: NaiveDateTimePolicy | None = None,
     boundary_policy: DateBoundaryPolicy | None = None,
 ) -> datetime:
-    """将输入值解析或归一化为带时区的 `datetime`"""
+    """将输入值解析或归一化为带时区信息的 `datetime`。
+
+    此函数是 `DateTimeCodec.parse()` 的函数式快捷入口。
+    """
     return DateTimeCodec(options).parse(
         value,
         timezone,
@@ -146,7 +189,10 @@ def format_datetime(
     output_format: DateTimeOutputFormat | None = None,
     format_pattern: str | None = None,
 ) -> DateTimeOutput:
-    """将 `datetime` 格式化为配置指定的外部表示"""
+    """将 `datetime` 格式化为指定外部表示，格式化前会先将输入时间归一化到目标时区。
+
+    此函数是 `DateTimeCodec.format()` 的函数式快捷入口。
+    """
     return DateTimeCodec(options).format(
         value,
         timezone,
