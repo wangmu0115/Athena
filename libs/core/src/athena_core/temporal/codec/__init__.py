@@ -8,17 +8,34 @@ if TYPE_CHECKING:
         format_datetime,
         parse_datetime,
     )
+    from athena_core.temporal.codec.time import (
+        TimeCodec,
+        TimeInput,
+        TimeOutput,
+        format_time,
+        parse_time,
+    )
 
 __all__ = (
     "DateTimeCodec",
     "format_datetime",
     "parse_datetime",
+    "TimeCodec",
+    "TimeInput",
+    "TimeOutput",
+    "format_time",
+    "parse_time",
 )
 
 _dynamic_imports = {
     "DateTimeCodec": "datetime",
     "format_datetime": "datetime",
     "parse_datetime": "datetime",
+    "TimeCodec": "time",
+    "TimeInput": "time",
+    "TimeOutput": "time",
+    "format_time": "time",
+    "parse_time": "time",
 }
 
 

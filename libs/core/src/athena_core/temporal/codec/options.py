@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from athena_core.temporal.base import TimeOutputFormat
+
 type TimestampUnit = Literal["s", "ms"]
 type NaiveDateTimePolicy = Literal["assume_local", "raise"]
 type DateBoundaryPolicy = Literal["start", "end", "noon"]
@@ -75,18 +77,16 @@ class DateCodecOptions(BaseOptions):
 
 
 class TimeCodecOptions(BaseOptions):
-    """Options for `TimeCodec`.
-
-    `TimeCodec` 的配置。
-    """
-
-    time_formats: tuple[str, ...] = Field(
+    parse_patterns: tuple[str, ...] = Field(
         DEFAULT_TIME_FORMATS,
         min_length=1,
-        description="时间字符串解析格式",
+        description="用于解析时间字符串的 `strptime` 格式列表",
     )
-    decode_target: TimeDecodeTarget = Field("string", description="time 解码目标")
-    time_string_format: str = Field("%H:%M:%S", description="解码为 string 时的时间格式")
+    output_format: TimeOutputFormat = Field("formatted", description="时间输出格式")
+    format_pattern: str = Field(
+        "%H:%M:%S",
+        description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式",
+    )
 
 
 class DatetimeCodecOptions(BaseOptions):

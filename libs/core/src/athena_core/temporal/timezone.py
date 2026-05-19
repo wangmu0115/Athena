@@ -1,35 +1,31 @@
-"""Timezone utilities for runtime configuration and datetime normalization.
+"""运行时时区配置
 
-This module provides a lightweight timezone runtime, supports three levels of timezone selection:
-    1. Context-local timezone override via `_timezone_context`.
-    2. Process-wide default timezone configured by `set_default_timezone`.
-    3. Environment-based default timezone loaded from `os.environ`.
+该模块提供了轻量级的时区运行时系统，并支持三层时区选择机制：
+    1. 通过 `_timezone_context` 提供的上下文局部时区覆盖。
+    2. 通过 `set_default_timezone` 配置的进程级默认时区。
+    3. 从 `os.environ` 加载的环境变量默认时区。
 
-Package code should prefer `get_timezone()` over importing a fixed timezone constant directly.
+包内部代码应优先使用 `get_timezone()` 获取当前有效时区，而不是直接导入固定的时区常量。
 """
 
 import os
 from collections.abc import Generator
 from contextlib import contextmanager
 from contextvars import ContextVar, Token
-from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from athena_core.values.optional import optional_or_else
-
 DEFAULT_TIMEZONE_NAME = "Asia/Shanghai"
-"""Built-in fallback timezone name used when no environment override exists."""
+"""当环境变量未提供时使用的内置默认时区名称。"""
 
 TIMEZONE_ENV_KEYS = ("ATHENA_TIMEZONE", "ATHENA_TZ", "ATHENA__TIMEZONE", "ATHENA__TZ")
-"""Environment variable names used to configure the default timezone."""
+"""用于配置默认时区的环境变量名称列表。"""
 
 
 @contextmanager
 def timezone_context(tz: str | ZoneInfo) -> Generator[ZoneInfo, None, None]:
-    """Temporarily override the effective timezone in the current context.
+    """在当前上下文中临时覆盖有效时区。
 
-    The override is local to the current context, including the current asyncio
-    task or thread context. It is restored automatically when the context exits.
+    该覆盖仅作用于当前上下文，包括当前 asyncio 任务或线程上下文，并会在上下文退出时自动恢复。
     """
     zone = coerce_timezone(tz)
     token: Token[ZoneInfo | None] = _timezone_context.set(zone)
@@ -40,8 +36,19 @@ def timezone_context(tz: str | ZoneInfo) -> Generator[ZoneInfo, None, None]:
         _timezone_context.reset(token)
 
 
+def get_timezone() -> ZoneInfo:
+    """返回当前有效时区。
+
+    通过 `timezone_context` 设置的上下文局部时区，优先级高于进程级默认时区。
+    """
+    tz = _timezone_context.get()
+    if tz is not None:
+        return tz
+    return _default_timezone
+
+
 def coerce_timezone(tz: str | ZoneInfo) -> ZoneInfo:
-    """Coerce a timezone value into a `ZoneInfo` instance."""
+    """将时区值转换为 `ZoneInfo` 实例。"""
     if isinstance(tz, ZoneInfo):
         return tz
     try:
@@ -51,7 +58,6 @@ def coerce_timezone(tz: str | ZoneInfo) -> ZoneInfo:
 
 
 def _resolve_default_timezone_name() -> str:
-    """Resolve the process-wide default timezone name from environment variables."""
     for tz_key in TIMEZONE_ENV_KEYS:
         tz_name = os.getenv(tz_key)
         if tz_name:
@@ -68,46 +74,14 @@ _timezone_context: ContextVar[ZoneInfo | None] = ContextVar(
 
 
 def get_default_timezone() -> ZoneInfo:
-    """Return the process-wide default timezone."""
     return _default_timezone
 
 
 def set_default_timezone(tz: str | ZoneInfo) -> ZoneInfo:
-    """Set the process-wide default timezone."""
     global _default_timezone
     _default_timezone = coerce_timezone(tz)
     return _default_timezone
 
 
 def reload_default_timezone() -> ZoneInfo:
-    """Reload the process-wide default timezone from environment variables."""
     return set_default_timezone(_resolve_default_timezone_name())
-
-
-def get_timezone() -> ZoneInfo:
-    """Return the currently effective timezone.
-
-    The context-local timezone set by `timezone_context` takes precedence over
-    the process-wide default timezone.
-    """
-    tz = _timezone_context.get()
-    if tz is not None:
-        return tz
-    return _default_timezone
-
-
-def is_aware_datetime(dt: datetime) -> bool:
-    """Return whether a `datetime` is timezone-aware."""
-    return dt.tzinfo is not None and dt.utcoffset() is not None
-
-
-def normalize_datetime_timezone(dt: datetime, *, tz: str | ZoneInfo | None = None) -> datetime:
-    """Normalize a datetime to the target timezone.
-
-    If `dt` is naive, it is interpreted as already being in the target timezone.
-    If `dt` is aware, it is converted to the target timezone.
-    """
-    target_tz = coerce_timezone(optional_or_else(tz, lambda: get_timezone()))
-    if is_aware_datetime(dt):
-        return dt.astimezone(target_tz)
-    return dt.replace(tzinfo=target_tz)
