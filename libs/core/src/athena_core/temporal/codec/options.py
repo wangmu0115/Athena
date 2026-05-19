@@ -3,6 +3,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from athena_core.temporal.types import (
     DateBoundaryPolicy,
     DateOutputFormat,
+    DateTimeOutputFormat,
     NaiveInputDateTimeHanding,
     TimeOutputFormat,
     TimestampUnit,
@@ -75,7 +76,7 @@ class DateTimeCodecOptions(BaseOptions):
         min_length=1,
         description="用于解析日期时间字符串的 `strptime` 格式列表",
     )
-    output_format: NaiveInputDateTimeHanding = Field("formatted", description="日期时间输出格式")
+    output_format: DateTimeOutputFormat = Field("formatted", description="日期时间输出格式")
     format_pattern: str = Field("%Y-%m-%d %H:%M:%S", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
     naive_handling: NaiveInputDateTimeHanding = Field(
