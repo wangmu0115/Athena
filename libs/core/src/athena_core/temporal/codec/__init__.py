@@ -20,8 +20,10 @@ if TYPE_CHECKING:
     from athena_core.temporal.codec.options import (
         DateCodecOptions,
         DateTimeCodecOptions,
+        TemporalCodecOptions,
         TimeCodecOptions,
     )
+    from athena_core.temporal.codec.temporal import TemporalCodec
     from athena_core.temporal.codec.time import (
         TimeCodec,
         TimeInput,
@@ -31,6 +33,7 @@ if TYPE_CHECKING:
     )
 
 __all__ = (
+    "TemporalCodec",
     "DateCodec",
     "DateInput",
     "DateOutput",
@@ -49,9 +52,11 @@ __all__ = (
     "DateCodecOptions",
     "DateTimeCodecOptions",
     "TimeCodecOptions",
+    "TemporalCodecOptions",
 )
 
 _dynamic_imports = {
+    "TemporalCodec": "temporal",
     "DateCodec": "date",
     "DateInput": "date",
     "DateOutput": "date",
@@ -70,6 +75,7 @@ _dynamic_imports = {
     "DateCodecOptions": "options",
     "DateTimeCodecOptions": "options",
     "TimeCodecOptions": "options",
+    "TemporalCodecOptions": "options",
 }
 
 

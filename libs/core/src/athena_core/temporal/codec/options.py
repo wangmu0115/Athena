@@ -85,3 +85,9 @@ class DateTimeCodecOptions(_BaseCodecOptions):
     )
     boundary_policy: DateBoundaryPolicy = Field("start", description="`date` 补全为 `datetime` 时使用的时间边界策略")
     timestamp_unit: TimestampUnit = Field("s", description="时间戳单位")
+
+
+class TemporalCodecOptions(_BaseCodecOptions):
+    time: TimeCodecOptions = Field(default_factory=TimeCodecOptions, description="时间编解码器配置项")
+    date: DateCodecOptions = Field(default_factory=DateCodecOptions, description="日期编解码器配置项")
+    datetime: DateTimeCodecOptions = Field(default_factory=DateTimeCodecOptions, description="日期时间编解码器配置项")
