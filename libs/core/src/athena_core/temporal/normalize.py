@@ -8,7 +8,19 @@ from athena_core.values.optional import optional_or_else
 
 
 def resolve_date_boundary(d: date, tz: ZoneInfo, *, boundary_policy: DateBoundaryPolicy) -> datetime:
-    """根据指定的日期边界策略，将 `date` 解析为带有时区信息的 `datetime`。"""
+    """将 `date` 按指定边界补全为带时区的 `datetime`。
+
+    Args:
+        d: 需要补全的日期。
+        tz: 补全后 `datetime` 使用的时区。
+        boundary_policy: 日期补全策略。
+
+    Returns:
+        带有 `tzinfo` 的 `datetime`。
+
+    Raises:
+        ValueError: 当 `boundary_policy` 不是受支持的取值时抛出。
+    """
     match boundary_policy:
         case "start":
             return datetime.combine(d, time.min, tzinfo=tz)
@@ -25,8 +37,15 @@ def resolve_date_boundary(d: date, tz: ZoneInfo, *, boundary_policy: DateBoundar
 def normalize_datetime_timezone(dt: datetime, *, tz: str | ZoneInfo | None = None) -> datetime:
     """将 `datetime` 归一化到目标时区。
 
-    - 如果 `dt` 是 naive datetime，则会被视为已经属于目标时区，并直接附加目标时区信息。
-    - 如果 `dt` 是 aware datetime，则会被转换到目标时区。
+    如果 `dt` 是 aware datetime，会使用 `astimezone()` 转换到目标时区。
+    如果 `dt` 是 naive datetime，会将其视为目标时区下的本地时间，并直接附加 `tzinfo`。
+
+    Args:
+        dt: 需要归一化的 `datetime`。
+        tz: 目标时区。未传入时使用 `get_timezone()` 返回的当前有效时区。
+
+    Returns:
+        带有目标时区信息的 `datetime`。
     """
     target_tz = coerce_timezone(optional_or_else(tz, default_factory=get_timezone))
     if is_aware_datetime(dt):
