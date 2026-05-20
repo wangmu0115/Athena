@@ -1,18 +1,7 @@
 from datetime import date, datetime, time
-from typing import Literal
 
-from athena_charts.specs.coords.axis import AxisDataType
-from athena_charts.specs.coords.ticks import TickFormatter
-
-type ResolvedTickFormatterKind = Literal[
-    "number",
-    "category",
-    "datetime",
-    "date",
-    "time",
-    "percent",
-    "currency",
-]
+from athena_charts.specs.coords.axis import TickFormatter
+from athena_charts.specs.coords.types import AxisDataType
 
 
 def infer_tick_formatter_kind(axis_data_type: AxisDataType) -> ResolvedTickFormatterKind:

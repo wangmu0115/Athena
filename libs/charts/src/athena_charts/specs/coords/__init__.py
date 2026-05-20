@@ -11,11 +11,15 @@ if TYPE_CHECKING:
         TickFormatter,
         TickOptions,
     )
-    from athena_charts.specs.coords.base import Coord, CoordKind
     from athena_charts.specs.coords.cartesian import CartesianCoord
+    from athena_charts.specs.coords.base import Coord
     from athena_charts.specs.coords.polar import PolarCoord
-    from athena_charts.specs.coords.types import AxisDataType
-    from athena_charts.specs.coords.union import CoordSpec
+    from athena_charts.specs.coords.types import (
+        AxisDataType,
+        CoordKind,
+        TickFormatterKind,
+    )
+    from athena_charts.specs.coords.unions import CoordSpec
 
 
 __all__ = (
@@ -24,13 +28,14 @@ __all__ = (
     "PolarAxis",
     "TickFormatter",
     "TickOptions",
-    "CoordKind",
     "Coord",
     "CoordSpec",
     "CartesianCoord",
     "CartesianGridOptions",
     "PolarCoord",
     "AxisDataType",
+    "CoordKind",
+    "TickFormatterKind",
 )
 
 
@@ -40,13 +45,14 @@ _dynamic_imports = {
     "PolarAxis": "axis",
     "TickFormatter": "axis",
     "TickOptions": "axis",
-    "CoordKind": "base",
     "Coord": "base",
     "CoordSpec": "union",
     "CartesianCoord": "cartesian",
     "CartesianGridOptions": "options",
     "PolarCoord": "polar",
     "AxisDataType": "types",
+    "CoordKind": "types",
+    "TickFormatterKind": "types",
 }
 
 
