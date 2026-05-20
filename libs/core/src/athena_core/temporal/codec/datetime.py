@@ -14,6 +14,7 @@ from athena_core.temporal.types import (
     TimestampUnit,
 )
 from athena_core.values.fallbacks import first_non_empty
+from athena_core.values.optional import optional_or_else
 
 type DateTimeInput = str | int | float | datetime | date
 type DateTimeOutput = datetime | int | str
@@ -63,7 +64,7 @@ class DateTimeCodec:
         Raises:
             ValueError: 当输入类型不受支持、字符串格式无法解析，或 naive datetime 被禁止时抛出。
         """
-        tz = coerce_timezone(timezone) if timezone is not None else get_timezone()
+        tz = coerce_timezone(optional_or_else(timezone, default_factory=get_timezone))
         match value:
             # `datetime` is a subclass of `date`, so this case must appear first.
             case datetime():
@@ -99,7 +100,7 @@ class DateTimeCodec:
         Raises:
             ValueError: 当输出表示格式不受支持时抛出。
         """
-        tz = coerce_timezone(timezone) if timezone is not None else get_timezone()  # Always has a timezone
+        tz = coerce_timezone(optional_or_else(timezone, default_factory=get_timezone))
         dt = normalize_datetime_timezone(value, tz=tz)
 
         resolved = output_format or self._options.output_format

@@ -6,6 +6,7 @@ from athena_core.temporal.normalize import normalize_datetime_timezone
 from athena_core.temporal.timezone import coerce_timezone, get_timezone
 from athena_core.temporal.types import TimeOutputFormat
 from athena_core.values.fallbacks import first_non_empty
+from athena_core.values.optional import optional_or_else
 
 type TimeInput = str | datetime | time
 type TimeOutput = time | str
@@ -46,7 +47,7 @@ class TimeCodec:
         Raises:
             ValueError: 当输入类型不受支持或字符串格式无法解析时抛出。
         """
-        tz = coerce_timezone(timezone) if timezone is not None else get_timezone()  # Always has a timezone
+        tz = coerce_timezone(optional_or_else(timezone, default_factory=get_timezone))
         match value:
             case datetime():
                 return normalize_datetime_timezone(value, tz=tz).time()
