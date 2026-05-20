@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
+    from athena_charts.options.coord import CartesianGridOptions
     from athena_charts.specs.coords.axis import (
         AxisSpec,
         CartesianAxis,
@@ -12,8 +13,8 @@ if TYPE_CHECKING:
     )
     from athena_charts.specs.coords.base import Coord, CoordKind
     from athena_charts.specs.coords.cartesian import CartesianCoord
-    from athena_charts.options.coord import CartesianGridOptions
     from athena_charts.specs.coords.polar import PolarCoord
+    from athena_charts.specs.coords.types import AxisDataType
     from athena_charts.specs.coords.union import CoordSpec
 
 
@@ -29,6 +30,7 @@ __all__ = (
     "CartesianCoord",
     "CartesianGridOptions",
     "PolarCoord",
+    "AxisDataType",
 )
 
 
@@ -44,6 +46,7 @@ _dynamic_imports = {
     "CartesianCoord": "cartesian",
     "CartesianGridOptions": "options",
     "PolarCoord": "polar",
+    "AxisDataType": "types",
 }
 
 
