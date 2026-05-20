@@ -12,7 +12,17 @@ type DateOutput = date | datetime | int | str
 
 
 class DateCodec:
-    """用于在外部日期值和 `datetime.date` 之间转换的编解码器"""
+    """日期解码器&编码器，该类负责在外部日期表示和 Python `datetime.date` 之间转换。
+
+    支持的输入包括：
+    - `date`：原样返回。
+    - `datetime`：先转换到目标时区，再取日期部分。
+    - `int` / `float`：按照 `timestamp_unit` 解释为 Unix 时间戳。
+    - `str`：按照 `parse_patterns` 解析为日期。
+
+    注意：
+        字符串输入只按日期格式解析，不默认解析日期时间字符串。
+    """
 
     def __init__(self, options: DateCodecOptions | None = None):
         self._options = options or DateCodecOptions()
@@ -25,8 +35,23 @@ class DateCodec:
         parse_patterns: list[str] | tuple[str, ...] | None = None,
         timestamp_unit: TimestampUnit | None = None,
     ) -> date:
+        """将输入值解析为 `date`。
+
+        Args:
+            value: 日期输入值。
+            timezone: 目标时区，未传入时使用当前有效时区，用于将 `datetime` 和时间戳先归一化到目标时区的日期时间类型。
+            parse_patterns: 字符串解析格式列表，未传入时使用配置中的默认格式。
+            timestamp_unit: 数字时间戳单位，未传入时使用配置中的默认单位。
+
+        Returns:
+            `date`
+
+        Raises:
+            ValueError: 当输入类型不受支持或字符串格式无法解析时抛出。
+        """
         tz = coerce_timezone(timezone) if timezone is not None else get_timezone()
         match value:
+            # `datetime` is a subclass of `date`, so this case must appear first.
             case datetime():
                 return normalize_datetime_timezone(value, tz=tz).date()
             case date():
@@ -47,6 +72,21 @@ class DateCodec:
         format_pattern: str | None = None,
         boundary_policy: DateBoundaryPolicy | None = None,
     ) -> DateOutput:
+        """将 `date` 格式化为指定外部表示，格式化为 `datetime` 或时间戳时会归一化到目标时区。
+
+        Args:
+            value: 需要格式化的 `date`。
+            timezone: 目标时区，未传入时使用当前有效时区，用于输出表示为 `datetime` 或时间戳。
+            output_format: 输出表示格式，未传入时使用配置中的默认格式。
+            format_pattern: 当 `output_format` 为 `formatted` 时使用的 `strftime` 格式。
+            boundary_policy: `date` 补全为 `datetime` 时使用的边界策略。
+
+        Returns:
+            根据 `output_format` 返回 `date`、`datetime`、字符串或时间戳。
+
+        Raises:
+            ValueError: 当输出表示格式不受支持时抛出。
+        """
         tz = coerce_timezone(timezone) if timezone is not None else get_timezone()
 
         resolved = output_format or self._options.output_format
@@ -102,7 +142,10 @@ def parse_date(
     parse_patterns: list[str] | tuple[str, ...] | None = None,
     timestamp_unit: TimestampUnit | None = None,
 ) -> date:
-    """将输入值解析或归一化为 `date`"""
+    """将输入值解析为 `date`。
+
+    此函数是 `DateCodec.parse()` 的函数式快捷入口。
+    """
     return DateCodec(options).parse(
         value,
         timezone,
@@ -120,7 +163,10 @@ def format_date(
     format_pattern: str | None = None,
     boundary_policy: DateBoundaryPolicy | None = None,
 ) -> DateOutput:
-    """将 `date` 格式化为配置指定的外部表示"""
+    """将 `date` 格式化为指定外部表示，格式化为 `datetime` 或时间戳时会归一化到目标时区。
+
+    此函数是 `DateCodec.format()` 的函数式快捷入口。
+    """
     return DateCodec(options).format(
         value,
         timezone,

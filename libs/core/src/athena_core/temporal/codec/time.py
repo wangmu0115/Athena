@@ -12,7 +12,16 @@ type TimeOutput = time | str
 
 
 class TimeCodec:
-    """用于在外部时间值和 `datetime.time` 之间转换的编解码器"""
+    """时间解码器&编码器，该类负责在外部时间表示和 Python `datetime.time` 之间转换。
+
+    支持的输入包括：
+    - `time`：原样返回。
+    - `datetime`：先转换到目标时区，再取时间部分。
+    - `str`：按照 `parse_patterns` 解析为时间。
+
+    注意：
+        从 `datetime` 提取时间时会丢弃日期和时区信息，返回的是目标时区下的墙上时间。
+    """
 
     def __init__(self, options: TimeCodecOptions | None = None) -> None:
         self._options = options or TimeCodecOptions()
@@ -24,6 +33,19 @@ class TimeCodec:
         *,
         parse_patterns: list[str] | tuple[str, ...] | None = None,
     ) -> time:
+        """将输入值解析 `time`。
+
+        Args:
+            value: 时间输入值。
+            timezone: 目标时区，未传入时使用当前有效时区，用于当输入时 `datetime` 时，先归一化到目标时区。
+            parse_patterns: 字符串解析格式列表，未传入时使用配置中的默认格式。
+
+        Returns:
+            目标时区下的墙上时间。
+
+        Raises:
+            ValueError: 当输入类型不受支持或字符串格式无法解析时抛出。
+        """
         tz = coerce_timezone(timezone) if timezone is not None else get_timezone()  # Always has a timezone
         match value:
             case datetime():
@@ -42,6 +64,19 @@ class TimeCodec:
         output_format: TimeOutputFormat | None = None,
         format_pattern: str | None = None,
     ) -> TimeOutput:
+        """将 `time` 格式化为指定外部表示。
+
+        Args:
+            value: 需要格式化的 `datetime`。
+            output_format: 输出表示格式，未传入时使用配置中的默认格式。
+            format_pattern: 当 `output_format` 为 `formatted` 时使用的 `strftime` 格式。
+
+        Returns:
+            根据 `output_format` 返回 `time` 或时间戳。
+
+        Raises:
+            ValueError: 当输出表示格式不受支持时抛出。
+        """
         resolved = output_format or self._options.output_format
         match resolved:
             case "native":
@@ -75,7 +110,10 @@ def parse_time(
     options: TimeCodecOptions | None = None,
     parse_patterns: list[str] | tuple[str, ...] | None = None,
 ) -> time:
-    """将输入值解析或归一化为 `time`"""
+    """将输入值解析 `time`。
+
+    此函数是 `TimeCodec.parse()` 的函数式快捷入口。
+    """
     return TimeCodec(options).parse(
         value,
         timezone,
@@ -90,7 +128,10 @@ def format_time(
     output_format: TimeOutputFormat | None = None,
     format_pattern: str | None = None,
 ) -> TimeOutput:
-    """将 `time` 格式化为配置指定的外部表示"""
+    """将 `time` 格式化为指定外部表示。
+
+    此函数是 `TimeCodec.format()` 的函数式快捷入口。
+    """
     return TimeCodec(options).format(
         value,
         output_format=output_format,

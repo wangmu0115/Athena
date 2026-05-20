@@ -38,7 +38,7 @@ DEFAULT_DATETIME_FORMATS: tuple[str, ...] = (
 )
 
 
-class BaseOptions(BaseModel):
+class _BaseCodecOptions(BaseModel):
     model_config = ConfigDict(
         extra="forbid",                  # 禁止未知字段
         arbitrary_types_allowed=True,    # 允许自定义对象
@@ -47,7 +47,7 @@ class BaseOptions(BaseModel):
     )  # fmt: off
 
 
-class DateCodecOptions(BaseOptions):
+class DateCodecOptions(_BaseCodecOptions):
     parse_patterns: tuple[str, ...] = Field(
         DEFAULT_DATE_FORMATS,
         min_length=1,
@@ -60,7 +60,7 @@ class DateCodecOptions(BaseOptions):
     timestamp_unit: TimestampUnit = Field("s", description="时间戳单位")
 
 
-class TimeCodecOptions(BaseOptions):
+class TimeCodecOptions(_BaseCodecOptions):
     parse_patterns: tuple[str, ...] = Field(
         DEFAULT_TIME_FORMATS,
         min_length=1,
@@ -70,7 +70,7 @@ class TimeCodecOptions(BaseOptions):
     format_pattern: str = Field("%H:%M:%S", description="当 `output_format` 为 `formatted` 时使用的 `strftime` 格式")
 
 
-class DateTimeCodecOptions(BaseOptions):
+class DateTimeCodecOptions(_BaseCodecOptions):
     parse_patterns: tuple[str, ...] = Field(
         DEFAULT_DATETIME_FORMATS,
         min_length=1,
