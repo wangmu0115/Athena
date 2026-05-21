@@ -15,6 +15,32 @@ class TickLabelFormat(_BaseOptions):
     date_format: str | None = Field(None, description="日期字符串输出格式")
     datetime_format: str | None = Field(None, description="日期时间字符串输出格式")
 
+    @classmethod
+    def currency(cls, *, precision: int | None = 2, prefix: str = "¥", suffix: str = "Yuan") -> Self:
+        return cls(kind="currency", precision=precision, prefix=prefix, suffix=suffix)
+
+    "¥894.32Yuan"
+
+    @classmethod
+    def percent(cls, *, precision: int | None = 2, suffix: str = "%") -> Self:
+        return cls(kind="percent", precision=precision, suffix=suffix)
+
+    @classmethod
+    def datetime(cls, *, datetime_format: str = "%Y-%m-%d %H:%M:%S") -> Self:
+        return cls(kind="datetime", datetime_format=datetime_format)
+
+    @classmethod
+    def date(cls, *, date_format: str = "%Y-%m-%d") -> Self:
+        return cls(kind="datetime", date_format=date_format)
+
+    @classmethod
+    def time(cls, *, time_format: str = "%H:%M:%S") -> Self:
+        return cls(kind="datetime", time_format=time_format)
+
+    @classmethod
+    def timestamp(cls, *, precision: int | None = 2, unit: str = "ms") -> Self:
+        return cls(kind="number", precision=precision, suffix=unit)
+
 
 class TickLocator(_BaseOptions):
     strategy: TickLocatorStrategy = Field("auto", description="刻度位置选择策略")
