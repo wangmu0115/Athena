@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.themes.base import (
+    from athena_charts.themes._base import (
         AxisTheme,
         ChartTheme,
         FigureTheme,
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
         TextTheme,
         Theme,
     )
-    from athena_charts.themes.default import DEFAULT_THEME
+    from athena_charts.themes.presets.default import DEFAULT_THEME
     from athena_charts.themes.types import FontWeight
 
 

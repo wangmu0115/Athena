@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from athena_charts.themes.base import FontWeight
+from athena_charts.themes._base import FontWeight
 from athena_charts_matplotlib.options.base import BaseOptions
 
 type FontFamily = Literal["sans-serif", "serif", "monospace", "cursive", "fantasy"]

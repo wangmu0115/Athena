@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import matplotlib as mpl
 
 from athena_charts.themes import Theme
-from athena_charts.themes.base import FigureTheme, FontTheme
+from athena_charts.themes._base import FigureTheme, FontTheme
 from athena_charts_matplotlib.options import (
     MatplotlibFontOptions,
     MatplotlibOptions,
