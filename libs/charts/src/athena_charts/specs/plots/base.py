@@ -1,18 +1,16 @@
-from typing import Literal
-
 from pydantic import Field
 
+from athena_charts.specs._base import _BaseSpec
 from athena_charts.specs.coords import Coord, CoordKind
-from athena_core.models import BaseAthenaModel
-
-type PlotKind = Literal["line", "bar", "pie"]
+from athena_charts.specs.plots.types import PlotKind
 
 
-class Plot(BaseAthenaModel):
-    name: str = Field("", description="图层名称，通常用于图例")
+class Plot(_BaseSpec):
     kind: PlotKind = Field(..., description="图层类型")
     coord_kind: CoordKind = Field(..., description="图层所属坐标系统")
+    name: str = Field("", description="图层名称，通常用于图例")
+    z_index: int = Field(0, description="图层顺序，值越小图层越在底部")
 
-    def validate_with_coord(self, coord: Coord):
+    def validate_coord(self, coord: Coord):
         if self.coord_kind != coord.kind:
-            raise ValueError(f"Plot {self.kind} requires coord {self.coord_kind}.")
+            raise ValueError(f"Plot {self.name or self.kind} requires {self.coord_kind} coordinate system.")

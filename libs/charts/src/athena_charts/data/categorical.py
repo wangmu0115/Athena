@@ -13,7 +13,7 @@ class CategoricalDatum(BaseAthenaModel):
 
 
 class CategoricalSeriesData(BaseAthenaModel):
-    kind: Literal["categorical"] = "categorical"  # For Serialization and Deserialization in BarPlotData
+    kind: Literal["categorical"] = "categorical"
 
     datums: list[CategoricalDatum] = Field(..., description="分类项列表")
 

@@ -17,10 +17,12 @@ if TYPE_CHECKING:
         Theme,
     )
     from athena_charts.themes.default import DEFAULT_THEME
+    from athena_charts.themes.types import FontWeight
 
 
 __all__ = (
     "DEFAULT_THEME",
+    "FontWeight",
     "TextTheme",
     "Theme",
     "PaletteTheme",
@@ -35,6 +37,7 @@ __all__ = (
 
 _dynamic_imports = {
     "DEFAULT_THEME": "default",
+    "FontWeight": "types",
     "TextTheme": "base",
     "Theme": "base",
     "PaletteTheme": "base",

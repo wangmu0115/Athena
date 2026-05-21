@@ -11,4 +11,4 @@ def _format_number(
     return f"{number:{',' if thousands_separator else ''}.{precision}f}"
 
 
-print(_format_number(1894456.32, precision=2, thousands_separator=True))
+print(_format_number(1894456.32, precision=0, thousands_separator=True))
