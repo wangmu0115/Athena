@@ -3,56 +3,74 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.options.coord import CartesianGridOptions
-    from athena_charts.specs.coords.axis import (
-        AxisSpec,
-        CartesianAxis,
-        PolarAxis,
-        TickFormatter,
+    from athena_charts.specs.coords.axis import AxisOptions, AxisSpec
+    from athena_charts.specs.coords.base import Coord
+    from athena_charts.specs.coords.cartesian import (
+        CartesianAxisSpec,
+        CartesianCoord,
+        CartesianGridOptions,
+    )
+    from athena_charts.specs.coords.polar import PolarAxisSpec, PolarCoord
+    from athena_charts.specs.coords.ticks import (
+        TickLabelFormat,
+        TickLocator,
         TickOptions,
     )
-    from athena_charts.specs.coords.cartesian import CartesianCoord
-    from athena_charts.specs.coords.base import Coord
-    from athena_charts.specs.coords.polar import PolarCoord
     from athena_charts.specs.coords.types import (
         AxisDataType,
+        AxisScale,
+        CartesianAxisPosition,
         CoordKind,
-        TickFormatterKind,
+        PolarAxisRole,
+        TickLabelFormatKind,
+        TickLocatorStrategy,
     )
     from athena_charts.specs.coords.unions import CoordSpec
 
 
 __all__ = (
-    "AxisSpec",
-    "CartesianAxis",
-    "PolarAxis",
-    "TickFormatter",
-    "TickOptions",
-    "Coord",
     "CoordSpec",
+    "AxisOptions",
+    "AxisSpec",
+    "Coord",
+    "CartesianAxisSpec",
     "CartesianCoord",
     "CartesianGridOptions",
+    "PolarAxisSpec",
     "PolarCoord",
+    "TickLabelFormat",
+    "TickLocator",
+    "TickOptions",
     "AxisDataType",
+    "AxisScale",
+    "CartesianAxisPosition",
     "CoordKind",
-    "TickFormatterKind",
+    "PolarAxisRole",
+    "TickLabelFormatKind",
+    "TickLocatorStrategy",
 )
 
 
 _dynamic_imports = {
+    "CoordSpec": "unions",
+    "AxisOptions": "axis",
     "AxisSpec": "axis",
-    "CartesianAxis": "axis",
-    "PolarAxis": "axis",
-    "TickFormatter": "axis",
-    "TickOptions": "axis",
     "Coord": "base",
-    "CoordSpec": "union",
+    "CartesianAxisSpec": "cartesian",
     "CartesianCoord": "cartesian",
-    "CartesianGridOptions": "options",
+    "CartesianGridOptions": "cartesian",
+    "PolarAxisSpec": "polar",
     "PolarCoord": "polar",
+    "TickLabelFormat": "ticks",
+    "TickLocator": "ticks",
+    "TickOptions": "ticks",
     "AxisDataType": "types",
+    "AxisScale": "types",
+    "CartesianAxisPosition": "types",
     "CoordKind": "types",
-    "TickFormatterKind": "types",
+    "PolarAxisRole": "types",
+    "TickLabelFormatKind": "types",
+    "TickLocatorStrategy": "types",
 }
 
 

@@ -3,13 +3,61 @@ from typing import Literal, Self
 from pydantic import Field, model_validator
 
 from athena_charts.specs._base import _BaseOptions
-from athena_charts.specs.coords.axis import AxisSpec
+from athena_charts.specs.coords.axis import AxisOptions, AxisSpec
 from athena_charts.specs.coords.base import Coord
-from athena_charts.specs.coords.types import CartesianAxisPosition
+from athena_charts.specs.coords.types import AxisDataType, CartesianAxisPosition
 
 
 class CartesianAxisSpec(AxisSpec):
     position: CartesianAxisPosition = Field(..., description="坐标轴位置")
+
+    @classmethod
+    def primary_x_axis(
+        cls,
+        *,
+        label: str = "",
+        data_type: AxisDataType = "category",
+        options: AxisOptions | None = None,
+    ):
+        return cls(
+            label=label,
+            data_type=data_type,
+            position="bottom",
+            options=options if options is not None else AxisOptions(),
+        )
+
+    @classmethod
+    def secondary_x_axis(
+        cls,
+        *,
+        label: str = "",
+        data_type: AxisDataType = "category",
+        options: AxisOptions | None = None,
+    ):
+        return cls(
+            label=label,
+            data_type=data_type,
+            position="top",
+            options=options if options is not None else AxisOptions(),
+        )
+
+    @classmethod
+    def left_y_axis(cls, *, label: str = "", options: AxisOptions | None = None):
+        return cls(
+            label=label,
+            data_type="number",
+            position="left",
+            options=options if options is not None else AxisOptions(),
+        )
+
+    @classmethod
+    def right_y_axis(cls, *, label: str = "", options: AxisOptions | None = None):
+        return cls(
+            label=label,
+            data_type="number",
+            position="right",
+            options=options if options is not None else AxisOptions(),
+        )
 
     @model_validator(mode="after")
     def validate(self) -> Self:
