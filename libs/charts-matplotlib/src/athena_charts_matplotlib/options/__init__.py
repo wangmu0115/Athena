@@ -1,5 +1,3 @@
-
-
 from typing import TYPE_CHECKING
 
 from athena_core._import_utils import import_attr

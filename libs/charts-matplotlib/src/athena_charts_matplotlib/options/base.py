@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from athena_charts_matplotlib.options.figure import MatplotlibFigureOptions
-from athena_charts_matplotlib.options.font import MatplotlibFontOptions
+from athena_charts_matplotlib.styles.figure import MatplotlibFigureOptions
+from athena_charts_matplotlib.styles.font import MatplotlibFontOptions
 from athena_charts_matplotlib.options.saving import MatplotlibSavingOptions
 
 

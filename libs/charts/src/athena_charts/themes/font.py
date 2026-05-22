@@ -1,6 +1,7 @@
 from pydantic import Field
 
-from athena_charts.themes._base import FontWeight, _BaseTheme
+from athena_charts.themes._base import _BaseTheme
+from athena_charts.themes.types import FontWeight
 
 
 class FontTheme(_BaseTheme):

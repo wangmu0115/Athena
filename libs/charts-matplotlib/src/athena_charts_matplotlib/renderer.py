@@ -11,7 +11,7 @@ from athena_charts.themes import Theme
 from athena_charts_matplotlib.artifact import MatplotlibFigureArtifact
 from athena_charts_matplotlib.charts.renderer import MatplotlibChartRenderer
 from athena_charts_matplotlib.options import DEFAULT_MATPLOTLIB_OPTIONS, MatplotlibOptions
-from athena_charts_matplotlib.themes.context import MatplotlibRenderContext, matplotlib_theme_context
+from athena_charts_matplotlib.rendering.context import MatplotlibRenderContext, matplotlib_theme_context
 from athena_core.values.optional import optional_map, safe_getattr
 
 
