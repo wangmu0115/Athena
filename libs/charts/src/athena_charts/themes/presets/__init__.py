@@ -1,0 +1,35 @@
+"""Theme 描述跨引擎视觉语义"""
+
+from typing import TYPE_CHECKING
+
+from athena_core._import_utils import import_attr
+
+if TYPE_CHECKING:
+    from athena_charts.themes.presets.default import DEFAULT_THEME
+    from athena_charts.themes.presets.fonts import DEFAULT_FONT_THEME
+    from athena_charts.themes.presets.palettes import DEFAULT_PALETTE_THEME
+
+
+__all__ = (
+    "DEFAULT_THEME",
+    "DEFAULT_FONT_THEME",
+    "DEFAULT_PALETTE_THEME",
+)
+
+
+_dynamic_imports = {
+    "DEFAULT_THEME": "default",
+    "DEFAULT_FONT_THEME": "fonts",
+    "DEFAULT_PALETTE_THEME": "palettes",
+}
+
+
+def __getattr__(attr_name: str) -> object:
+    module_name = _dynamic_imports.get(attr_name)
+    result = import_attr(attr_name, module_name, __spec__.parent)
+    globals()[attr_name] = result
+    return result
+
+
+def __dir__() -> list[str]:
+    return list(__all__)

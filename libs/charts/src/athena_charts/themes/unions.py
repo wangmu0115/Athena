@@ -7,6 +7,7 @@ from athena_charts.themes.figure import FigureTheme
 from athena_charts.themes.font import FontTheme
 from athena_charts.themes.legend import LegendTheme
 from athena_charts.themes.palette import PaletteTheme
+from athena_charts.themes.plot import PlotTheme
 
 
 class Theme(_BaseTheme):
@@ -18,4 +19,4 @@ class Theme(_BaseTheme):
     tick: TickTheme = Field(default_factory=TickTheme, description="刻度线主题")
     grid: GridTheme = Field(default_factory=GridTheme, description="网格主题")
     legend: LegendTheme = Field(default_factory=LegendTheme, description="图例主题")
-    # plot: PlotTheme = Field(default_factory=PlotTheme, description="图层主题")
+    plot: PlotTheme = Field(default_factory=PlotTheme, description="图层主题")

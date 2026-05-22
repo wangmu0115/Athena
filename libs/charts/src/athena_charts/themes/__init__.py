@@ -5,48 +5,58 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts.themes._base import (
-        AxisTheme,
-        ChartTheme,
-        FigureTheme,
-        GridTheme,
-        LegendTheme,
-        PaletteTheme,
-        PlotTheme,
-        TextTheme,
-        Theme,
+    from athena_charts.themes.chart import ChartTheme
+    from athena_charts.themes.coord import AxisTheme, GridTheme, TickTheme
+    from athena_charts.themes.figure import FigureTheme
+    from athena_charts.themes.font import FontTheme
+    from athena_charts.themes.legend import LegendTheme
+    from athena_charts.themes.palette import PaletteTheme
+    from athena_charts.themes.plot import PlotTheme
+    from athena_charts.themes.types import (
+        FontWeight,
+        LegendDirection,
+        LegendLocation,
+        LineStyle,
+        TickDirection,
     )
-    from athena_charts.themes.presets.default import DEFAULT_THEME
-    from athena_charts.themes.types import FontWeight
+    from athena_charts.themes.unions import Theme
 
 
 __all__ = (
-    "DEFAULT_THEME",
-    "FontWeight",
-    "TextTheme",
-    "Theme",
-    "PaletteTheme",
-    "FigureTheme",
     "ChartTheme",
-    "GridTheme",
-    "LegendTheme",
     "AxisTheme",
+    "GridTheme",
+    "TickTheme",
+    "FigureTheme",
+    "FontTheme",
+    "LegendTheme",
+    "PaletteTheme",
     "PlotTheme",
+    "FontWeight",
+    "LegendDirection",
+    "LegendLocation",
+    "LineStyle",
+    "TickDirection",
+    "Theme",
 )
 
 
 _dynamic_imports = {
-    "DEFAULT_THEME": "default",
+    "ChartTheme": "chart",
+    "AxisTheme": "coord",
+    "GridTheme": "coord",
+    "TickTheme": "coord",
+    "FigureTheme": "figure",
+    "FontTheme": "font",
+    "LegendTheme": "legend",
+    "PaletteTheme": "palette",
+    "PlotTheme": "plot",
     "FontWeight": "types",
-    "TextTheme": "base",
-    "Theme": "base",
-    "PaletteTheme": "base",
-    "FigureTheme": "base",
-    "ChartTheme": "base",
-    "GridTheme": "base",
-    "LegendTheme": "base",
-    "AxisTheme": "base",
-    "PlotTheme": "base",
+    "LegendDirection": "types",
+    "LegendLocation": "types",
+    "LineStyle": "types",
+    "TickDirection": "types",
+    "Theme": "unions",
 }
 
 
