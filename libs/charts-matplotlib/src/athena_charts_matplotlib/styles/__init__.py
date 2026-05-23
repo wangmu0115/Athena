@@ -3,28 +3,78 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts_matplotlib.styles.figure import MatplotlibFigureStyle
-    from athena_charts_matplotlib.styles.font import MatplotlibFontStyle
-    from athena_charts_matplotlib.styles.palette import MatplotlibPaletteStyle
-    from athena_charts_matplotlib.styles.types import FontFamily
+    from athena_charts_matplotlib.styles.base import FontStyle, PaletteStyle
+    from athena_charts_matplotlib.styles.chart import AxisLineVisible, ChartStyle
+    from athena_charts_matplotlib.styles.coord import (
+        AxisStyle,
+        GridStyle,
+        TickLabelStyle,
+        TickLineStyle,
+        TickStyle,
+        TickVisible,
+    )
+    from athena_charts_matplotlib.styles.figure import FigureStyle
+    from athena_charts_matplotlib.styles.legend import LegendStyle
+    from athena_charts_matplotlib.styles.plot import LinePlotStyle
+    from athena_charts_matplotlib.styles.types import (
+        FontFamily,
+        FontWeight,
+        GridAxis,
+        LegendLocation,
+        LineStyle,
+        MarkerShape,
+        TickDirection,
+    )
     from athena_charts_matplotlib.styles.unions import MatplotlibStyle
 
 
 __all__ = (
-    "MatplotlibFigureStyle",
+    "FontStyle",
+    "PaletteStyle",
+    "FigureStyle",
+    "AxisLineVisible",
+    "ChartStyle",
+    "AxisStyle",
+    "GridStyle",
+    "TickLabelStyle",
+    "TickLineStyle",
+    "TickVisible",
+    "TickStyle",
+    "LegendStyle",
+    "LinePlotStyle",
     "MatplotlibStyle",
-    "MatplotlibFontStyle",
-    "MatplotlibPaletteStyle",
     "FontFamily",
+    "FontWeight",
+    "GridAxis",
+    "LegendLocation",
+    "LineStyle",
+    "MarkerShape",
+    "TickDirection",
 )
 
 
 _dynamic_imports = {
-    "MatplotlibFigureStyle": "figure",
-    "MatplotlibFontStyle": "font",
-    "MatplotlibPaletteStyle": "palette",
-    "FontFamily": "types",
+    "FontStyle": "base",
+    "PaletteStyle": "base",
+    "FigureStyle": "figure",
+    "AxisLineVisible": "chart",
+    "ChartStyle": "chart",
+    "AxisStyle": "coord",
+    "GridStyle": "coord",
+    "TickLabelStyle": "coord",
+    "TickLineStyle": "coord",
+    "TickVisible": "coord",
+    "TickStyle": "coord",
+    "LegendStyle": "legend",
+    "LinePlotStyle": "plot",
     "MatplotlibStyle": "unions",
+    "FontFamily": "types",
+    "FontWeight": "types",
+    "GridAxis": "types",
+    "LegendLocation": "types",
+    "LineStyle": "types",
+    "MarkerShape": "types",
+    "TickDirection": "types",
 }
 
 

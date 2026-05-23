@@ -4,8 +4,8 @@ from athena_charts.themes.figure import FigureTheme
 from athena_charts.themes.legend import LegendTheme
 from athena_charts.themes.plot import PlotTheme
 from athena_charts.themes.presets.fonts import DEFAULT_FONT_THEME
-from athena_charts.themes.presets.palettes import DEFAULT_PALETTE_THEME
 from athena_charts.themes.unions import Theme
+from athena_charts_matplotlib.styles.presets.palettes import DEFAULT_PALETTE_THEME
 
 DEFAULT_THEME = Theme(
     font=DEFAULT_FONT_THEME,

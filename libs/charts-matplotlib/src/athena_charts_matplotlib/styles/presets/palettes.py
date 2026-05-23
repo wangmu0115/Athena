@@ -1,7 +1,7 @@
-from athena_charts.themes.palette import PaletteTheme
+from athena_charts_matplotlib.styles.base import PaletteStyle
 
-DEFAULT_PALETTE_THEME = PaletteTheme(
-    sequence=[
+DEFAULT_PALETTE = PaletteStyle(
+    colors=[
         "#1f77b4",
         "#ff7f0e",
         "#2ca02c",

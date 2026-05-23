@@ -3,7 +3,7 @@ from io import BytesIO
 import matplotlib as mpl
 from matplotlib.figure import Figure
 
-from athena_charts_matplotlib.options.saving import MatplotlibSavingOptions
+from athena_charts_matplotlib.options.savefig import MatplotlibSavingOptions
 from athena_core.values.optional import optional_map, optional_or, optional_or_else
 
 _MEDIA_TYPES: dict[str, str] = {

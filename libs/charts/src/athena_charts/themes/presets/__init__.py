@@ -7,7 +7,7 @@ from athena_core._import_utils import import_attr
 if TYPE_CHECKING:
     from athena_charts.themes.presets.default import DEFAULT_THEME
     from athena_charts.themes.presets.fonts import DEFAULT_FONT_THEME
-    from athena_charts.themes.presets.palettes import DEFAULT_PALETTE_THEME
+    from athena_charts_matplotlib.styles.presets.palettes import DEFAULT_PALETTE_THEME
 
 
 __all__ = (

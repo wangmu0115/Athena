@@ -1,7 +1,7 @@
 from athena_charts_matplotlib.options.base import MatplotlibOptions, MatplotlibPaletteOptions
 from athena_charts_matplotlib.styles.figure import MatplotlibFigureOptions
 from athena_charts_matplotlib.styles.font import MatplotlibFontOptions
-from athena_charts_matplotlib.options.saving import MatplotlibSavingOptions
+from athena_charts_matplotlib.options.savefig import MatplotlibSavingOptions
 
 DEFAULT_PALETTE_OPTIONS = MatplotlibPaletteOptions(
     sequence=[
