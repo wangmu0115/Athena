@@ -1,6 +1,6 @@
 from matplotlib.axes import Axes
 
-from athena_charts.specs.charts.chart import ChartSpec
+from athena_charts.specs.charts import ChartSpec
 from athena_charts_matplotlib.rendering.context import MatplotlibRenderContext
 
 

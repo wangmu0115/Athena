@@ -5,7 +5,6 @@ from pydantic import Field
 
 from athena_charts.specs.charts import ChartSpec
 from athena_charts.specs.figures import FigureSpec
-from athena_charts.themes import DEFAULT_THEME, Theme
 from athena_core.models import BaseAthenaModel
 
 type RenderSpec = ChartSpec | FigureSpec
@@ -26,24 +25,16 @@ class Renderer[TArtifact](Protocol):
     @property
     def name(self) -> str: ...
 
-    @property
-    def theme(self) -> Theme: ...
-
     def render(self, spec: RenderSpec) -> RenderResult[TArtifact]: ...
 
 
 class BaseRenderer[TArtifact](ABC):
-    def __init__(self, name: str = "", theme: Theme | None = None):
+    def __init__(self, name: str = ""):
         self._name = name  # tracing
-        self._theme = theme or DEFAULT_THEME
 
     @property
     def name(self) -> str:
         return self._name
-
-    @property
-    def theme(self) -> Theme:
-        return self._theme
 
     def render(self, spec: RenderSpec) -> RenderResult[TArtifact]:
         figure_spec = FigureSpec.from_chart(spec) if isinstance(spec, ChartSpec) else spec

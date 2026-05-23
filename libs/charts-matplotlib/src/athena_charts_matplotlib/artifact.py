@@ -1,15 +1,19 @@
 from io import BytesIO
 
-import matplotlib as mpl
 from matplotlib.figure import Figure
 
-from athena_charts_matplotlib.options.savefig import MatplotlibSavingOptions
-from athena_core.values.optional import optional_map, optional_or, optional_or_else
+from athena_charts_matplotlib.rendering.options import SaveFigureOptions
+from athena_core.values.optional import optional_map_or, optional_or, safe_getattr
 
 _MEDIA_TYPES: dict[str, str] = {
     "png": "image/png",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
     "svg": "image/svg+xml",
     "pdf": "application/pdf",
+    "eps": "application/postscript",
+    "ps": "application/postscript",
+    "webp": "image/webp",
 }
 
 
@@ -23,10 +27,10 @@ class MatplotlibFigureArtifact:
         - Figure closing should be handled externally by the renderer pipeline or artifact finalizer.
     """
 
-    def __init__(self, figure: Figure, *, options: MatplotlibSavingOptions | None = None):
+    def __init__(self, figure: Figure, *, options: SaveFigureOptions | None = None):
         self._figure = figure
         self._options = options
-        self._format = optional_or(optional_map(options, lambda x: x.format), default="png")
+        self._format = optional_or(safe_getattr(options, "format"), default="png")
 
     @property
     def media_type(self) -> str:
@@ -38,7 +42,14 @@ class MatplotlibFigureArtifact:
 
     def to_bytes(self) -> bytes:
         buffer = BytesIO()
-        self.figure.savefig(buffer, **self._build_saving_params())
+        self._figure.savefig(
+            buffer,
+            **optional_map_or(
+                self._options,
+                lambda x: x.build_saving_params,
+                default={},
+            ),
+        )
         buffer.seek(0)
         return buffer.getvalue()
 
@@ -46,20 +57,3 @@ class MatplotlibFigureArtifact:
         import matplotlib.pyplot as plt
 
         plt.close(self._figure)
-
-    def _build_saving_params(self) -> dict[str, object]:
-        saving_params: dict[str, object] = {}
-        saving_params["format"] = self._format
-        dpi = optional_or_else(optional_map(self._options, lambda x: x.dpi), lambda: mpl.rcParams["figure.dpi"])
-        saving_params["dpi"] = dpi
-        transparent = optional_map(self._options, lambda x: x.transparent)
-        if transparent is not None:
-            saving_params["transparent"] = transparent
-        bbox_inches = optional_map(self._options, lambda x: x.bbox_inches)
-        if bbox_inches is not None:
-            saving_params["bbox_inches"] = bbox_inches
-        pad_inches = optional_map(self._options, lambda x: x.pad_inches)
-        if pad_inches is not None:
-            saving_params["pad_inches"] = pad_inches
-
-        return saving_params

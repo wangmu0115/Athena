@@ -14,7 +14,6 @@ class FigureStyle(_BaseStyle):
 
     titlesize: int | None = Field(None, gt=0, description="画布标题字号")
     titleweight: FontWeight | None = Field(None, description="画布标题字体粗细")
-    # titlecolor: str | None = Field(None, description="画布标题字体颜色")
 
     @classmethod
     def default(cls) -> Self:

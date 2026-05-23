@@ -2,16 +2,16 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_charts_matplotlib.styles.base import _BaseStyle
-from athena_charts_matplotlib.styles.types import BboxInches, ImageFormat
+from athena_charts_matplotlib.rendering.options.base import _BaseOptions
+from athena_charts_matplotlib.rendering.options.types import BboxInches, ImageFormat
 
 
-class PngExportStyle(_BaseStyle):
+class PngExportStyle(_BaseOptions):
     compress_level: int = Field(6, ge=0, le=9, description="ZLIB 压缩级别：1=表示速度最快，9=表示压缩率最高，0=表示完全不压缩")
     optimize: bool = Field(False, description="为 True 时会优化 PNG 编码，输出变慢但是文件会变小")
 
 
-class MatplotlibSavefigStyle(_BaseStyle):
+class SaveFigureOptions(_BaseOptions):
     dpi: int | None = Field(None, gt=0, description="输出分辨率")
     format: ImageFormat | None = Field(None, description="输出图片格式")
     facecolor: str | None = Field(None, description="背景颜色")
@@ -36,7 +36,7 @@ class MatplotlibSavefigStyle(_BaseStyle):
     @classmethod
     def transparent_png(
         cls,
-        dpi: int = 144,
+        dpi: int = 150,
         bbox_inches: BboxInches = "tight",
         pad_inches: float = 0.1,
         pil_compress_level: int = 6,
@@ -56,7 +56,7 @@ class MatplotlibSavefigStyle(_BaseStyle):
     @classmethod
     def png(
         cls,
-        dpi: int = 144,
+        dpi: int = 150,
         facecolor: str = "white",
         edgecolor: str = "white",
         bbox_inches: BboxInches = "tight",
