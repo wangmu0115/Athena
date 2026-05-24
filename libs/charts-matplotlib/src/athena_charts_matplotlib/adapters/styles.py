@@ -1,3 +1,4 @@
+from athena_charts.specs.coords.types import AxisScale
 from athena_charts_matplotlib.styles.types import LegendLocation, LineStyle, MarkerShape
 from athena_core.values.optional import optional_map
 
@@ -33,6 +34,11 @@ _MPL_MARKER_SHAPE: dict[MarkerShape, str] = {
     "none": "",
 }
 
+_MPL_AXIS_SCALE: dict[AxisScale, str] = {
+    "linear": "linear",
+    "log": "log",
+}
+
 
 def to_mpl_line_style(style: LineStyle | None) -> str | None:
     return optional_map(style, _MPL_LINE_STYLE.__getitem__)
@@ -44,3 +50,9 @@ def to_mpl_legend_loc(loc: LegendLocation | None) -> str | None:
 
 def to_mpl_marker_shape(marker: MarkerShape | None) -> str | None:
     return optional_map(marker, _MPL_MARKER_SHAPE.__getitem__)
+
+
+def to_mpl_axis_scale(scale: AxisScale | None) -> str:
+    if scale is None:
+        return "linear"
+    return _MPL_AXIS_SCALE[scale]

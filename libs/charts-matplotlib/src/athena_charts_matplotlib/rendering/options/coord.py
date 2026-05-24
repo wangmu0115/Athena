@@ -3,7 +3,6 @@ from typing import Self
 from pydantic import Field
 
 from athena_charts_matplotlib.rendering.options.base import _BaseOptions
-from athena_charts_matplotlib.rendering.options.types import AxisScale
 from athena_charts_matplotlib.styles import FontWeight, GridAxis, LineStyle, TickDirection
 
 
@@ -49,18 +48,22 @@ class GridOptions(_BaseOptions):
         )
 
 
-class AxisOptions(_BaseOptions):
+class AxisSpineOptions(_BaseOptions):
     visible: bool | None = Field(None, description="是否显示坐标轴")
-    scale: AxisScale = Field("linear", description="坐标轴缩放方式。")
-    domain_min: object | None = Field(None, description="坐标轴数据域最小值，类型应与坐标轴数据类型兼容。")
-    domain_max: object | None = Field(None, description="坐标轴数据域最大值，类型应与坐标轴数据类型兼容。")
-
     linewidth: float | None = Field(None, gt=0, description="坐标轴线宽")
-    linecolor: str | None = Field(None, description="坐标轴线颜色")
+    linecolor: str | None = Field(None, description="坐标轴线颜色", alias="color")
 
-    labelsize: int | None = Field(None, gt=0, description="坐标轴标题字号")
-    labelweight: FontWeight | None = Field(None, description="坐标轴标题粗细")
-    labelcolor: str | None = Field(None, description="坐标轴标题颜色")
+
+class AxisLabelOptions(_BaseOptions):
+    visible: bool | None = Field(None, description="是否显示坐标轴标题")
+    fontsize: int | None = Field(None, gt=0, description="坐标轴标题字号")
+    fontweight: FontWeight | None = Field(None, description="坐标轴标题粗细")
+    color: str | None = Field(None, description="坐标轴标题颜色")
+
+
+class AxisOptions(_BaseOptions):
+    spine: AxisSpineOptions | None
+    label: AxisLabelOptions | None
 
     def build_spine_params(self) -> dict[str, object]:
         params: dict[str, object] = {}
