@@ -10,6 +10,8 @@ from athena_charts.transforms.alignment import align_cartesian_plots_data
 @dataclass
 class AlignedLinePlot:
     plot: LinePlot
+    index: int
+    x_values: list[object]
     y_values: list[object]
 
 
