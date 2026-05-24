@@ -97,8 +97,6 @@ class TickLabelStyle(_BaseStyle):
     labelsize: int | None = Field(None, gt=0, description="刻度文本字号")
     labelcolor: str | None = Field(None, description="刻度文本颜色")
 
-    # lableweight: FontWeight | None = Field(None, description="刻度文本字体粗细")
-    # rotation: float | None = Field(None, ge=-90, le=90, description="刻度文本旋转角度")
     @classmethod
     def default(cls) -> Self:
         return cls.of()

@@ -2,11 +2,11 @@ from typing import Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.specs._base import _BaseOptions
+from athena_charts.specs._base import _BaseSpec
 from athena_charts.specs.coords.types import TickLabelFormatKind, TickLocatorStrategy
 
 
-class TickLabelFormat(_BaseOptions):
+class TickLabelFormat(_BaseSpec):
     kind: TickLabelFormatKind = Field("auto", description="刻度标签格式化类型")
     precision: int | None = Field(None, ge=0, description="数值精度")
     prefix: str = Field("", description="前缀")
@@ -18,8 +18,6 @@ class TickLabelFormat(_BaseOptions):
     @classmethod
     def currency(cls, *, precision: int | None = 2, prefix: str = "¥", suffix: str = "Yuan") -> Self:
         return cls(kind="currency", precision=precision, prefix=prefix, suffix=suffix)
-
-    "¥894.32Yuan"
 
     @classmethod
     def percent(cls, *, precision: int | None = 2, suffix: str = "%") -> Self:
@@ -42,7 +40,7 @@ class TickLabelFormat(_BaseOptions):
         return cls(kind="number", precision=precision, suffix=unit)
 
 
-class TickLocator(_BaseOptions):
+class TickLocator(_BaseSpec):
     strategy: TickLocatorStrategy = Field("auto", description="刻度位置选择策略")
     max_count: int | None = Field(None, gt=0, description="自动策略下最多生成或展示的刻度数量")
     fixed_values: list[object] | None = Field(None, description="fixed 策略下使用的固定刻度值")
@@ -54,9 +52,6 @@ class TickLocator(_BaseOptions):
         return self
 
 
-class TickOptions(_BaseOptions):
-    visible: bool | None = Field(None, description="是否显示刻度")
-    label_visible: bool | None = Field(None, description="是否显示刻度标签")
-    label_rotation: float | None = Field(0.0, ge=-90, le=90, description="刻度标签旋转角度")
+class TickSpec(_BaseSpec):
     label_format: TickLabelFormat = Field(default_factory=TickLabelFormat, description="刻度格式化配置")
     locator: TickLocator = Field(default_factory=TickLocator, description="刻度位置配置")

@@ -56,7 +56,7 @@ type CartesianAxisPosition = Literal["bottom", "top", "left", "right"]
 
 取值说明：
     - bottom: 底部 X 轴，通常作为默认主 X 轴，刻度标签显示在图表底部。
-    - top: 顶部 X 轴，通常用于辅助 X 轴、双 X 轴布局、时间范围对比和特殊统计展示等。
+    - top: 顶部 X 轴。
     - left: 左侧 Y 轴，通常作为默认主 Y 轴，用于展示主要数值指标。
     - right: 右侧 Y 轴，通常用于双 Y 轴图表、辅助数值轴、不同量纲指标对比等。
 

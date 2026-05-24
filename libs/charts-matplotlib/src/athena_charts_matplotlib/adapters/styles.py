@@ -1,7 +1,13 @@
 from athena_charts_matplotlib.styles.types import LegendLocation, LineStyle, MarkerShape
 from athena_core.values.optional import optional_map
 
-_MPL_LINE_STYLE: dict[LineStyle, str] = {"solid": "-", "dashed": "--", "dotted": ":", "dashdot": "-.", "none": ""}
+_MPL_LINE_STYLE: dict[LineStyle, str] = {
+    "solid": "-",
+    "dashed": "--",
+    "dotted": ":",
+    "dashdot": "-.",
+    "none": "",
+}
 
 _MPL_LEGEND_LOC: dict[LegendLocation, str] = {
     "auto": "best",

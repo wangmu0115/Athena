@@ -12,5 +12,6 @@ class Plot(_BaseSpec):
     z_index: int = Field(0, description="图层顺序，值越小图层越在底部")
 
     def validate_coord(self, coord: Coord):
+        """验证绘制图层的坐标系"""
         if self.coord_kind != coord.kind:
             raise ValueError(f"Plot {self.name or self.kind} requires {self.coord_kind} coordinate system.")

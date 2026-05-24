@@ -5,9 +5,9 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 
 from athena_charts.runtime import BaseRenderer, RenderResult
-from athena_charts.specs.figures import FigureSpec
-from athena_charts.specs.figures.layout import FigureGridLayout
+from athena_charts.specs.figures import FigureGridLayout, FigureSpec
 from athena_charts_matplotlib.artifact import MatplotlibFigureArtifact
+from athena_charts_matplotlib.charts.renderer import ChartRenderer
 from athena_charts_matplotlib.rendering.context import matplotlib_theme_context
 from athena_charts_matplotlib.rendering.options import MatplotlibRenderOptions
 from athena_charts_matplotlib.styles import MatplotlibStyle
@@ -19,12 +19,14 @@ class MatplotlibFigureRenderer(BaseRenderer[MatplotlibFigureArtifact]):
         self,
         name: str = "",
         *,
+        chart_renderer: ChartRenderer | None = None,
         style: MatplotlibStyle | None = None,
         options: MatplotlibRenderOptions | None = None,
     ):
         super().__init__(name=name or uuid.uuid())
         self._style = style or MatplotlibStyle.default()
         self._options = options or MatplotlibRenderOptions.default()
+        self._chart_renderer = chart_renderer or ChartRenderer()
 
     @property
     def style(self):
@@ -34,6 +36,10 @@ class MatplotlibFigureRenderer(BaseRenderer[MatplotlibFigureArtifact]):
     def options(self):
         return self._options
 
+    @property
+    def chart_renderer(self):
+        return self._chart_renderer
+
     def _render_figure(self, spec: FigureSpec) -> RenderResult[MatplotlibFigureArtifact]:
         with matplotlib_theme_context(self.style):
             # Figure
@@ -41,11 +47,11 @@ class MatplotlibFigureRenderer(BaseRenderer[MatplotlibFigureArtifact]):
             # Layout
             gs = self._add_gridspec(figure, spec.layout)
             # Render Charts
-            for chart_placement in spec.charts:
+            for index, chart_placement in enumerate(spec.charts):
                 row = (chart_placement.row or 1) - 1
                 col = (chart_placement.col or 1) - 1
                 axes = figure.add_subplot(gs[row : row + chart_placement.row_span, col : col + chart_placement.col_span])
-                self._chart_renderer.render(axes, chart_placement.chart, context=render_context)
+                self.chart_renderer.render(axes, chart_placement.chart, index=index, options=self.options)
 
         artifact = MatplotlibFigureArtifact(figure, options=self.options.save_figure)
         return RenderResult(

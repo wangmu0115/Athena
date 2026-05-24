@@ -11,7 +11,7 @@ if TYPE_CHECKING:
         CartesianGridOptions,
     )
     from athena_charts.specs.coords.polar import PolarAxisSpec, PolarCoord
-    from athena_charts.specs.coords.ticks import (
+    from athena_charts.specs.coords.tick import (
         TickLabelFormat,
         TickLocator,
         TickOptions,

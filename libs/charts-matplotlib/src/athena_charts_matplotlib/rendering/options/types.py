@@ -1,5 +1,47 @@
 from typing import Literal
 
+type AxisScale = Literal["linear", "log"]
+"""坐标轴缩放类型定义，用于描述坐标轴的数据映射方式。
+
+取值说明：
+    - linear: 线性缩放，坐标轴上的数值按照线性比例映射到屏幕坐标。
+        这是最常见的坐标轴缩放方式，适用于：普通数值轴、时间轴、分类轴以及大多数统计图表等。
+    - log: 对数缩放，坐标轴上的数值按照对数比例映射到屏幕坐标。
+        适用于：数值跨度非常大的数据、指数增长数据、科学计量数据以及指标数量级差异较大的场景等。
+        对数坐标轴通常只支持正数，`0` 和负数通常无法在对数坐标系中显示。
+"""
+
+type HorizontalAlignment = Literal["left", "right", "center"]
+"""水平对齐方式，用于描述文本、标签或图形元素在水平方向上的对齐位置。
+
+常见用于：
+    - 图表标题 Title
+    - 坐标轴标签 Axis Label
+    - 数据标签 Data Label
+    - 注释 Annotation 
+    - 图例文本 Legend
+
+取值说明：
+    - left: 左对齐。
+    - center: 水平居中对齐。
+    - right: 右对齐。
+"""
+
+type VerticalAlignment = Literal["top", "center", "bottom"]
+"""垂直对齐方式，用于描述文本、标签或图形元素在垂直方向上的对齐位置。
+
+常见用于：
+    - 坐标轴标签 Axis Label
+    - 数据标签 Data Label
+    - 注释 Annotation
+    - 文本框 Text Box
+
+取值说明：
+    - top: 顶部对齐。
+    - center: 垂直居中对齐。
+    - bottom: 底部对齐。
+"""
+
 type ImageFormat = Literal["png", "jpg", "jpeg", "svg", "pdf", "eps", "ps", "webp"]
 """图片输出格式，用于描述图表导出时的目标图片格式。
 
