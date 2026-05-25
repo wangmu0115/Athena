@@ -2,8 +2,8 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_charts.specs.charts import ChartSpec
 from athena_matplotlib.specs._base import _BaseSpec
+from athena_matplotlib.specs.chart import ChartSpec
 
 
 class ChartPlacement(_BaseSpec):

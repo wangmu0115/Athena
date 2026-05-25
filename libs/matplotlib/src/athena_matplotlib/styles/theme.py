@@ -2,13 +2,16 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_charts_matplotlib.styles.base import FontStyle, PaletteStyle, _BaseStyle
-from athena_charts_matplotlib.styles.chart import ChartStyle
-from athena_charts_matplotlib.styles.coord import AxisStyle, GridStyle, TickStyle
-from athena_charts_matplotlib.styles.figure import FigureStyle
-from athena_charts_matplotlib.styles.legend import LegendStyle
-from athena_charts_matplotlib.styles.plot import LinePlotStyle
-from athena_charts_matplotlib.styles.presets import DEFAULT_FONT, DEFAULT_PALETTE
+from athena_matplotlib.styles.base import FontStyle, PaletteStyle, _BaseStyle
+from athena_matplotlib.styles.chart import ChartStyle
+from athena_matplotlib.styles.coord import AxisStyle
+from athena_matplotlib.styles.figure import FigureStyle
+from athena_matplotlib.styles.grid import GridStyle
+from athena_matplotlib.styles.legend import LegendStyle
+from athena_matplotlib.styles.plot import LinePlotStyle
+from athena_matplotlib.styles.presets.fonts import DEFAULT_FONT
+from athena_matplotlib.styles.presets.palettes import DEFAULT_PALETTE
+from athena_matplotlib.styles.tick import TickStyle
 
 
 class Theme(_BaseStyle):
@@ -19,9 +22,9 @@ class Theme(_BaseStyle):
 
     figure: FigureStyle | None = Field(None, description="画布")
     chart: ChartStyle | None = Field(None, description="图表")
-    axis: AxisStyle | None = Field(None, description="坐标系-轴线")
-    grid: GridStyle | None = Field(None, description="坐标系-网格")
-    tick: TickStyle | None = Field(None, description="坐标系-刻度")
+    axis: AxisStyle | None = Field(None, description="坐标轴线")
+    tick: TickStyle | None = Field(None, description="坐标轴的刻度，包括刻度线和刻度标签")
+    grid: GridStyle | None = Field(None, description="网格")
     legend: LegendStyle | None = Field(None, description="图例")
     line_plot: LinePlotStyle | None = Field(None, description="图层-折线&Marker")
 
@@ -45,11 +48,11 @@ class Theme(_BaseStyle):
         return cls(
             font=font or DEFAULT_FONT,
             palette=palette or DEFAULT_PALETTE,
-            figure=figure or FigureStyle.default(),
-            chart=chart or ChartStyle.default(),
-            axis=axis or AxisStyle.default(),
-            grid=grid or GridStyle.default(),
-            tick=tick or TickStyle.default(),
-            legend=legend or LegendStyle.default(),
-            line_plot=line_plot or LinePlotStyle.default(),
+            figure=figure or FigureStyle.of(),
+            chart=chart or ChartStyle.of(),
+            axis=axis or AxisStyle.of(),
+            grid=grid or GridStyle.show(),
+            tick=tick or TickStyle.of(),
+            legend=legend or LegendStyle.of(),
+            line_plot=line_plot or LinePlotStyle.of(),
         )

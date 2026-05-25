@@ -15,10 +15,6 @@ class FigureStyle(_BaseStyle):
     titleweight: FontWeight | None = Field(None, description="画布标题字体粗细")
 
     @classmethod
-    def default(cls) -> Self:
-        return cls.of()
-
-    @classmethod
     def of(
         cls,
         size: tuple[int, int] = (960, 720),

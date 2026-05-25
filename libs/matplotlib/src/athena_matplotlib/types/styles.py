@@ -35,6 +35,7 @@ type FontFamily = Literal["sans-serif", "serif", "monospace", "cursive", "fantas
     当指定字体不存在时，Matplotlib 会自动回退到下一个可用字体。
 """
 
+
 type FontWeight = Literal["ultralight", "light", "normal", "medium", "semibold", "bold", "heavy", "black"]
 """字体粗细类型，用于描述图表文本的字体粗细语义，例如标题、坐标轴标签、刻度文本、图例文本、数据标签和注释文本等。
 
@@ -59,6 +60,16 @@ type LineStyle = Literal["solid", "dashed", "dotted", "dashdot", "none"]
     - dotted: 点线，使用短点状线段绘制。
     - dashdot: 点划线，使用“虚线 + 点线”组合绘制。
     - none: 不显示线
+"""
+
+
+type GridAxis = Literal["x", "y", "both"]
+"""网格线应用坐标轴范围，用于控制网格线应用到哪些坐标轴方向。
+
+可选值：
+- x: 仅为 X 轴刻度绘制网格线，最终显示为竖向网格线。
+- y: 仅为 Y 轴刻度绘制网格线，最终显示为横向网格线。
+- both: 同时为 X/Y 两个方向绘制网格线，即同时显示竖向网格线和横向网格线。
 """
 
 
@@ -103,13 +114,15 @@ type MarkerShape = Literal["circle", "square", "triangle", "diamond", "cross", "
 """
 
 
-type GridAxis = Literal["x", "y", "both"]
-"""网格线应用坐标轴范围，用于控制网格线应用到哪些坐标轴方向。
+type AxisScale = Literal["linear", "log"]
+"""坐标轴缩放类型定义，用于描述坐标轴的数据映射方式。
 
-可选值：
-- x: 仅为 X 轴刻度绘制网格线，最终显示为竖向网格线。
-- y: 仅为 Y 轴刻度绘制网格线，最终显示为横向网格线。
-- both: 同时为 X/Y 两个方向绘制网格线，即同时显示竖向网格线和横向网格线。
+取值说明：
+    - linear: 线性缩放，坐标轴上的数值按照线性比例映射到屏幕坐标。
+        这是最常见的坐标轴缩放方式，适用于：普通数值轴、时间轴、分类轴以及大多数统计图表等。
+    - log: 对数缩放，坐标轴上的数值按照对数比例映射到屏幕坐标。
+        适用于：数值跨度非常大的数据、指数增长数据、科学计量数据以及指标数量级差异较大的场景等。
+        对数坐标轴通常只支持正数，`0` 和负数通常无法在对数坐标系中显示。
 """
 
 type LegendDirection = Literal["horizontal", "vertical"]

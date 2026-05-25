@@ -3,23 +3,21 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_matplotlib.specs.chart import ChartSpec
-    from athena_matplotlib.specs.figure import ChartPlacement, FigureGridLayout, FigureSpec
+    from athena_matplotlib.options.renderfig import RenderFigureOptions
+    from athena_matplotlib.options.savefig import PngExportStyle, SaveFigureOptions
 
 
 __all__ = (
-    "ChartPlacement",
-    "FigureGridLayout",
-    "FigureSpec",
-    "ChartSpec",
+    "PngExportStyle",
+    "SaveFigureOptions",
+    "RenderFigureOptions",
 )
 
 
 _dynamic_imports = {
-    "ChartPlacement": "figure",
-    "FigureGridLayout": "figure",
-    "FigureSpec": "figure",
-    "ChartSpec": "chart",
+    "PngExportStyle": "savefig",
+    "SaveFigureOptions": "savefig",
+    "RenderFigureOptions": "renderfig",
 }
 
 

@@ -3,26 +3,43 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_matplotlib.types.theme import (
+    from athena_matplotlib.types.options import (
+        BboxInches,
+        ImageFormat,
+    )
+    from athena_matplotlib.types.styles import (
         FontFamily,
         FontWeight,
-        # GridAxis,
-        # LegendLocation,
-        # LineStyle,
-        # MarkerShape,
-        # TickDirection,
+        GridAxis,
+        LegendLocation,
+        LineStyle,
+        MarkerShape,
+        TickDirection,
     )
-
 
 __all__ = (
     "FontFamily",
     "FontWeight",
+    "TickDirection",
+    "GridAxis",
+    "LegendLocation",
+    "LineStyle",
+    "MarkerShape",
+    "ImageFormat",
+    "BboxInches",
 )
 
 
 _dynamic_imports = {
-    "FontFamily": "theme",
-    "FontWeight": "theme",
+    "FontFamily": "styles",
+    "FontWeight": "styles",
+    "TickDirection": "styles",
+    "GridAxis": "styles",
+    "LegendLocation": "styles",
+    "LineStyle": "styles",
+    "MarkerShape": "styles",
+    "ImageFormat": "options",
+    "BboxInches": "options",
 }
 
 

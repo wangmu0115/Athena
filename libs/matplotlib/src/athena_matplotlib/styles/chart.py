@@ -3,7 +3,7 @@ from typing import Self
 from pydantic import Field
 
 from athena_matplotlib.styles.base import _BaseStyle
-from athena_matplotlib.types.theme import FontWeight
+from athena_matplotlib.types.styles import FontWeight
 
 
 class ChartStyle(_BaseStyle):
@@ -11,10 +11,6 @@ class ChartStyle(_BaseStyle):
     titlesize: int | None = Field(None, gt=0, description="标题字号")
     titleweight: FontWeight | None = Field(None, description="标题字体粗细")
     titlecolor: str | None = Field(None, description="标题字体颜色")
-
-    @classmethod
-    def default(cls) -> Self:
-        return cls.of()
 
     @classmethod
     def of(
