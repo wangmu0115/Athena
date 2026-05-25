@@ -18,7 +18,7 @@ class ChartSpec(_BaseSpec):
     coord: CoordSpec = Field(..., description="坐标系统")
     plots: list[PlotSpec] = Field(default_factory=list, description="图层列表")
 
-    bar_layout_mode: BarLayoutMode = Field("group", description="当具有多个 Bar 图层时的布局方式")
+    bar_layout: BarLayoutMode = Field("group", description="当具有多个 Bar 图层时的布局方式")
     category_order: list[object] | None = Field(None, description="多个图层 X 轴对齐时的特定顺序")
 
     @model_validator(mode="after")
@@ -27,6 +27,6 @@ class ChartSpec(_BaseSpec):
             raise ValueError("Chart must contain at least one plot.")
 
         for plot in self.plots:
-            plot.validate_with_coord(self.coord)  # 校验坐标系
+            plot.validate_coord(self.coord)  # 校验坐标系
 
         return self

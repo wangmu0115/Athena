@@ -38,14 +38,14 @@ class LineArtist:
     ) -> dict[str, object]:
         params: dict[str, object] = optional_map_or(
             safe_getattr(default_options, "line_plot"),
-            lambda x: x.build_plot_params,
+            lambda x: x.build_plot_params(),
             default={},
         )
         if override_options is not None:
             params.update(
                 optional_map_or(
                     override_options.line_plot,
-                    lambda x: x.build_plot_params,
+                    lambda x: x.build_plot_params(),
                     default={},
                 )
             )

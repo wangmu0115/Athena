@@ -42,13 +42,14 @@ class MatplotlibFigureArtifact:
 
     def to_bytes(self) -> bytes:
         buffer = BytesIO()
+        params = optional_map_or(
+            self._options,
+            lambda x: x.build_saving_params(),
+            default={},
+        )
         self._figure.savefig(
             buffer,
-            **optional_map_or(
-                self._options,
-                lambda x: x.build_saving_params,
-                default={},
-            ),
+            **params,
         )
         buffer.seek(0)
         return buffer.getvalue()

@@ -2,8 +2,8 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_charts.themes import FontWeight
 from athena_charts_matplotlib.styles.base import _BaseStyle
+from athena_charts_matplotlib.styles.types import FontWeight
 
 
 class FigureStyle(_BaseStyle):

@@ -1,11 +1,13 @@
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
+from athena_charts.specs._base import _BaseSpec
 from athena_charts.specs.plots.base import Plot
+from athena_charts.specs.plots.datas import CategoricalSeriesData
 
 
-class PiePlotData(BaseAthenaModel):
+class PiePlotData(_BaseSpec):
     data: CategoricalSeriesData = Field(..., description="饼状图数据")
 
     @model_validator(mode="after")

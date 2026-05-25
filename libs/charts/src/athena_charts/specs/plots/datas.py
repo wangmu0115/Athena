@@ -25,12 +25,16 @@ class XYSeriesData(_BaseSpec):
     y: list[float | None] = Field(..., description="Y 轴数据")
 
     @classmethod
-    def from_points(cls, points: list[XYPoint]):
+    def from_points(cls, points: list[XYPoint]) -> Self:
         x = []
         y = []
         for point in points or []:
             x.append(point.x)
             y.append(point.y)
+        return cls(x=x, y=y)
+
+    @classmethod
+    def of(cls, x: list[object], y: list[float | None]) -> Self:
         return cls(x=x, y=y)
 
     @model_validator(mode="after")

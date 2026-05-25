@@ -3,7 +3,6 @@ from collections.abc import Callable
 from athena_charts.runtime.context import DefaultPipelineContext, PipelineContextProvider
 from athena_charts.runtime.renderers import Renderer, RenderResult, RenderSpec
 from athena_charts.runtime.writers import Writer, WriteResult
-from athena_charts.themes._base import Theme
 
 
 class Pipeline[TArtifact, TValue]:
@@ -31,10 +30,9 @@ class Pipeline[TArtifact, TValue]:
         spec: RenderSpec,
         *,
         filename: str | None = None,
-        theme: Theme | None = None,
     ) -> WriteResult[TValue]:
         with self._context_provider.pipeline_context():
-            rendered = self._renderer.render(spec, theme=theme)
+            rendered = self._renderer.render(spec)
             try:
                 return self._writer.write(rendered, filename=filename)
             finally:

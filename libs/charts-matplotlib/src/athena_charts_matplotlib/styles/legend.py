@@ -2,8 +2,8 @@ from typing import Self
 
 from pydantic import Field
 
-from athena_charts.themes.types import LegendLocation
 from athena_charts_matplotlib.styles.base import _BaseStyle
+from athena_charts_matplotlib.styles.types import LegendLocation
 
 
 class LegendStyle(_BaseStyle):
@@ -18,8 +18,8 @@ class LegendStyle(_BaseStyle):
     framealpha: float | None = Field(None, ge=0, le=1, description="图例透明度")
     facecolor: str | None = Field(None, description="图例背景颜色")
     edgecolor: str | None = Field(None, description="图例边框颜色")
-    shadow: bool | None = Field(None, gt=0, description="是否有阴影")
-    fancybox: bool | None = Field(None, gt=0, description="圆角边框")
+    shadow: bool | None = Field(None, description="是否有阴影")
+    fancybox: bool | None = Field(None, description="圆角边框")
 
     @classmethod
     def default(cls) -> Self:

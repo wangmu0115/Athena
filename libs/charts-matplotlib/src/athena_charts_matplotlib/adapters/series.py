@@ -32,7 +32,7 @@ def build_cartesian_render_plan(chart: ChartSpec) -> CartesianRenderPlan:
     if not isinstance(chart.coord, CartesianCoord):
         raise ValueError("")
 
-    missing_value = 0.0 if chart.bar_layout_mode == "stack" else None
+    missing_value = 0.0 if chart.bar_layout == "stack" else None
     aligned_xy_series = align_cartesian_plots_data(
         chart.plots,
         chart.coord,
@@ -43,9 +43,9 @@ def build_cartesian_render_plan(chart: ChartSpec) -> CartesianRenderPlan:
     line_plots: list[AlignedLinePlot] = []
     bar_plots: list[BarPlot] = []
     bar_plot_y_values_list: list[list[object]] = []
-    for index, plot in chart.plots:
+    for index, plot in enumerate(chart.plots):
         if isinstance(plot, LinePlot):
-            line_plots.append(AlignedLinePlot(plot=plot, y_values=aligned_xy_series.y_values_list[index]))
+            line_plots.append(AlignedLinePlot(index=index, x_values=aligned_xy_series.x_values, plot=plot, y_values=aligned_xy_series.y_values_list[index]))
         elif isinstance(plot, BarPlot):
             bar_plots.append(plot)
             bar_plot_y_values_list.append(aligned_xy_series.y_values_list[index])

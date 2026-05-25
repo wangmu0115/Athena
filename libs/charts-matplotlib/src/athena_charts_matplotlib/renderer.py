@@ -10,6 +10,7 @@ from athena_charts_matplotlib.artifact import MatplotlibFigureArtifact
 from athena_charts_matplotlib.charts.renderer import ChartRenderer
 from athena_charts_matplotlib.rendering.context import matplotlib_theme_context
 from athena_charts_matplotlib.rendering.options import MatplotlibRenderOptions
+from athena_charts_matplotlib.rendering.options.base import ColorCycle
 from athena_charts_matplotlib.styles import MatplotlibStyle
 from athena_core.values.optional import optional_map_or, safe_getattr
 
@@ -19,14 +20,13 @@ class MatplotlibFigureRenderer(BaseRenderer[MatplotlibFigureArtifact]):
         self,
         name: str = "",
         *,
-        chart_renderer: ChartRenderer | None = None,
         style: MatplotlibStyle | None = None,
         options: MatplotlibRenderOptions | None = None,
     ):
-        super().__init__(name=name or uuid.uuid())
+        super().__init__(name=name or uuid.uuid4())
         self._style = style or MatplotlibStyle.default()
         self._options = options or MatplotlibRenderOptions.default()
-        self._chart_renderer = chart_renderer or ChartRenderer()
+        self._chart_renderer = ChartRenderer(ColorCycle(safe_getattr(self._style.palette, "colors")))
 
     @property
     def style(self):
@@ -63,7 +63,7 @@ class MatplotlibFigureRenderer(BaseRenderer[MatplotlibFigureArtifact]):
         fig: Figure = plt.figure(
             **optional_map_or(
                 self.options.figure,
-                lambda x: x.build_create_params,
+                lambda x: x.build_create_params(),
                 default={},
             )
         )
@@ -73,7 +73,7 @@ class MatplotlibFigureRenderer(BaseRenderer[MatplotlibFigureArtifact]):
                 title,
                 **optional_map_or(
                     self.options.figure,
-                    lambda x: x.build_title_params,
+                    lambda x: x.build_title_params(),
                     default={},
                 ),
             )

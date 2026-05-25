@@ -11,10 +11,8 @@ from athena_core.values.optional import optional_map_or, safe_getattr
 
 
 class ChartRenderer:
-    def __init__(
-        self,
-    ):
-        self._cartesian_renderer = CartesianCoordRenderer()
+    def __init__(self, color_cycle: ColorCycle):
+        self._cartesian_renderer = CartesianCoordRenderer(color_cycle)
 
     def render(self, axes: Axes, chart: ChartSpec, *, index: int, options: MatplotlibRenderOptions):
         override_chart_options = options.chart_overrides.get(index)
@@ -36,11 +34,9 @@ class ChartRenderer:
         if isinstance(chart.coord, CartesianCoord):
             self._cartesian_renderer.render(
                 axes,
-                chart.coord,
-                chart.plots,
+                chart,
                 default_options=options.chart_default,
                 override_options=override_chart_options,
-                color_cycle=options.color_cycle or ColorCycle(),
             )
 
     def _apply_title(
@@ -53,7 +49,7 @@ class ChartRenderer:
     ):
         if not title:
             return
-        title_params = optional_map_or(default_options, lambda x: x.build_title_params, default={})
+        title_params = optional_map_or(default_options, lambda x: x.build_title_params(), default={})
         if override_options is not None:
-            title_params.update(optional_map_or(override_options, lambda x: x.build_title_params, default={}))
+            title_params.update(optional_map_or(override_options, lambda x: x.build_title_params(), default={}))
         axes.set_title(title, **title_params)

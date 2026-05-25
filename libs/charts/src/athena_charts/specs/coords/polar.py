@@ -2,7 +2,7 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.specs.coords.axis import AxisOptions, AxisSpec
+from athena_charts.specs.coords.axis import AxisSpec
 from athena_charts.specs.coords.base import Coord
 from athena_charts.specs.coords.types import AxisDataType, PolarAxisRole
 
@@ -16,22 +16,19 @@ class PolarAxisSpec(AxisSpec):
         *,
         label: str = "",
         data_type: AxisDataType = "category",
-        options: AxisOptions | None = None,
     ) -> Self:
         return cls(
             role="theta",
             label=label,
             data_type=data_type,
-            options=options if options is not None else AxisOptions(),
         )
 
     @classmethod
-    def radius(cls, *, label: str = "", options: AxisOptions | None = None) -> Self:
+    def radius(cls, *, label: str = "") -> Self:
         return cls(
             role="radius",
             label=label,
             data_type="number",
-            options=options if options is not None else AxisOptions(),
         )
 
     @model_validator(mode="after")

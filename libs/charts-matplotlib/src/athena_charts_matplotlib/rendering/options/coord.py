@@ -1,7 +1,8 @@
 from typing import Self
 
-from pydantic import Field
+from pydantic import Field, field_serializer
 
+from athena_charts_matplotlib.adapters.styles import to_mpl_line_style
 from athena_charts_matplotlib.rendering.options.base import _BaseOptions
 from athena_charts_matplotlib.styles import FontWeight, GridAxis, LineStyle, TickDirection
 
@@ -13,6 +14,13 @@ class GridOptions(_BaseOptions):
     linewidth: float | None = Field(None, gt=0, description="网格线宽度")
     linestyle: LineStyle | None = Field(None, description="网格线样式")
     alpha: float | None = Field(None, ge=0, le=1, description="网格线透明度")
+
+    @field_serializer("linestyle")
+    def serialize_linestyle(self, value: LineStyle) -> str:
+        return to_mpl_line_style(value)
+
+    def build_grid_params(self) -> dict[str, object]:
+        return self.model_dump(exclude_none=True, by_alias=True, exclude=["visible"])
 
     @classmethod
     def nature(cls, grid_axis: GridAxis = "both") -> Self:
@@ -31,12 +39,11 @@ class GridOptions(_BaseOptions):
     @classmethod
     def show(
         cls,
-        *,
-        grid_axis: GridAxis = "both",
-        linecolor: str = "#999999",
-        linewidth: float = 0.2,
-        linestyle: LineStyle = "solid",
-        alpha: float = 0.25,
+        grid_axis: GridAxis | None = None,
+        linecolor: str | None = None,
+        linewidth: float | None = None,
+        linestyle: LineStyle | None = None,
+        alpha: float | None = None,
     ) -> Self:
         return cls(
             visible=True,
@@ -52,49 +59,125 @@ class AxisSpineOptions(_BaseOptions):
     visible: bool | None = Field(None, description="是否显示坐标轴")
     linewidth: float | None = Field(None, gt=0, description="坐标轴线宽")
     linecolor: str | None = Field(None, description="坐标轴线颜色", alias="color")
+    linestyle: LineStyle | None = Field(None, description="坐标轴线样式")
+
+    @field_serializer("linestyle")
+    def serialize_linestyle(self, value: LineStyle) -> str:
+        return to_mpl_line_style(value)
+
+    @classmethod
+    def hide(cls) -> Self:
+        return cls(visible=False)
+
+    @classmethod
+    def show(
+        cls,
+        linewidth: float | None = None,
+        linecolor: str | None = None,
+        linestyle: LineStyle | None = None,
+    ):
+        return cls(visible=True, linewidth=linewidth, linecolor=linecolor, linestyle=linestyle)
 
 
 class AxisLabelOptions(_BaseOptions):
     visible: bool | None = Field(None, description="是否显示坐标轴标题")
-    fontsize: int | None = Field(None, gt=0, description="坐标轴标题字号")
-    fontweight: FontWeight | None = Field(None, description="坐标轴标题粗细")
-    color: str | None = Field(None, description="坐标轴标题颜色")
+    labelsize: int | None = Field(None, gt=0, description="坐标轴标题字号", alias="fontsize")
+    labelweight: FontWeight | None = Field(None, description="坐标轴标题粗细", alias="fontweight")
+    labelcolor: str | None = Field(None, description="坐标轴标题颜色", alias="color")
+
+    @classmethod
+    def hide(cls) -> Self:
+        return cls(visible=False)
+
+    @classmethod
+    def show(
+        cls,
+        labelsize: int | None = None,
+        labelweight: FontWeight | None = None,
+        labelcolor: str | None = None,
+    ):
+        return cls(visible=True, labelsize=labelsize, labelweight=labelweight, labelcolor=labelcolor)
 
 
 class AxisOptions(_BaseOptions):
-    spine: AxisSpineOptions | None
-    label: AxisLabelOptions | None
+    spine: AxisSpineOptions | None = Field(None, description="坐标轴线配置项")
+    label: AxisLabelOptions | None = Field(None, description="坐标轴标题配置项")
 
     def build_spine_params(self) -> dict[str, object]:
-        params: dict[str, object] = {}
-        if self.linewidth:
-            params["linewidth"] = self.linewidth
-        if self.linecolor:
-            params["color"] = self.linecolor
-        return params
+        if self.spine is None:
+            return {}
+        return self.spine.model_dump(exclude_none=True, by_alias=True)
+
+    def build_label_params(self) -> dict[str, object]:
+        if self.label is None:
+            return {}
+        return self.label.model_dump(exclude_none=True, by_alias=True)
+
+
+class TickLineOptions(_BaseOptions):
+    visible: bool | None = Field(None, description="是否显示刻度线")
+    linecolor: str | None = Field(None, description="刻度线颜色", alias="color")
+    linewidth: float | None = Field(None, gt=0, description="主刻度线宽度", alias="width")
+    linelength: float | None = Field(None, gt=0, description="主刻度线长度", alias="length")
+    direction: TickDirection | None = Field(None, description="刻度线方向")
+
+    @classmethod
+    def hide(cls) -> Self:
+        return cls(visible=False)
+
+    @classmethod
+    def show(
+        cls,
+        linecolor: str | None = None,
+        linewidth: float | None = None,
+        linelength: float | None = None,
+        direction: TickDirection | None = None,
+    ):
+        return cls(visible=True, linecolor=linecolor, linewidth=linewidth, linelength=linelength, direction=direction)
+
+
+class TickLabelOptions(_BaseOptions):
+    visible: bool | None = Field(None, description="是否显示刻度文本")
+    labelsize: int | None = Field(None, gt=0, description="刻度文本字号")
+    labelcolor: str | None = Field(None, description="刻度文本颜色")
+    rotation: float | None = Field(None, ge=-90, le=90, description="刻度文本旋转角度")
+
+    @classmethod
+    def hide(cls) -> Self:
+        return cls(visible=False)
+
+    @classmethod
+    def show(
+        cls,
+        labelsize: int | None = None,
+        labelcolor: str | None = None,
+        rotation: float | None = None,
+    ):
+        return cls(visible=True, labelsize=labelsize, labelcolor=labelcolor, rotation=rotation)
 
 
 class TickOptions(_BaseOptions):
-    line: bool | None = Field(None, description="刻度线是否显示")
-    label: bool | None = Field(None, description="刻度文本是否显示")
+    line: TickLineOptions | None = Field(None, description="刻度线配置项")
+    label: TickLabelOptions | None = Field(None, description="刻度文本配置项")
 
-    linecolor: str | None = Field(None, description="刻度线颜色")
-    linewidth: float | None = Field(None, gt=0, description="主刻度线宽度")
-    linelength: float | None = Field(None, gt=0, description="主刻度线长度")
-    direction: TickDirection | None = Field(None, description="刻度线方向")
-    labelsize: int | None = Field(None, gt=0, description="刻度文本字号")
-    labelcolor: str | None = Field(None, description="刻度文本颜色")
-    lableweight: FontWeight | None = Field(None, description="刻度文本字体粗细")
-    rotation: float | None = Field(None, ge=-90, le=90, description="刻度文本旋转角度")
+    def build_line_params(self) -> dict[str, object]:
+        if self.line is None:
+            return {}
+        return self.line.model_dump(exclude_none=True, by_alias=True)
+
+    def build_label_params(self) -> dict[str, object]:
+        if self.label is None:
+            return {}
+        return self.label.model_dump(exclude_none=True, by_alias=True)
 
 
-class AxesOptions(_BaseOptions):
-    top_x_axis: AxisOptions | None
-    top_x_tick: TickOptions | None
-    bottom_x_axis: AxisOptions | None
-    bottom_x_tick: TickOptions | None
+class CoordOptions(_BaseOptions):
+    top_axis: AxisOptions | None = Field(None, description="Top X 轴轴线和标题配置项")
+    bottom_axis: AxisOptions | None = Field(None, description="Bottom X 轴轴线和标题配置项")
+    left_axis: AxisOptions | None = Field(None, description="Left Y 轴轴线和标题配置项")
+    right_axis: AxisOptions | None = Field(None, description="Right Y 轴轴线和标题配置项")
 
-    left_y_axis: AxisOptions | None
-    left_y_tick: TickOptions | None
-    right_y_axis: AxisOptions | None
-    right_y_tick: TickOptions | None
+    top_tick: TickOptions | None = Field(None, description="Top X 轴刻度线配置项")
+    bottom_tick: TickOptions | None = Field(None, description="Bottom X 轴刻度线配置项")
+    left_tick: TickOptions | None = Field(None, description="Left Y 轴刻度线配置项")
+    right_tick: TickOptions | None = Field(None, description="Right Y 轴刻度线配置项")

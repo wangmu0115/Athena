@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Any
 
 import matplotlib as mpl
+from cycler import cycler
 
 from athena_charts_matplotlib.adapters import (
     to_mpl_legend_loc,
@@ -63,7 +64,8 @@ def build_rc_params(style: MatplotlibStyle):
         - https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams
     """
     builder = RcParamsBuilder()
-    builder.set_non_empty("axes.prop_cycle", style=style.palette, attr="colors")
+    if style.palette is not None and style.palette.colors:
+        builder.set("axes.prop_cycle", cycler(color=style.palette.colors))
 
     _resolve_font_rc_params(builder, style)
     _resolve_figure_rc_params(builder, style)
@@ -157,17 +159,17 @@ def _resolve_coord_tick_rc_params(builder: RcParamsBuilder, style: MatplotlibSty
     builder.set_not_none("ytick.major.size", style=style.tick.line, attr="linelength")
     builder.set_not_none("ytick.direction", style=style.tick.line, attr="direction")
     # tick label
-    builder.set_not_none("xtick.labelcolor", style=style.tick.label, attr="labelsize")
-    builder.set_not_none("xtick.labelsize", style=style.tick.label, attr="labelcolor")
-    builder.set_not_none("ytick.labelcolor", style=style.tick.label, attr="labelsize")
-    builder.set_not_none("ytick.labelsize", style=style.tick.label, attr="labelcolor")
+    builder.set_not_none("xtick.labelcolor", style=style.tick.label, attr="labelcolor")
+    builder.set_not_none("xtick.labelsize", style=style.tick.label, attr="labelsize")
+    builder.set_not_none("ytick.labelcolor", style=style.tick.label, attr="labelcolor")
+    builder.set_not_none("ytick.labelsize", style=style.tick.label, attr="labelsize")
 
 
 def _resolve_legend_rc_params(builder: RcParamsBuilder, style: MatplotlibStyle):
     if style.legend is None:
         return
     builder.set_non_empty("legend.loc", style=style.legend, attr="location", mapper=to_mpl_legend_loc)
-    builder.set_not_none("legend.title_fontsizee", style=style.legend, attr="titlesize")
+    builder.set_not_none("legend.title_fontsize", style=style.legend, attr="titlesize")
     builder.set_not_none("legend.fontsize", style=style.legend, attr="labelsize")
     builder.set_non_empty("legend.labelcolor", style=style.legend, attr="labelcolor")
 

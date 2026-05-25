@@ -8,8 +8,6 @@ if TYPE_CHECKING:
     from athena_charts.specs.plots.line import LinePlot
     from athena_charts.specs.plots.pie import PiePlot
     from athena_charts.specs.plots.types import (
-        LineStyle,
-        MarkerShape,
         PlotKind,
     )
     from athena_charts.specs.plots.unions import PlotSpec
@@ -29,7 +27,7 @@ __all__ = (
 
 _dynamic_imports = {
     "Plot": "base",
-    "PlotSpec": "union",
+    "PlotSpec": "unions",
     "LinePlot": "line",
     "BarPlot": "bar",
     "PiePlot": "pie",

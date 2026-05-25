@@ -7,7 +7,7 @@ from athena_core.values.optional import optional_map_or
 
 
 def _apply_grid(axes: Axes, *, default_options: ChartOptions | None, override_options: ChartOptions | None):
-    grid_params = optional_map_or(default_options, lambda x: x.build_grid_params, default={})
+    grid_params = optional_map_or(default_options, lambda x: x.build_grid_params(), default={})
     if override_options is not None:
         grid_params.update(override_options.build_grid_params())
     # apply Grid params

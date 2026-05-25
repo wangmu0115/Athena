@@ -2,9 +2,11 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.specs.coords.axis import AxisOptions, AxisSpec
+from athena_charts.specs.coords.axis import AxisSpec
 from athena_charts.specs.coords.base import Coord
+from athena_charts.specs.coords.tick import TickSpec
 from athena_charts.specs.coords.types import AxisDataType, CartesianAxisPosition
+from athena_charts_matplotlib.rendering.options.types import AxisScale
 
 
 class CartesianAxisSpec(AxisSpec):
@@ -14,33 +16,61 @@ class CartesianAxisSpec(AxisSpec):
     def x_axis(
         cls,
         position: Literal["bottom", "top"] = "bottom",
-        *,
         label: str = "",
         data_type: AxisDataType = "category",
+        scale: AxisScale = "linear",
+        domain_min: object | None = None,
+        domain_max: object | None = None,
+        tick: TickSpec | None = None,
     ):
         return cls(
+            position=position,
             label=label,
             data_type=data_type,
-            position="bottom",
-            options=options if options is not None else AxisOptions(),
+            scale=scale,
+            domain_min=domain_min,
+            domain_max=domain_max,
+            tick=tick or TickSpec(),
         )
 
     @classmethod
-    def left_y_axis(cls, *, label: str = "", options: AxisOptions | None = None):
+    def left_y_axis(
+        cls,
+        *,
+        label: str = "",
+        scale: AxisScale = "linear",
+        domain_min: object | None = None,
+        domain_max: object | None = None,
+        tick: TickSpec | None = None,
+    ):
         return cls(
-            label=label,
-            data_type="number",
             position="left",
-            options=options if options is not None else AxisOptions(),
+            label=label,
+            data_type="number",
+            scale=scale,
+            domain_min=domain_min,
+            domain_max=domain_max,
+            tick=tick or TickSpec(),
         )
 
     @classmethod
-    def right_y_axis(cls, *, label: str = "", options: AxisOptions | None = None):
+    def right_y_axis(
+        cls,
+        *,
+        label: str = "",
+        scale: AxisScale = "linear",
+        domain_min: object | None = None,
+        domain_max: object | None = None,
+        tick: TickSpec | None = None,
+    ):
         return cls(
+            position="right",
             label=label,
             data_type="number",
-            position="right",
-            options=options if options is not None else AxisOptions(),
+            scale=scale,
+            domain_min=domain_min,
+            domain_max=domain_max,
+            tick=tick or TickSpec(),
         )
 
     @model_validator(mode="after")
@@ -65,11 +95,6 @@ class CartesianCoord(Coord):
 
     @model_validator(mode="after")
     def validate(self) -> Self:
-        if self.x_axis.position != "bottom":
-            raise ValueError("Cartesian primary x_axis must be at bottom position.")
-        if self.secondary_x_axis is not None and self.secondary_x_axis.position != "top":
-            raise ValueError("Cartesian secondary x_axis must be at top position.")
-
         if self.left_y_axis is None and self.right_y_axis is None:
             raise ValueError("Cartesian coord must contain at least one Y axis.")
         if self.left_y_axis is not None and self.left_y_axis.position != "left":

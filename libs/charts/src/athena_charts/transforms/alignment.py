@@ -40,7 +40,6 @@ def align_cartesian_plots_data(
         collect_x_categories(normalized_xy_series),
         x_axis=coord.get_x_axis(plots[0].x_axis_side),
         category_order=category_order,
-        missing_value=missing_value,
     )
     return align_series_to_categories(normalized_xy_series, categories, missing_value=missing_value)
 

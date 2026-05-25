@@ -4,7 +4,7 @@ from pydantic import Field
 
 from athena_charts_matplotlib.adapters import to_mpl_line_style
 from athena_charts_matplotlib.rendering.options.base import _BaseOptions
-from athena_charts_matplotlib.rendering.options.coord import AxesOptions, GridOptions
+from athena_charts_matplotlib.rendering.options.coord import CoordOptions, GridOptions
 from athena_charts_matplotlib.rendering.options.plot import LinePlotOptions
 from athena_charts_matplotlib.rendering.options.types import HorizontalAlignment
 from athena_charts_matplotlib.styles import FontWeight
@@ -37,11 +37,9 @@ class ChartOptions(_BaseOptions):
     title: ChartTitleOptions | None = Field(None, description="图表标题配置项")
 
     grid: GridOptions | None = Field(None, description="坐标系-网格配置项")
-    axes: AxesOptions | None = Field(None, description="坐标系-坐标轴")
+    coord: CoordOptions | None = Field(None, description="坐标系-坐标轴")
 
     line_plot: LinePlotOptions | None = Field(None, description="折线图图层")
-
-    # axis_line_visible: AxisLineVisible | None = Field(None, description="坐标轴线显示配置")
 
     def build_title_params(self) -> dict[str, object]:
         if self.title is None:
