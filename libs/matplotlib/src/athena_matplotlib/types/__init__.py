@@ -11,10 +11,12 @@ if TYPE_CHECKING:
         FontFamily,
         FontWeight,
         GridAxis,
+        HorizontalAlignment,
         LegendLocation,
         LineStyle,
         MarkerShape,
         TickDirection,
+        VerticalAlignment,
     )
 
 __all__ = (
@@ -25,6 +27,8 @@ __all__ = (
     "LegendLocation",
     "LineStyle",
     "MarkerShape",
+    "HorizontalAlignment",
+    "VerticalAlignment",
     "ImageFormat",
     "BboxInches",
 )
@@ -38,6 +42,8 @@ _dynamic_imports = {
     "LegendLocation": "styles",
     "LineStyle": "styles",
     "MarkerShape": "styles",
+    "HorizontalAlignment": "styles",
+    "VerticalAlignment": "styles",
     "ImageFormat": "options",
     "BboxInches": "options",
 }

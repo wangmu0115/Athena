@@ -1,40 +1,40 @@
-from collections.abc import Callable
+import matplotlib.pyplot as plt
 
-from athena_charts.runtime.context import DefaultPipelineContext, PipelineContextProvider
-from athena_charts.runtime.renderers import Renderer, RenderResult, RenderSpec
-from athena_charts.runtime.writers import Writer, WriteResult
+import matplotlib as mpl
+from athena_matplotlib.options import RenderFigureOptions, SaveFigureOptions
+from athena_matplotlib.runtime.context import build_rc_params
+from athena_matplotlib.runtime.renderer import BaseRenderer, FigureRenderer, RenderSpec
+from athena_matplotlib.runtime.writers import BaseWriter, TempFileWriter, WriteResult
+from athena_matplotlib.styles import Theme
 
 
-class Pipeline[TArtifact, TValue]:
-    """渲染输出流水线。Pipeline 本身不关心具体绘图库，也不关心输出目标，只负责流程编排。
-
-    负责串联 Renderer 与 Writer：
-        RenderSpec -> RenderResult -> WriteResult[TValue]
-    """
+class Pipeline[TValue]:
+    """渲染输出流水线，负责串联 Renderer 与 Writer。"""
 
     def __init__(
         self,
-        renderer: Renderer[TArtifact],
-        writer: Writer[TArtifact, TValue],
+        renderer: BaseRenderer | None,
+        writer: BaseWriter[TValue] | None,
         *,
-        context_provider: PipelineContextProvider | None = None,
-        artifact_finalizer: Callable[[RenderResult[TArtifact]], None] | None = None,
+        theme: Theme | None = None,
     ):
-        self._renderer = renderer
-        self._writer = writer
-        self._context_provider = context_provider or DefaultPipelineContext()
-        self._artifact_finalizer = artifact_finalizer
+        self._theme = theme or Theme.default()
+        self._renderer = renderer or FigureRenderer(name="", theme=self._theme)
+        self._writer = writer or TempFileWriter()
 
     def invoke(
         self,
         spec: RenderSpec,
         *,
         filename: str | None = None,
+        render_options: RenderFigureOptions | None = None,
+        save_options: SaveFigureOptions | None = None,
     ) -> WriteResult[TValue]:
-        with self._context_provider.pipeline_context():
-            rendered = self._renderer.render(spec)
+        with mpl.rc_context(build_rc_params(self.theme)):
+            render_result = self._renderer.render(spec, options=render_options)
             try:
-                return self._writer.write(rendered, filename=filename)
+                write_result = self._writer.write(render_result.figure, filename=filename, options=save_options)
+                write_result.metadata.update(render_result.metadata)  # 更新 Render metadata
+                return write_result
             finally:
-                if self._artifact_finalizer is not None:
-                    self._artifact_finalizer(rendered)
+                plt.close(render_result.figure)

@@ -1,10 +1,13 @@
+import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from uuid import uuid4
 
-from athena_charts.runtime.renderers import RenderResult
+from matplotlib.figure import Figure
+
+from athena_matplotlib.options import SaveFigureOptions
+from athena_matplotlib.runtime.artifact import FigureArtifact, WritableArtifact
 
 
 @dataclass
@@ -20,11 +23,8 @@ class WriteResult[TValue]:
 
 
 class BaseWriter[TValue](ABC):
-    def write(self, rendered: RenderResult[object], *, filename: str | None = None) -> WriteResult[TValue]:
-        artifact = rendered.artifact
-
-        if not isinstance(rendered.artifact, WritableArtifact):
-            raise TypeError(f"{type(artifact).__name__} does not implement WritableArtifact.")
+    def write(self, figure: Figure, *, filename: str | None = None, options: SaveFigureOptions | None) -> WriteResult[TValue]:
+        artifact = FigureArtifact(figure, options=options)
 
         return self._write_artifact(artifact, filename=filename)
 
@@ -41,14 +41,14 @@ class FileWriter(BaseWriter[Path]):
     def _write_artifact(self, artifact: WritableArtifact, *, filename: str | None = None) -> WriteResult[Path]:
         self._directory.mkdir(parents=True, exist_ok=True)
 
-        final_name = ensure_filename(filename, suffix=artifact.suffix)
-        path = self._directory / final_name
+        final_filename = _ensure_filename(filename, suffix=artifact.suffix)
+        path = self._directory / final_filename
         path.write_bytes(artifact.to_bytes())
 
         return WriteResult(
             value=path,
             media_type=artifact.media_type,
-            filename=final_name,
+            filename=final_filename,
         )
 
 
@@ -56,7 +56,7 @@ class TempFileWriter(BaseWriter[Path]):
     """写出到临时文件"""
 
     def _write_artifact(self, artifact: WritableArtifact, *, filename: str | None = None) -> WriteResult[Path]:
-        final_name = ensure_filename(filename, suffix=artifact.suffix)
+        final_filename = _ensure_filename(filename, suffix=artifact.suffix)
 
         with NamedTemporaryFile(delete=False, suffix=artifact.suffix) as file:
             file.write(artifact.to_bytes())
@@ -65,7 +65,7 @@ class TempFileWriter(BaseWriter[Path]):
             return WriteResult(
                 value=path,
                 media_type=artifact.media_type,
-                filename=final_name,
+                filename=final_filename,
                 metadata={"temporary": True},
             )
 
@@ -74,17 +74,17 @@ class MemoryWriter(BaseWriter[bytes]):
     """写出到内存。"""
 
     def _write_artifact(self, artifact: WritableArtifact, *, filename: str | None = None) -> WriteResult[bytes]:
-        final_name = ensure_filename(filename, suffix=artifact.suffix)
+        final_filename = _ensure_filename(filename, suffix=artifact.suffix)
 
         return WriteResult(
             value=artifact.to_bytes(),
             media_type=artifact.media_type,
-            filename=final_name,
+            filename=final_filename,
         )
 
 
-def ensure_filename(filename: str | None, *, suffix: str) -> str:
+def _ensure_filename(filename: str | None, *, suffix: str) -> str:
     suffix = suffix if suffix.startswith(".") else f".{suffix}"
     if filename:
         return filename if filename.endswith(suffix) else f"{filename}{suffix}"
-    return f"{uuid4().hex}{suffix}"
+    return f"{uuid.uuid4().hex}{suffix}"

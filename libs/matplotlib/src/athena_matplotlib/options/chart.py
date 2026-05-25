@@ -3,7 +3,7 @@ from typing import Self
 from pydantic import Field
 
 from athena_matplotlib.options._base import _BaseOptions
-from athena_matplotlib.types import FontWeight
+from athena_matplotlib.types import FontWeight, HorizontalAlignment
 
 
 class ChartOptions(_BaseOptions):

@@ -39,6 +39,7 @@ preview=true
 [tool.ruff.lint.isort]
 known-first-party = [
     "athena_core",
+    "athena_matplotlib",
     "athena_charts",
     "athena_charts_matplotlib",
 ]

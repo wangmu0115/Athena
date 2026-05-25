@@ -136,3 +136,34 @@ type LegendDirection = Literal["horizontal", "vertical"]
     - 水平排列通常适用于顶部或底部图例。
     - 垂直排列通常适用于左右侧图例。
 """
+
+type HorizontalAlignment = Literal["left", "right", "center"]
+"""水平对齐方式，用于描述文本、标签或图形元素在水平方向上的对齐位置。
+
+常见用于：
+    - 图表标题 Title
+    - 坐标轴标签 Axis Label
+    - 数据标签 Data Label
+    - 注释 Annotation 
+    - 图例文本 Legend
+
+取值说明：
+    - left: 左对齐。
+    - center: 水平居中对齐。
+    - right: 右对齐。
+"""
+
+type VerticalAlignment = Literal["top", "center", "bottom"]
+"""垂直对齐方式，用于描述文本、标签或图形元素在垂直方向上的对齐位置。
+
+常见用于：
+    - 坐标轴标签 Axis Label
+    - 数据标签 Data Label
+    - 注释 Annotation
+    - 文本框 Text Box
+
+取值说明：
+    - top: 顶部对齐。
+    - center: 垂直居中对齐。
+    - bottom: 底部对齐。
+"""
