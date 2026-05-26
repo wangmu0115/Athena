@@ -3,12 +3,11 @@ from matplotlib.axes import Axes
 from athena_charts_matplotlib.adapters.series import AlignedLinePlot
 from athena_charts_matplotlib.rendering.options.base import ColorCycle
 from athena_charts_matplotlib.rendering.options.chart import ChartOptions
+from athena_charts_matplotlib.rendering.options.plot import LinePlotOptions
 from athena_core.values.optional import optional_map_or, safe_getattr
 
 
 class LineArtist:
-    kind = "line"
-
     def __init__(self, color_cycle: ColorCycle):
         self._color_cycle = color_cycle
 
@@ -17,8 +16,7 @@ class LineArtist:
         axes: Axes,
         plot: AlignedLinePlot,
         *,
-        default_options: ChartOptions | None,
-        override_options: ChartOptions | None,
+        options: LinePlotOptions | None,
     ) -> None:
         # 绘制折线图
         axes.plot(

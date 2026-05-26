@@ -3,19 +3,14 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_charts_matplotlib.styles.presets.fonts import DEFAULT_FONT
-    from athena_charts_matplotlib.styles.presets.palettes import DEFAULT_PALETTE
+    from athena_matplotlib.rendering.coords.cartesian import CartesianCoordRenderer
 
 
-__all__ = (
-    "DEFAULT_FONT",
-    "DEFAULT_PALETTE",
-)
+__all__ = ("CartesianCoordRenderer",)
 
 
 _dynamic_imports = {
-    "DEFAULT_FONT": "fonts",
-    "DEFAULT_PALETTE": "palettes",
+    "CartesianCoordRenderer": "cartesian",
 }
 
 

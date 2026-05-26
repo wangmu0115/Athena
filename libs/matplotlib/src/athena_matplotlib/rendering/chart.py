@@ -4,7 +4,7 @@ from athena_charts.specs.coords.cartesian import CartesianCoord
 from athena_matplotlib.decorations import apply_chart_style
 from athena_matplotlib.options import RenderFigureOptions
 from athena_matplotlib.rendering.base import ColorCycle
-from athena_matplotlib.rendering.coord import CartesianCoordRenderer
+from athena_matplotlib.rendering.coords import CartesianCoordRenderer
 from athena_matplotlib.specs import ChartSpec
 
 

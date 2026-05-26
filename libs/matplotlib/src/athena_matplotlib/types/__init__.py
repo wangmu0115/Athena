@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     )
     from athena_matplotlib.types.specs import (
         AxisDataType,
+        BarLayoutMode,
         CartesianAxisPosition,
         CoordKind,
         PlotKind,
@@ -43,6 +44,7 @@ __all__ = (
     "ImageFormat",
     "BboxInches",
     "AxisDataType",
+    "BarLayoutMode",
     "CartesianAxisPosition",
     "CoordKind",
     "PlotKind",
@@ -66,6 +68,7 @@ _dynamic_imports = {
     "ImageFormat": "options",
     "BboxInches": "options",
     "AxisDataType": "specs",
+    "BarLayoutMode": "specs",
     "CartesianAxisPosition": "specs",
     "CoordKind": "specs",
     "PlotKind": "specs",

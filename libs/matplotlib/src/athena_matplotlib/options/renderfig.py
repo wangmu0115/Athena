@@ -7,6 +7,7 @@ from athena_matplotlib.options._base import _BaseOptions
 from athena_matplotlib.options.cartesian import CartesianCoordOptions
 from athena_matplotlib.options.chart import ChartOptions
 from athena_matplotlib.options.figure import FigureOptions
+from athena_matplotlib.options.line_plot import LinePlotOptions
 
 
 class RenderFigureOptions(_BaseOptions):
@@ -16,6 +17,7 @@ class RenderFigureOptions(_BaseOptions):
     figure: FigureOptions | None = Field(None, description="画布样式配置")
     chart: ChartOptions | None = Field(None, description="图表样式配置")
     cartesian: CartesianCoordOptions | None = Field(None, description="笛卡尔坐标系样式配置")
+    line_plot: LinePlotOptions | None = Field(None, description="Line Plot 样式配置")
 
     def build_figure_params(self) -> dict[str, object]:
         if self.size is not None:

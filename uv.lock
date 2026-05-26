@@ -5,7 +5,6 @@ requires-python = ">=3.12"
 [manifest]
 members = [
     "athena-charts",
-    "athena-charts-matplotlib",
     "athena-core",
     "athena-matplotlib",
 ]
@@ -32,21 +31,6 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [{ name = "athena-core", editable = "libs/core" }]
-
-[[package]]
-name = "athena-charts-matplotlib"
-version = "0.1.0"
-source = { editable = "libs/charts-matplotlib" }
-dependencies = [
-    { name = "athena-charts" },
-    { name = "matplotlib" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "athena-charts", editable = "libs/charts" },
-    { name = "matplotlib", specifier = ">=3.10.9" },
-]
 
 [[package]]
 name = "athena-core"

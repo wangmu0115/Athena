@@ -1,17 +1,3 @@
-from pydantic import Field
-
-from athena_charts.specs.rules.conditions import DataCondition
-from athena_charts_matplotlib.adapters.styles import to_mpl_line_style
-from athena_charts_matplotlib.rendering.options.base import _BaseOptions
-from athena_charts_matplotlib.styles.types import FontWeight, LineStyle, MarkerShape
-
-
-class OptionsRule(_BaseOptions):
-    """条件样式规则基类。"""
-
-    when: DataCondition = Field(..., description="规则生效条件")
-
-
 class LineOptions(_BaseOptions):
     linewidth: float | None = Field(None, gt=0, description="线宽")
     linestyle: LineStyle | None = Field(None, description="线型")
