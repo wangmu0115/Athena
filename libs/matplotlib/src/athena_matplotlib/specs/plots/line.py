@@ -3,6 +3,7 @@ from typing import Literal, Self
 from pydantic import Field
 
 from athena_matplotlib.datas import XYSeriesData
+from athena_matplotlib.options import LinePlotOptions
 from athena_matplotlib.specs.coords import Coord
 from athena_matplotlib.specs.plots.base import Plot
 
@@ -14,6 +15,8 @@ class LinePlot(Plot):
     y_axis_side: Literal["left", "right"] = Field("left", description="使用左侧或右侧 Y 轴")
     data: XYSeriesData = Field(..., description="折线图数据")
 
+    options: LinePlotOptions | None = Field(None, description="折线图运行时配置项")
+
     @classmethod
     def of(
         cls,
@@ -23,6 +26,7 @@ class LinePlot(Plot):
         *,
         name: str = "",
         z_index: int = 100,
+        options: LinePlotOptions | None = None,
     ) -> Self:
         return cls(
             kind="line",
@@ -32,6 +36,7 @@ class LinePlot(Plot):
             x_axis_side=x_axis_side,
             y_axis_side=y_axis_side,
             z_index=z_index,
+            options=options,
         )
 
     def validate_coord(self, coord: Coord):

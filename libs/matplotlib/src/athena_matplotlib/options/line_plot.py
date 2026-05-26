@@ -1,16 +1,50 @@
+from typing import Self
+
+from pydantic import Field, field_serializer
+
+from athena_matplotlib.adapters import to_mpl_line_style
+from athena_matplotlib.options._base import _BaseOptions
+from athena_matplotlib.types import FontWeight, LineStyle, MarkerShape
+
+
 class LineOptions(_BaseOptions):
     linewidth: float | None = Field(None, gt=0, description="线宽")
     linestyle: LineStyle | None = Field(None, description="线型")
     linecolor: str | None = Field(None, description="线的颜色", alias="color")
 
+    @field_serializer("linestyle")
+    def serialize_linestyle(self, value: LineStyle) -> str:
+        return to_mpl_line_style(value)
+
 
 class MarkerOptions(_BaseOptions):
-    visible: bool = Field(False, description="是否显示数据点标记")
-    shape: MarkerShape | None = Field(None, description="标记形状", alias="marker")
-    size: float | None = Field(None, gt=0, description="标记大小", alias="markersize")
-    facecolor: str | None = Field(None, description="标记填充颜色", alias="markerfacecolor")
-    edgecolor: str | None = Field(None, description="标记边框颜色", alias="markeredgecolor")
-    edgewidth: float | None = Field(None, ge=0, description="标记边框宽度", alias="markeredgewidth")
+    marker: MarkerShape | None = Field(None, description="标记形状")
+    markersize: float | None = Field(None, gt=0, description="标记大小")
+    marker_facecolor: str | None = Field(None, description="标记填充颜色", alias="markerfacecolor")
+    marker_edgecolor: str | None = Field(None, description="标记边框颜色", alias="markeredgecolor")
+    marker_edgewidth: float | None = Field(None, ge=0, description="标记边框宽度", alias="markeredgewidth")
+
+    @classmethod
+    def hide(cls) -> Self:
+        return cls(marker=None)
+
+    @classmethod
+    def show(
+        cls,
+        marker: MarkerShape = "circle",
+        *,
+        markersize: float | None = None,
+        marker_facecolor: str | None = None,
+        marker_edgecolor: str | None = None,
+        marker_edgewidth: float | None = None,
+    ):
+        return cls(
+            marker=marker,
+            markersize=markersize,
+            marker_facecolor=marker_facecolor,
+            marker_edgecolor=marker_edgecolor,
+            marker_edgewidth=marker_edgewidth,
+        )
 
 
 class DataLabelOptions(_BaseOptions):
@@ -25,19 +59,32 @@ class DataLabelOptions(_BaseOptions):
 
 
 class LinePlotOptions(_BaseOptions):
-    line: LineOptions
-    marker: MarkerOptions
-    data_label: DataLabelOptions
+    line: LineOptions | None = Field(None, description="线")
+    marker: MarkerOptions | None = Field(None, description="标记点")
+    data_label: DataLabelOptions | None = Field(None, description="数据标签")
+
+    @classmethod
+    def cls(
+        cls,
+        *,
+        linewidth: float | None = None,
+        linestyle: LineStyle | None = None,
+        linecolor: str | None = None,
+        marker: MarkerOptions | None = None,
+    ) -> Self:
+        line = LineOptions(linewidth=linewidth, linestyle=linestyle, linecolor=linecolor)
+
+        return cls(
+            line=line,
+            marker=marker,
+        )
 
     def build_plot_params(self) -> dict[str, object]:
         params: dict[str, object] = {}
+
         if self.line is not None:
-            params.update(self.line.model_dump(exclude_none=True, by_alias=True, exclude=["linestyle"]))
-            if self.line.linestyle is not None:
-                params["linestyle"] = to_mpl_line_style(self.line.linestyle)
+            params.update(self.line.model_dump(exclude_none=True, by_alias=True))
         if self.marker is not None:
-            if self.marker.visible:
-                params.update(self.marker.model_dump(exclude_none=True, by_alias=True, exclude=["visible"]))
-            else:
-                params["marker"] = None
+            params.update(self.marker.model_dump(exclude_none=True, by_alias=True))
+
         return params

@@ -36,10 +36,17 @@ class RenderFigureOptions(_BaseOptions):
         cls,
         size: tuple[int, int] | None = None,
         dpi: int | None = None,
+        *,
         figure: FigureOptions | None = None,
+        chart: ChartOptions | None = None,
+        cartesian: CartesianCoordOptions | None = None,
+        line_plot: LinePlotOptions | None = None,
     ) -> Self:
         return cls(
             size=size,
             dpi=dpi,
             figure=figure,
+            chart=chart,
+            cartesian=cartesian,
+            line_plot=line_plot,
         )

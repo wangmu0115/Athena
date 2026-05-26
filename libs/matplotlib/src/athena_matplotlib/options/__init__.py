@@ -7,6 +7,12 @@ if TYPE_CHECKING:
     from athena_matplotlib.options.cartesian import CartesianCoordOptions
     from athena_matplotlib.options.chart import ChartOptions
     from athena_matplotlib.options.grid import GridOptions
+    from athena_matplotlib.options.line_plot import (
+        DataLabelOptions,
+        LineOptions,
+        LinePlotOptions,
+        MarkerOptions,
+    )
     from athena_matplotlib.options.renderfig import RenderFigureOptions
     from athena_matplotlib.options.savefig import PngExportStyle, SaveFigureOptions
     from athena_matplotlib.options.tick import TickLabelOptions, TickLineOptions, TickOptions
@@ -25,6 +31,10 @@ __all__ = (
     "TickLabelOptions",
     "TickLineOptions",
     "TickOptions",
+    "DataLabelOptions",
+    "LineOptions",
+    "LinePlotOptions",
+    "MarkerOptions",
 )
 
 
@@ -41,6 +51,10 @@ _dynamic_imports = {
     "TickLabelOptions": "tick",
     "TickLineOptions": "tick",
     "TickOptions": "tick",
+    "DataLabelOptions": "line_plot",
+    "LineOptions": "line_plot",
+    "LinePlotOptions": "line_plot",
+    "MarkerOptions": "line_plot",
 }
 
 

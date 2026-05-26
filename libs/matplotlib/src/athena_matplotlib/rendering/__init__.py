@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_matplotlib.rendering.base import ColorCycle
     from athena_matplotlib.rendering.chart import ChartRenderer
+    from athena_matplotlib.rendering.color_cycle import ColorCycle
 
 
 __all__ = (
@@ -14,8 +14,8 @@ __all__ = (
 
 
 _dynamic_imports = {
-    "ColorCycle": "base",
     "ChartRenderer": "chart",
+    "ColorCycle": "color_cycle",
 }
 
 

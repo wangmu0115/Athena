@@ -5,7 +5,7 @@ from matplotlib.axes import Axes
 from athena_core.values.fallbacks import first_not_none
 from athena_core.values.optional import optional_map_or, safe_getattr
 from athena_matplotlib.options import AxisOptions, CartesianCoordOptions, GridOptions, TickOptions
-from athena_matplotlib.rendering.coords.axes_runtime import AxesRuntime
+from athena_matplotlib.rendering.axes_runtime import AxesRuntime
 from athena_matplotlib.specs.coords import CartesianCoord
 from athena_matplotlib.specs.coords.cartesian import CartesianAxisSpec
 
