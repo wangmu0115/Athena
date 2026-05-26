@@ -4,7 +4,13 @@ from pydantic import Field, field_serializer
 
 from athena_matplotlib.adapters import to_mpl_line_style
 from athena_matplotlib.options._base import _BaseOptions
-from athena_matplotlib.types import FontWeight, LineStyle, MarkerShape
+from athena_matplotlib.types import (
+    FontWeight,
+    HorizontalAlignment,
+    LineStyle,
+    MarkerShape,
+    VerticalAlignment,
+)
 
 
 class LineOptions(_BaseOptions):
@@ -57,6 +63,46 @@ class DataLabelOptions(_BaseOptions):
     fontsize: int | None = Field(None, gt=0, description="字号")
     fontweight: FontWeight | None = Field(None, description="字体粗细")
 
+    offset_x: float = Field(0, description="标签 X 方向偏移量，单位为 points")
+    offset_y: float = Field(6, description="标签 Y 方向偏移量，单位为 points")
+    ha: HorizontalAlignment = Field("center", description="水平对齐方式")
+    va: VerticalAlignment = Field("bottom", description="垂直对齐方式")
+
+    @classmethod
+    def hide(cls) -> Self:
+        return cls(visible=False)
+
+    @classmethod
+    def show(
+        cls,
+        formatter: str | None = None,
+        *,
+        color: str | None = None,
+        fontsize: int | None = None,
+        fontweight: FontWeight | None = None,
+        offset_x: float = 0,
+        offset_y: float = 6,
+        ha: HorizontalAlignment = "center",
+        va: VerticalAlignment = "bottom",
+    ):
+        return cls(
+            visible=True,
+            formatter=formatter,
+            color=color,
+            fontsize=fontsize,
+            fontweight=fontweight,
+            offset_x=offset_x,
+            offset_y=offset_y,
+            ha=ha,
+            va=va,
+        )
+
+    def build_text_params(self) -> dict[str, object]:
+        return self.model_dump(
+            include=["color", "fontsize", "fontweight", "ha", "va"],
+            exclude_none=True,
+        )
+
 
 class LinePlotOptions(_BaseOptions):
     line: LineOptions | None = Field(None, description="线")
@@ -64,19 +110,20 @@ class LinePlotOptions(_BaseOptions):
     data_label: DataLabelOptions | None = Field(None, description="数据标签")
 
     @classmethod
-    def cls(
+    def of(
         cls,
         *,
         linewidth: float | None = None,
         linestyle: LineStyle | None = None,
         linecolor: str | None = None,
         marker: MarkerOptions | None = None,
+        data_label: DataLabelOptions | None = None,
     ) -> Self:
         line = LineOptions(linewidth=linewidth, linestyle=linestyle, linecolor=linecolor)
-
         return cls(
             line=line,
             marker=marker,
+            data_label=data_label,
         )
 
     def build_plot_params(self) -> dict[str, object]:

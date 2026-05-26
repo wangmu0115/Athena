@@ -1,4 +1,5 @@
 from athena_matplotlib.datas.xy import XYSeriesData
+from athena_matplotlib.options.line_plot import DataLabelOptions, LinePlotOptions
 from athena_matplotlib.runtime.pipeline import Pipeline
 from athena_matplotlib.runtime.renderer import FigureRenderer
 from athena_matplotlib.runtime.writers import FileWriter
@@ -48,6 +49,7 @@ spec = ChartSpec(
                 ],
             ),
             name="cpu_utilizations",
+            options=LinePlotOptions.of(data_label=DataLabelOptions.show(formatter="({x:%m-%d}, {y:.2%})", fontsize=4)),
         )
     ],
 )
