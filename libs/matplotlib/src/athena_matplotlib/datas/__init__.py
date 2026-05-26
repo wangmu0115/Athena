@@ -3,19 +3,23 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_matplotlib.rendering.base import ColorCycle
-    from athena_matplotlib.rendering.chart import ChartRenderer
+    from athena_matplotlib.datas.categorical import CategoricalDatum, CategoricalSeriesData
+    from athena_matplotlib.datas.xy import XYPoint, XYSeriesData
 
 
 __all__ = (
-    "ColorCycle",
-    "ChartRenderer",
+    "XYPoint",
+    "XYSeriesData",
+    "CategoricalDatum",
+    "CategoricalSeriesData",
 )
 
 
 _dynamic_imports = {
-    "ColorCycle": "base",
-    "ChartRenderer": "chart",
+    "XYPoint": "xy",
+    "XYSeriesData": "xy",
+    "CategoricalDatum": "categorical",
+    "CategoricalSeriesData": "categorical",
 }
 
 

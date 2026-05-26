@@ -7,7 +7,17 @@ if TYPE_CHECKING:
         BboxInches,
         ImageFormat,
     )
+    from athena_matplotlib.types.specs import (
+        AxisDataType,
+        CartesianAxisPosition,
+        CoordKind,
+        PlotKind,
+        PolarAxisRole,
+        TickLabelFormatKind,
+        TickLocatorStrategy,
+    )
     from athena_matplotlib.types.styles import (
+        AxisScale,
         FontFamily,
         FontWeight,
         GridAxis,
@@ -20,6 +30,7 @@ if TYPE_CHECKING:
     )
 
 __all__ = (
+    "AxisScale",
     "FontFamily",
     "FontWeight",
     "TickDirection",
@@ -31,10 +42,18 @@ __all__ = (
     "VerticalAlignment",
     "ImageFormat",
     "BboxInches",
+    "AxisDataType",
+    "CartesianAxisPosition",
+    "CoordKind",
+    "PlotKind",
+    "PolarAxisRole",
+    "TickLabelFormatKind",
+    "TickLocatorStrategy",
 )
 
 
 _dynamic_imports = {
+    "AxisScale": "styles",
     "FontFamily": "styles",
     "FontWeight": "styles",
     "TickDirection": "styles",
@@ -46,6 +65,13 @@ _dynamic_imports = {
     "VerticalAlignment": "styles",
     "ImageFormat": "options",
     "BboxInches": "options",
+    "AxisDataType": "specs",
+    "CartesianAxisPosition": "specs",
+    "CoordKind": "specs",
+    "PlotKind": "specs",
+    "PolarAxisRole": "specs",
+    "TickLabelFormatKind": "specs",
+    "TickLocatorStrategy": "specs",
 }
 
 

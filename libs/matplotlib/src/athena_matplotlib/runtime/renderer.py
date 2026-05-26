@@ -7,12 +7,11 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 
 import matplotlib as mpl
-from athena_core.values.optional import optional_map_or
+from athena_core.values.optional import optional_map_or, safe_getattr
 from athena_matplotlib.options import RenderFigureOptions
-from athena_matplotlib.rendering.chart import ChartRenderer
+from athena_matplotlib.rendering import ChartRenderer, ColorCycle
 from athena_matplotlib.runtime.context import build_rc_params
-from athena_matplotlib.specs import ChartSpec, FigureSpec
-from athena_matplotlib.specs.figure import FigureGridLayout
+from athena_matplotlib.specs import ChartSpec, FigureGridLayout, FigureSpec
 from athena_matplotlib.styles import Theme
 
 type RenderSpec = ChartSpec | FigureSpec
@@ -36,7 +35,7 @@ class BaseRenderer(ABC):
         return self._name
 
     @property
-    def theme(self) -> str:
+    def theme(self) -> Theme:
         return self._theme
 
     def render(self, spec: RenderSpec, *, options: RenderFigureOptions | None) -> RenderResult:
@@ -56,7 +55,11 @@ class FigureRenderer(BaseRenderer):
             name=name or uuid.uuid4(),
             theme=theme or Theme.default(),
         )
-        self.chart_renderer = ChartRenderer()
+        self._post_init()
+
+    def _post_init(self):
+        color_cycle = ColorCycle(safe_getattr(self.theme.palette, "colors"))
+        self._chart_renderer = ChartRenderer(color_cycle)
 
     def _render_figure(self, spec: FigureSpec, *, options: RenderFigureOptions) -> RenderResult:
         with mpl.rc_context(build_rc_params(self.theme)):  # 主体上下文中渲染图片
@@ -69,7 +72,7 @@ class FigureRenderer(BaseRenderer):
                 row = chart_placement.row - 1
                 col = chart_placement.row - 1
                 axes = figure.add_subplot(gs[row : row + chart_placement.row_span, col : col + chart_placement.col_span])
-                self.chart_renderer.render(axes, chart_placement.chart, options=options)
+                self._chart_renderer.render(axes, chart_placement.chart, options=options)
 
         return RenderResult(
             artifact=figure,
