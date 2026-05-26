@@ -30,7 +30,7 @@ class Pipeline[TValue]:
         render_options: RenderFigureOptions | None = None,
         save_options: SaveFigureOptions | None = None,
     ) -> WriteResult[TValue]:
-        with mpl.rc_context(build_rc_params(self.theme)):
+        with mpl.rc_context(build_rc_params(self._theme)):
             render_result = self._renderer.render(spec, options=render_options)
             try:
                 write_result = self._writer.write(render_result.figure, filename=filename, options=save_options)

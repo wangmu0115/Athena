@@ -14,7 +14,7 @@ class ChartRenderer:
 
     def render(self, axes: Axes, chart: ChartSpec, *, options: RenderFigureOptions):
         # 渲染图表样式
-        apply_chart_style(axes, chart, options=options)
+        apply_chart_style(axes, chart, options=options.chart)
         # 渲染坐标轴系统
         if isinstance(chart.coord, CartesianCoord):
             self._cartesian_renderer.render(axes, chart, options=options)

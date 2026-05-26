@@ -64,7 +64,7 @@ class FigureRenderer(BaseRenderer):
     def _render_figure(self, spec: FigureSpec, *, options: RenderFigureOptions) -> RenderResult:
         with mpl.rc_context(build_rc_params(self.theme)):  # 主体上下文中渲染图片
             # Figure
-            figure: Figure = self._create_figure(spec)
+            figure: Figure = self._create_figure(spec, options=options)
             # Layout
             gs = self._add_gridspec(figure, spec.layout)
             # Render Charts
@@ -75,7 +75,7 @@ class FigureRenderer(BaseRenderer):
                 self._chart_renderer.render(axes, chart_placement.chart, options=options)
 
         return RenderResult(
-            artifact=figure,
+            figure=figure,
             metadata={"renderer": self.name},
         )
 

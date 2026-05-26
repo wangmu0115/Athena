@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Literal, Self
 
 from pydantic import Field, model_validator
@@ -77,7 +76,7 @@ class CartesianCoord(Coord):
 
     options: CartesianCoordOptions | None = Field(None, description="运行时样式配置")
 
-    @dataclass
+    @classmethod
     def of(
         cls,
         x_axis: CartesianAxisSpec,

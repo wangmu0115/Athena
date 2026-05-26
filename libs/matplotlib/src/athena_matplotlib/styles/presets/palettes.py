@@ -1,4 +1,4 @@
-from athena_charts_matplotlib.styles.base import PaletteStyle
+from athena_matplotlib.styles.base import PaletteStyle
 
 DEFAULT_PALETTE = PaletteStyle(
     colors=[

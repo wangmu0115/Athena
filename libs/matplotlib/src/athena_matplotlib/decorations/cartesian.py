@@ -2,12 +2,10 @@ from typing import Literal
 
 from matplotlib.axes import Axes
 
-from athena_charts_matplotlib.rendering.options.coord import AxisOptions, TickOptions
 from athena_core.values.fallbacks import first_not_none
 from athena_core.values.optional import optional_map_or, safe_getattr
-from athena_matplotlib.options import CartesianCoordOptions
-from athena_matplotlib.options.grid import GridOptions
-from athena_matplotlib.rendering.coord import AxesRuntime
+from athena_matplotlib.options import AxisOptions, CartesianCoordOptions, GridOptions, TickOptions
+from athena_matplotlib.rendering.coord.axes_runtime import AxesRuntime
 from athena_matplotlib.specs.coords import CartesianCoord
 from athena_matplotlib.specs.coords.cartesian import CartesianAxisSpec
 

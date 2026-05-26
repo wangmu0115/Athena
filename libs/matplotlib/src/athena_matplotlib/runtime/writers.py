@@ -46,7 +46,7 @@ class FileWriter(BaseWriter[Path]):
         path.write_bytes(artifact.to_bytes())
 
         return WriteResult(
-            value=path,
+            value=path.absolute(),
             media_type=artifact.media_type,
             filename=final_filename,
         )
@@ -63,7 +63,7 @@ class TempFileWriter(BaseWriter[Path]):
             path = Path(file.name)
 
             return WriteResult(
-                value=path,
+                value=path.absolute(),
                 media_type=artifact.media_type,
                 filename=final_filename,
                 metadata={"temporary": True},

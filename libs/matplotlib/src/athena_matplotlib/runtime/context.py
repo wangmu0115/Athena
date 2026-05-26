@@ -108,7 +108,7 @@ def _resolve_figure_rc_params(builder: RcParamsBuilder, style: FigureStyle):
 
     dpi = optional_or_else(safe_getattr(style, "dpi"), default_factory=lambda: mpl.rcParamsDefault["figure.dpi"])
     builder.set("figure.dpi", dpi)
-    width, height = safe_getattr(style.figure, "size")
+    width, height = safe_getattr(style, "size")
     if width is not None and height is not None:
         builder.set("figure.figsize", (width / dpi, height / dpi))
     builder.set_non_empty("figure.facecolor", style=style, attr="facecolor")
