@@ -2,11 +2,10 @@ from typing import Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.specs.plots import PlotSpec
-from athena_charts.specs.types import BarLayoutMode
 from athena_matplotlib.options.chart import ChartOptions
 from athena_matplotlib.specs._base import _BaseSpec
 from athena_matplotlib.specs.coords import CoordSpec
+from athena_matplotlib.specs.plots.unions import PlotSpec
 
 
 class ChartSpec(_BaseSpec):
@@ -14,9 +13,9 @@ class ChartSpec(_BaseSpec):
     coord: CoordSpec = Field(..., description="坐标系统")
     plots: list[PlotSpec] = Field(default_factory=list, description="图层列表")
 
-    chart_options: ChartOptions | None = Field(None, description="图表运行时配置")
+    options: ChartOptions | None = Field(None, description="图表运行时样式配置")
 
-    bar_layout: BarLayoutMode = Field("group", description="当具有多个 Bar 图层时的布局方式")
+    # bar_layout: BarLayoutMode = Field("group", description="当具有多个 Bar 图层时的布局方式")
     category_order: list[object] | None = Field(None, description="多个图层 X 轴对齐时的特定顺序")
 
     @model_validator(mode="after")

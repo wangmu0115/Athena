@@ -3,14 +3,18 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_matplotlib.rendering.coord.cartesian import CartesianCoordRenderer
+    from athena_matplotlib.rendering.coord.cartesian import AxesRuntime, CartesianCoordRenderer
 
 
-__all__ = ("CartesianCoordRenderer",)
+__all__ = (
+    "CartesianCoordRenderer",
+    "AxesRuntime",
+)
 
 
 _dynamic_imports = {
     "CartesianCoordRenderer": "cartesian",
+    "AxesRuntime": "cartesian",
 }
 
 

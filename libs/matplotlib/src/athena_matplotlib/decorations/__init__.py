@@ -3,14 +3,19 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
+    from athena_matplotlib.decorations.cartesian import apply_cartesian_style
     from athena_matplotlib.decorations.chart import apply_chart_style
 
 
-__all__ = ("apply_chart_style",)
+__all__ = (
+    "apply_chart_style",
+    "apply_cartesian_style",
+)
 
 
 _dynamic_imports = {
     "apply_chart_style": "chart",
+    "apply_cartesian_style": "cartesian",
 }
 
 

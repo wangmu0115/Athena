@@ -7,7 +7,7 @@ from athena_matplotlib.specs import ChartSpec
 
 
 def apply_chart_style(axes: Axes, chart: ChartSpec, *, options: ChartOptions):
-    override = chart.chart_options
+    override = chart.options
     # 背景色
     facecolor = first_non_empty(
         safe_getattr(override, "facecolor"),

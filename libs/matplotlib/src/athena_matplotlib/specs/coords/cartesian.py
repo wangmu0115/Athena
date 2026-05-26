@@ -3,6 +3,7 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
+from athena_matplotlib.options import CartesianCoordOptions
 from athena_matplotlib.specs.coords.base import AxisSpec, Coord
 from athena_matplotlib.specs.coords.tick import TickSpec
 from athena_matplotlib.types import AxisDataType, AxisScale, CartesianAxisPosition
@@ -74,6 +75,8 @@ class CartesianCoord(Coord):
     left_y_axis: CartesianAxisSpec | None = Field(None, description="左 Y 轴")
     right_y_axis: CartesianAxisSpec | None = Field(None, description="右 Y 轴")
 
+    options: CartesianCoordOptions | None = Field(None, description="运行时样式配置")
+
     @dataclass
     def of(
         cls,
@@ -81,12 +84,14 @@ class CartesianCoord(Coord):
         *,
         left_y_axis: CartesianAxisSpec | None = None,
         right_y_axis: CartesianAxisSpec | None = None,
+        options: CartesianCoordOptions | None = None,
     ) -> Self:
         return cls(
             kind="cartesian",
             x_axis=x_axis,
             left_y_axis=left_y_axis,
             right_y_axis=right_y_axis,
+            options=options,
         )
 
     @model_validator(mode="after")
