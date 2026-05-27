@@ -1,11 +1,11 @@
 from athena_matplotlib.options.rules.conditions import DataCondition, DataPredicate
-from athena_matplotlib.options.rules.data_content import CartesianDataContent
+from athena_matplotlib.options.rules.data_context import DataContext
 
 
 def match_data_predicate(
     predicate: DataPredicate,
     *,
-    context: CartesianDataContent,
+    context: DataContext,
 ) -> bool:
     """判断单个数据谓词是否满足。
 
@@ -13,7 +13,7 @@ def match_data_predicate(
     - 不设置任何条件时，返回值为 `True`。
     - 不为空的条件都满足时，返回值才为 `True`。
     """
-    value = context.get(predicate.field)
+    value = context.get(predicate.field_)
     if value is None:
         return False
 
@@ -36,7 +36,7 @@ def match_data_predicate(
 def match_data_condition(
     condition: DataCondition,
     *,
-    context: CartesianDataContent,
+    context: DataContext,
 ) -> bool:
     """判断数据条件表达式是否满足。
 

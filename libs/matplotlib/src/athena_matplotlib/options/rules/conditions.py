@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import Self
 
-from athena_matplotlib.options.rules.data_content import DataField
+from athena_matplotlib.options.rules.data_context import DataField
 
 
-@dataclass(slots=True, init=False)
+@dataclass(slots=True)
 class DataPredicate:
     """单个数据条件谓词，用于描述针对某个数据字段的一组比较条件。
 
@@ -51,7 +51,7 @@ class DataPredicate:
         return self
 
 
-@dataclass(slots=True, init=False)
+@dataclass(slots=True)
 class DataCondition:
     """数据条件表达式，支持单条件与复合条件。"""
 

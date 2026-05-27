@@ -3,24 +3,31 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_matplotlib.options.rules import (
+    from athena_matplotlib.options.rules.conditions import (
         DataCondition,
-        DataField,
         DataPredicate,
     )
+    from athena_matplotlib.options.rules.data_context import DataContext, DataField
+    from athena_matplotlib.options.rules.matches import match_data_condition, match_data_predicate
 
 
 __all__ = (
-    "DataField",
     "DataPredicate",
     "DataCondition",
+    "DataField",
+    "DataContext",
+    "match_data_condition",
+    "match_data_predicate",
 )
 
 
 _dynamic_imports = {
-    "DataField": "conditions",
     "DataCondition": "conditions",
     "DataPredicate": "conditions",
+    "DataField": "data_context",
+    "DataContext": "data_context",
+    "match_data_condition": "matches",
+    "match_data_predicate": "matches",
 }
 
 

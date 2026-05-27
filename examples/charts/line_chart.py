@@ -1,5 +1,8 @@
 from athena_matplotlib.datas.xy import XYSeriesData
-from athena_matplotlib.options.line_plot import DataLabelOptions, LinePlotOptions
+from athena_matplotlib.options.data_label import DataLabelStyle
+from athena_matplotlib.options.line_plot import DataLabelOptions, LinePlotOptions, MarkerOptions
+from athena_matplotlib.options.marker import MarkerStyle
+from athena_matplotlib.options.rules.conditions import DataCondition, DataPredicate
 from athena_matplotlib.runtime.pipeline import Pipeline
 from athena_matplotlib.runtime.renderer import FigureRenderer
 from athena_matplotlib.runtime.writers import FileWriter
@@ -49,7 +52,19 @@ spec = ChartSpec(
                 ],
             ),
             name="cpu_utilizations",
-            options=LinePlotOptions.of(data_label=DataLabelOptions.show(formatter="({x:%m-%d}, {y:.2%})", fontsize=4)),
+            options=LinePlotOptions.of(
+                data_label=DataLabelOptions.hide().add_rule(
+                    when=DataCondition.when(DataPredicate.field("last").eq(True)),
+                    style=DataLabelStyle.show(
+                        formatter="({name}: {y:.2%})",
+                        fontsize=4,
+                    ),
+                ),
+                marker=MarkerOptions.hide().add_rule(
+                    when=DataCondition.when(DataPredicate.field("last").eq(True)),
+                    style=MarkerStyle(marker="circle", markerfacecolor="red"),
+                ),
+            ),
         )
     ],
 )

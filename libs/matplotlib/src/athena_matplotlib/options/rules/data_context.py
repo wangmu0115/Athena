@@ -6,7 +6,7 @@ type DataField = Literal["x", "y", "category", "value", "name", "plotname", "ind
 
 
 @dataclass
-class CartesianDataContent:
+class DataContext:
     x: object
     y: float | None
     category: object
@@ -23,9 +23,9 @@ class CartesianDataContent:
         *,
         x: object,
         y: float | None,
-        name: str | None,
         index: int,
         count: int,
+        name: str | None = "",
     ) -> Self:
         return cls(
             x=x,

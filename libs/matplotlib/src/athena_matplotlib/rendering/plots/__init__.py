@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 from athena_core._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_matplotlib.rendering.plots.line import LineArtist
+    from athena_matplotlib.rendering.plots.line_plot import LineArtist
 
 
 __all__ = ("LineArtist",)
 
 
 _dynamic_imports = {
-    "LineArtist": "line",
+    "LineArtist": "line_plot",
 }
 
 

@@ -4,7 +4,7 @@ from athena_matplotlib.decorations import apply_cartesian_style
 from athena_matplotlib.options import RenderFigureOptions
 from athena_matplotlib.rendering.axes_runtime import resolve_axes_runtime
 from athena_matplotlib.rendering.color_cycle import ColorCycle
-from athena_matplotlib.rendering.plots.line import LineArtist
+from athena_matplotlib.rendering.plots.line_plot import LineArtist
 from athena_matplotlib.rendering.render_plan import resolve_cartesian_render_plan
 from athena_matplotlib.specs import ChartSpec
 
