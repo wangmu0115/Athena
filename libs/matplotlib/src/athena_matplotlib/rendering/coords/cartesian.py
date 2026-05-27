@@ -41,5 +41,16 @@ class CartesianCoordRenderer:
         if axes_runtime.right_y is not None and chart.coord.right_y_axis is not None:
             render_axis_tick(axes_runtime.right_y.yaxis, chart.coord.right_y_axis)  # X
         # Legend
-
-    # def _render_axis_tick(axes)
+        handles = []
+        labels = []
+        for ax in [axes_runtime.primary]:
+            ax_handles, ax_labels = ax.get_legend_handles_labels()
+            for handle, label in zip(ax_handles, ax_labels):
+                if not label or label.startswith("_"):
+                    continue
+                handles.append(handle)
+                labels.append(label)
+        axes_runtime.primary.legend(
+            handles,
+            labels,
+        )

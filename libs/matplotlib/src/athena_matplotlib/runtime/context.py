@@ -191,12 +191,22 @@ def _resolve_legend_rc_params(builder: RcParamsBuilder, style: LegendStyle):
     builder.set_not_none("legend.title_fontsize", style=style, attr="titlesize")
     builder.set_not_none("legend.fontsize", style=style, attr="labelsize")
     builder.set_non_empty("legend.labelcolor", style=style, attr="labelcolor")
+
     builder.set_not_none("legend.frameon", style=style, attr="frameon")
     builder.set_not_none("legend.framealpha", style=style, attr="framealpha")
     builder.set_non_empty("legend.facecolor", style=style, attr="facecolor")
     builder.set_non_empty("legend.edgecolor", style=style, attr="edgecolor")
     builder.set_not_none("legend.shadow", style=style, attr="shadow")
     builder.set_not_none("legend.fancybox", style=style, attr="fancybox")
+
+    builder.set_not_none("legend.borderpad", style=style, attr="borderpad")
+    builder.set_not_none("legend.labelspacing", style=style, attr="labelspacing")
+    builder.set_not_none("legend.handlelength", style=style, attr="handlelength")
+    builder.set_not_none("legend.handleheight", style=style, attr="handleheight")
+    builder.set_not_none("legend.handletextpad", style=style, attr="handletextpad")
+    builder.set_not_none("legend.columnspacing", style=style, attr="columnspacing")
+
+    builder.set_not_none("legend.markerscale", style=style, attr="markerscale")
 
 
 def _resolve_line_plot_rc_params(builder: RcParamsBuilder, style: LinePlotStyle):
