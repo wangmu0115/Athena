@@ -31,7 +31,7 @@ type PlotKind = Literal["line", "bar", "pie"]
     - 极坐标系中，通常包含 `pie`。
 """
 
-type AxisDataType = Literal["timestamp_ms", "timestamp_s", "datetime", "date", "time", "number", "category"]
+type AxisDataType = Literal["timestamp_ms", "timestamp_s", "datetime", "date", "number", "category"]
 """坐标轴数据类型定义，用于描述坐标轴数据的语义类型。
 
 取值说明：
@@ -39,7 +39,6 @@ type AxisDataType = Literal["timestamp_ms", "timestamp_s", "datetime", "date", "
     - timestamp_s: 秒级 Unix 时间戳。
     - datetime: 日期时间类型，通常对应 `datetime` 对象或日期时间字符串。
     - date: 日期类型，通常对应 `date` 对象或日期字符串。
-    - time: 时间类型，通常对应 `time` 对象或时间字符串。
     - number: 连续数值类型。
     - category: 离散分类类型。
 

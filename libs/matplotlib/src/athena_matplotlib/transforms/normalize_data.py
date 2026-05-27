@@ -100,7 +100,6 @@ def normalize_axis_value(
 
     - timestamp_ms / timestamp_s / datetime 会转换为 `datetime`。
     - date 会转换为 `date`。
-    - time 会转换为 `time`。
     - number 会转换为 `float`。
     - category 会转换为 `str`。
     - `None` 会保持为 `None`，用于表示缺失值。
@@ -124,8 +123,6 @@ def normalize_axis_value(
             if isinstance(value, datetime):
                 return temporal_codec.parse_datetime(value).date()
             return temporal_codec.parse_date(value)
-        case "time":
-            return temporal_codec.parse_time(value)
         case "number":
             return float(value)
         case "category":

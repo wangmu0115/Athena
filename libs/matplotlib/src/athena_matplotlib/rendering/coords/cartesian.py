@@ -4,6 +4,7 @@ from athena_matplotlib.decorations import apply_cartesian_style
 from athena_matplotlib.options import RenderFigureOptions
 from athena_matplotlib.rendering.axes_runtime import resolve_axes_runtime
 from athena_matplotlib.rendering.color_cycle import ColorCycle
+from athena_matplotlib.rendering.coords.tick import render_axis_tick
 from athena_matplotlib.rendering.plots.line_plot import LineArtist
 from athena_matplotlib.rendering.render_plan import resolve_cartesian_render_plan
 from athena_matplotlib.specs import ChartSpec
@@ -33,6 +34,12 @@ class CartesianCoordRenderer:
         if render_plan.bar_plots:
             pass
 
+        # Tick
+        render_axis_tick(axes_runtime.primary.xaxis, chart.coord.x_axis)  # X
+        if axes_runtime.left_y is not None and chart.coord.left_y_axis is not None:
+            render_axis_tick(axes_runtime.left_y.yaxis, chart.coord.left_y_axis)
+        if axes_runtime.right_y is not None and chart.coord.right_y_axis is not None:
+            render_axis_tick(axes_runtime.right_y.yaxis, chart.coord.right_y_axis)  # X
         # Legend
 
-        # Tick
+    # def _render_axis_tick(axes)

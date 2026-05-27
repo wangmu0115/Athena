@@ -25,6 +25,7 @@ class LineLayerArtist:
             y_values,
             zorder=z_index,
             label=plot_name,
+            antialiased=True,
             marker="none",  # don't draw marker
             **line_params,
         )

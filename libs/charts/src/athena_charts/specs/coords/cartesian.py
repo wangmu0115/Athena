@@ -6,7 +6,7 @@ from athena_charts.specs.coords.axis import AxisSpec
 from athena_charts.specs.coords.base import Coord
 from athena_charts.specs.coords.tick import TickSpec
 from athena_charts.specs.coords.types import AxisDataType, CartesianAxisPosition
-from athena_charts_matplotlib.rendering.options.types import AxisScale
+from athena_matplotlib.types import AxisScale
 
 
 class CartesianAxisSpec(AxisSpec):

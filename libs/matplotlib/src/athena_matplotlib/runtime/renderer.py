@@ -38,7 +38,7 @@ class BaseRenderer(ABC):
     def theme(self) -> Theme:
         return self._theme
 
-    def render(self, spec: RenderSpec, *, options: RenderFigureOptions | None) -> RenderResult:
+    def render(self, spec: RenderSpec, *, options: RenderFigureOptions | None = None) -> RenderResult:
         figure_spec = FigureSpec.from_chart(spec) if isinstance(spec, ChartSpec) else spec
         return self._render_figure(
             figure_spec,

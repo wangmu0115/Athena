@@ -18,7 +18,7 @@ class FigureStyle(_BaseStyle):
     def of(
         cls,
         size: tuple[int, int] = (960, 720),
-        dpi: int = 150,
+        dpi: int = 300,
         facecolor: str = "white",
         edgecolor: str = "white",
         titlesize: int = 12,

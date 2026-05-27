@@ -16,7 +16,7 @@ class LinePlotStyle(_BaseStyle):
     @classmethod
     def of(
         cls,
-        linewidth: float = 1.0,
+        linewidth: float = 0.8,
         linestyle: LineStyle = "solid",
         marker: MarkerShape = "circle",
         marker_size: int = 4,

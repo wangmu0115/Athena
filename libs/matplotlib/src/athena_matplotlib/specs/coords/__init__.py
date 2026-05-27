@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from athena_matplotlib.specs.coords.base import AxisSpec, Coord
     from athena_matplotlib.specs.coords.cartesian import CartesianAxisSpec, CartesianCoord
     from athena_matplotlib.specs.coords.polar import PolarAxisSpec, PolarCoord
-    from athena_matplotlib.specs.coords.tick import TickLabelFormat, TickLocator, TickSpec
+    from athena_matplotlib.specs.coords.tick import TickLabelFormatter, TickLocator, TickSpec
     from athena_matplotlib.specs.coords.unions import CoordSpec
 
 
@@ -18,7 +18,7 @@ __all__ = (
     "CartesianCoord",
     "PolarAxisSpec",
     "PolarCoord",
-    "TickLabelFormat",
+    "TickLabelFormatter",
     "TickLocator",
     "TickSpec",
 )
@@ -32,9 +32,9 @@ _dynamic_imports = {
     "CartesianCoord": "cartesian",
     "PolarAxisSpec": "polar",
     "PolarCoord": "polar",
-    "TickLabelFormat": "tick",
+    "TickLabelFormatter": "tick",
     "TickLocator": "tick",
-    "TickSpec": "ticks",
+    "TickSpec": "tick",
 }
 
 

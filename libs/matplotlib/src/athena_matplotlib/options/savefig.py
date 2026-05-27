@@ -36,7 +36,7 @@ class SaveFigureOptions(_BaseOptions):
     @classmethod
     def transparent_png(
         cls,
-        dpi: int = 150,
+        dpi: int = 300,
         bbox_inches: BboxInches = "tight",
         pad_inches: float = 0.1,
         pil_compress_level: int = 6,
@@ -56,7 +56,7 @@ class SaveFigureOptions(_BaseOptions):
     @classmethod
     def png(
         cls,
-        dpi: int = 150,
+        dpi: int = 300,
         facecolor: str = "white",
         edgecolor: str = "white",
         bbox_inches: BboxInches = "tight",
