@@ -32,6 +32,13 @@ class BaseWriter[TValue](ABC):
     def _write_artifact(self, artifact: WritableArtifact, *, filename: str | None = None) -> WriteResult[TValue]: ...
 
 
+class NullWriter(BaseWriter[None]):
+    def _write_artifact(self, artifact: WritableArtifact, *, filename: str | None = None) -> WriteResult[None]:
+        import matplotlib.pyplot as plt
+
+        plt.show()
+
+
 class FileWriter(BaseWriter[Path]):
     """写出到本地目录"""
 

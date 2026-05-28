@@ -11,7 +11,7 @@ class LineLayerArtist:
     def draw(
         self,
         axes: Axes,
-        x_values: list[object],
+        x_positions: list[float],
         y_values: list[float | None],
         *,
         plot_name: str = "",
@@ -21,7 +21,7 @@ class LineLayerArtist:
     ):
         line_params = _build_line_params(self._color_cycle, options=options, override=override)
         axes.plot(
-            x_values,
+            x_positions,
             y_values,
             zorder=z_index,
             label=plot_name,

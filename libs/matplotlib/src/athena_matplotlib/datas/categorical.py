@@ -2,7 +2,7 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.specs._base import _BaseSpec
+from athena_matplotlib.specs._base import _BaseSpec
 
 
 class CategoricalDatum(_BaseSpec):

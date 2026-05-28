@@ -22,8 +22,8 @@ class RenderFigureOptions(_BaseOptions):
     def build_figure_params(self) -> dict[str, object]:
         if self.size is not None:
             dpi = self.dpi or mpl.rcParams["figure.dpi"]
-            figsize = self.size / dpi
-            return {"figsize": figsize, "dpi": dpi}
+            width, height = self.size
+            return {"figsize": (width / dpi, height / dpi), "dpi": dpi}
         return {}
 
     @classmethod

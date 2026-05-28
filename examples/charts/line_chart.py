@@ -5,15 +5,14 @@ from athena_matplotlib.options.marker import MarkerStyle
 from athena_matplotlib.options.rules.conditions import DataCondition, DataPredicate
 from athena_matplotlib.runtime.pipeline import Pipeline
 from athena_matplotlib.runtime.renderer import FigureRenderer
-from athena_matplotlib.runtime.writers import FileWriter
+from athena_matplotlib.runtime.writers import NullWriter
 from athena_matplotlib.specs.chart import ChartSpec
 from athena_matplotlib.specs.coords.cartesian import CartesianAxisSpec, CartesianCoord
 from athena_matplotlib.specs.coords.tick import TickLabelFormatter, TickSpec
 from athena_matplotlib.specs.plots.line import LinePlot
-from matplotlib import pyplot as plt
 
 renderer = FigureRenderer()
-writer = FileWriter(".")
+writer = NullWriter()
 pipeline = Pipeline(renderer, writer)
 
 
@@ -71,9 +70,7 @@ spec = ChartSpec(
     ],
 )
 
-renderer.render(spec)
-plt.show()
 
-# result = pipeline.invoke(spec, filename="test.png", render_options=RenderFigureOptions(dpi=300), save_options=SaveFigureOptions(dpi=300))
+result = pipeline.invoke(spec, filename="test.png")
 
 # print(result)

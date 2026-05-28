@@ -32,7 +32,7 @@ class LineArtist:
         # 1. 绘制折线图
         self._line_layer.draw(
             axes,
-            plot.x_values,
+            plot.x_positions,
             plot.y_values,
             plot_name=plot.plot.name,
             z_index=plot.plot.z_index,
@@ -42,8 +42,9 @@ class LineArtist:
         # 2. 绘制Marker
         self._marker_layer.draw(
             axes,
-            plot.x_values,
+            plot.x_positions,
             plot.y_values,
+            semantic_x_values=plot.x_values,
             plot_name=plot.plot.name,
             z_index=plot.plot.z_index + 1,
             options=safe_getattr(options, "marker"),
@@ -52,8 +53,9 @@ class LineArtist:
         # 3. 绘制数据标签
         self._datalabel_layer.draw(
             axes,
-            plot.x_values,
+            plot.x_positions,
             plot.y_values,
+            semantic_x_values=plot.x_values,
             plot_name=plot.plot.name,
             z_index=plot.plot.z_index + 1,
             options=safe_getattr(options, "data_label"),

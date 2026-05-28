@@ -1,15 +1,21 @@
+from dataclasses import dataclass
 from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
-from athena_charts.specs._base import _BaseSpec
+from athena_matplotlib.specs._base import _BaseSpec
 
 
-class XYPoint(_BaseSpec):
-    """二维坐标轴中的点"""
+@dataclass
+class XYPoint:
+    x: object
+    """X 轴值"""
+    y: float | None
+    """Y 轴值"""
 
-    x: object = Field(..., description="X 轴值")
-    y: float | None = Field(..., description="Y 轴值")
+    @classmethod
+    def point(cls, *, x: object, y: float | None):
+        return cls(x=x, y=y)
 
 
 class XYSeriesData(_BaseSpec):
