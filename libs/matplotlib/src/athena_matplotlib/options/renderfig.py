@@ -5,10 +5,10 @@ from pydantic import Field
 import matplotlib as mpl
 from athena_matplotlib.options._base import _BaseOptions
 from athena_matplotlib.options.chart import ChartOptions
-from athena_matplotlib.options.coords.cartesian import CartesianCoordOptions
+from athena_matplotlib.options.coords import CartesianCoordOptions
 from athena_matplotlib.options.figure import FigureOptions
-from athena_matplotlib.options.coords.legend import LegendOptions
-from athena_matplotlib.options.plots.line_plot import LinePlotOptions
+from athena_matplotlib.options.plots.bar import BarPlotOptions
+from athena_matplotlib.options.plots.line import LinePlotOptions
 
 
 class RenderFigureOptions(_BaseOptions):
@@ -18,9 +18,9 @@ class RenderFigureOptions(_BaseOptions):
     figure: FigureOptions | None = Field(None, description="画布样式配置")
     chart: ChartOptions | None = Field(None, description="图表样式配置")
     cartesian: CartesianCoordOptions | None = Field(None, description="笛卡尔坐标系样式配置")
-    legend: LegendOptions | None = Field(None, description="图例样式配置")
 
     line_plot: LinePlotOptions | None = Field(None, description="Line Plot 样式配置")
+    bar_plot: BarPlotOptions | None = Field(None, description="Bar Plot 样式配置")
 
     def build_figure_params(self) -> dict[str, object]:
         if self.size is not None:
@@ -43,8 +43,8 @@ class RenderFigureOptions(_BaseOptions):
         figure: FigureOptions | None = None,
         chart: ChartOptions | None = None,
         cartesian: CartesianCoordOptions | None = None,
-        legend: LegendOptions | None = None,
         line_plot: LinePlotOptions | None = None,
+        bar_plot: BarPlotOptions | None = None,
     ) -> Self:
         return cls(
             size=size,
@@ -52,6 +52,6 @@ class RenderFigureOptions(_BaseOptions):
             figure=figure,
             chart=chart,
             cartesian=cartesian,
-            legend=legend,
             line_plot=line_plot,
+            bar_plot=bar_plot,
         )

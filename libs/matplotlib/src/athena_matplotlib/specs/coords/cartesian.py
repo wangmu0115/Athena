@@ -2,7 +2,7 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
-from athena_matplotlib.options import CartesianCoordOptions
+from athena_matplotlib.options.coords import CartesianCoordOptions
 from athena_matplotlib.specs.coords.base import AxisSpec, Coord
 from athena_matplotlib.specs.coords.tick import TickSpec
 from athena_matplotlib.types import AxisDataType, AxisScale, CartesianAxisPosition
@@ -18,7 +18,7 @@ class CartesianAxisSpec(AxisSpec):
         data_type: AxisDataType = "category",
         tick: TickSpec | None = None,
         *,
-        label: str = "",
+        label: str | None = None,
         scale: AxisScale = "linear",
         min: object | None = None,
         max: object | None = None,
@@ -27,10 +27,10 @@ class CartesianAxisSpec(AxisSpec):
             position=position,
             label=label,
             data_type=data_type,
+            tick=tick or TickSpec.auto(),
             scale=scale,
             min=min,
             max=max,
-            tick=tick,
         )
 
     @classmethod
@@ -39,7 +39,7 @@ class CartesianAxisSpec(AxisSpec):
         position: Literal["left", "right"] = "left",
         tick: TickSpec | None = None,
         *,
-        label: str = "",
+        label: str | None = None,
         scale: AxisScale = "linear",
         min: object | None = None,
         max: object | None = None,
@@ -48,10 +48,10 @@ class CartesianAxisSpec(AxisSpec):
             position=position,
             label=label,
             data_type="number",
+            tick=tick or TickSpec.auto(),
             scale=scale,
             min=min,
             max=max,
-            tick=tick,
         )
 
     @model_validator(mode="after")
@@ -85,6 +85,7 @@ class CartesianCoord(Coord):
         *,
         left_y_axis: CartesianAxisSpec | None = None,
         right_y_axis: CartesianAxisSpec | None = None,
+        legend_title: str | None = None,
         options: CartesianCoordOptions | None = None,
     ) -> Self:
         return cls(
@@ -92,6 +93,7 @@ class CartesianCoord(Coord):
             x_axis=x_axis,
             left_y_axis=left_y_axis,
             right_y_axis=right_y_axis,
+            legend_title=legend_title,
             options=options,
         )
 

@@ -18,14 +18,13 @@ class CartesianCoordRenderer:
         self._bar_artist = BarArtist(color_cycle)
 
     def render(self, axes: Axes, chart: ChartSpec, *, options: RenderFigureOptions):
-        # 运行时 Axes 配置，根据 Y 轴的位置可能有两个 Axes
+        # 1. 运行时 Axes 配置，根据 Y 轴的位置可能有两个 Axes
         axes_runtime: AxesRuntime = resolve_axes_runtime(axes, chart.coord)
-        # 轴线、轴标签、刻度和 Grid 渲染样式配置
+        # 2. 轴线、轴标签、刻度和 Grid 渲染样式配置
         apply_cartesian_style(axes_runtime, chart.coord, options=options.cartesian)
-        # Plot artists
+        # 3. Plot artists
         if not chart.plots:
             return
-        # Render plan
         render_plan = resolve_cartesian_render_plan(chart)
         if render_plan.line_plots:
             for line_plot in render_plan.line_plots:
@@ -41,7 +40,7 @@ class CartesianCoordRenderer:
                 # options
             )
 
-        # Tick
+        # 4. Tick
         x_tick_context = AxisTickContext(values=render_plan.x_values, positions=render_plan.x_positions)
         render_axis_tick(
             axes_runtime.primary.xaxis,
@@ -52,7 +51,7 @@ class CartesianCoordRenderer:
             render_axis_tick(axes_runtime.left_y.yaxis, chart.coord.left_y_axis)
         if axes_runtime.right_y is not None and chart.coord.right_y_axis is not None:
             render_axis_tick(axes_runtime.right_y.yaxis, chart.coord.right_y_axis)
-        # Legend
+        # 5. Legend
         render_cartesian_legend(
             axes_runtime,
             options=options.legend,

@@ -3,6 +3,7 @@ from typing import Annotated, Literal, Self
 from pydantic import Field
 
 from athena_matplotlib.datas import CategoricalSeriesData, XYSeriesData
+from athena_matplotlib.options.plots.bar import BarPlotOptions
 from athena_matplotlib.specs.coords import Coord
 from athena_matplotlib.specs.plots.base import Plot
 
@@ -16,6 +17,8 @@ class BarPlot(Plot):
     y_axis_side: Literal["left", "right"] = Field("left", description="使用左侧或右侧 Y 轴")
     data: BarPlotData = Field(..., description="图层数据")
 
+    options: BarPlotOptions | None = Field(None, description="柱状图运行时配置项")
+
     @classmethod
     def of(
         cls,
@@ -25,6 +28,7 @@ class BarPlot(Plot):
         *,
         name: str = "",
         z_index: int = 90,
+        options: BarPlotOptions | None = None,
     ) -> Self:
         return cls(
             kind="bar",
@@ -34,6 +38,7 @@ class BarPlot(Plot):
             x_axis_side=x_axis_side,
             y_axis_side=y_axis_side,
             z_index=z_index,
+            options=options,
         )
 
     def validate_coord(self, coord: Coord):

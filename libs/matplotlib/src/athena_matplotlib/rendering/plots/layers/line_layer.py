@@ -1,6 +1,6 @@
 from matplotlib.axes import Axes
 
-from athena_matplotlib.options.plots.line_plot import LineOptions
+from athena_matplotlib.options.plots.line import LineOptions
 from athena_matplotlib.rendering.color_cycle import ColorCycle
 
 

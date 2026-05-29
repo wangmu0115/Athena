@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from matplotlib.axes import Axes
 
 from athena_core.values.optional import optional_or, safe_getattr
-from athena_matplotlib.options.plots.bar_plot import BarLayoutOptions, BarPlotOptions
+from athena_matplotlib.options.plots.bar import BarLayoutOptions, BarPlotOptions
 from athena_matplotlib.rendering.color_cycle import ColorCycle
 from athena_matplotlib.rendering.plots.layers.bar_layer import BarLayerArtist
 from athena_matplotlib.rendering.coords._render_plan import AlignedBarPlots

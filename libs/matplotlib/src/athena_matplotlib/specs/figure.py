@@ -19,9 +19,9 @@ class ChartPlacement(_BaseSpec):
     def of(
         cls,
         chart: ChartSpec,
-        *,
         row: int = 1,
         col: int = 1,
+        *,
         row_span: int = 1,
         col_span: int = 1,
     ) -> Self:
@@ -66,18 +66,39 @@ class FigureGridLayout(_BaseSpec):
 class FigureSpec(_BaseSpec):
     """画布语义模型，Figure 是顶层容器，负责组织一个或多个 Chart"""
 
-    title: str = Field("", description="画布标题")
+    title: str | None = Field(None, description="画布标题")
     layout: FigureGridLayout = Field(..., description="图表网格布局")
     charts: list[ChartPlacement] = Field(default_factory=list, description="画布中的图表放置列表")
 
     @classmethod
-    def from_chart(cls, chart: ChartSpec, *, title: str = "") -> Self:
-        return cls.of(FigureGridLayout.of(1, 1), [ChartPlacement.of(chart)], title=title)
+    def from_chart(cls, chart: ChartSpec, *, title: str | None = None) -> Self:
+        return cls.of(
+            FigureGridLayout.of(1, 1),
+            title=title,
+        ).add_chart(chart)
 
     @classmethod
-    def of(cls, layout: FigureGridLayout, charts: list[ChartPlacement], *, title: str = "") -> Self:
+    def of(
+        cls,
+        layout: FigureGridLayout,
+        *,
+        charts: list[ChartPlacement] | None = None,
+        title: str | None = None,
+    ) -> Self:
         return cls(
-            title=title,
             layout=layout,
-            charts=charts,
+            charts=charts or [],
+            title=title,
         )
+
+    def add_chart(
+        self,
+        chart: ChartSpec,
+        row: int = 1,
+        col: int = 1,
+        *,
+        row_span: int = 1,
+        col_span: int = 1,
+    ) -> Self:
+        self.charts.append(ChartPlacement.of(chart, row, col, row_span=row_span, col_span=col_span))
+        return self

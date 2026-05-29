@@ -1,4 +1,9 @@
-from athena_matplotlib.types import LegendLocation, LineStyle, MarkerShape
+from athena_matplotlib.types import (
+    HatchPattern,
+    LegendLocation,
+    LineStyle,
+    MarkerShape,
+)
 
 _MPL_LINE_STYLE: dict[LineStyle, str] = {
     "solid": "-",
@@ -28,6 +33,20 @@ _MPL_MARKER_SHAPE: dict[MarkerShape, str] = {
     "diamond": "D",
     "cross": "x",
     "plus": "+",
+    "star": "*",
+    "none": "",
+}
+
+_MPL_HATCH_PATTERN: dict[HatchPattern, str] = {
+    "diagonal": "/",
+    "back_diagonal": "\\",
+    "vertical": "|",
+    "horizontal": "-",
+    "cross": "+",
+    "diagonal_cross": "x",
+    "dot": ".",
+    "circle": "o",
+    "large_circle": "O",
     "star": "*",
     "none": "",
 }
@@ -84,3 +103,27 @@ def to_mpl_marker_shape(marker: MarkerShape | None) -> str | None:
     if marker is None:
         return "o"
     return _MPL_MARKER_SHAPE[marker]
+
+
+def to_mpl_hatch_pattern(hatch_pattern: HatchPattern | None) -> str | None:
+    """
+    将 Athena HatchPattern 枚举转换为 Matplotlib Hatch 字符串。
+
+    当传入 `None` 时，表示未显式指定纹理样式，默认返回空字符串，不绘制 Hatch。
+
+    Notes:
+        - diagonal -> "/"
+        - back_diagonal -> "\\\\"
+        - vertical -> "|"
+        - horizontal -> "-"
+        - cross -> "+"
+        - diagonal_cross -> "x"
+        - dot -> "."
+        - circle -> "o"
+        - large_circle -> "O"
+        - star -> "*"
+        - none -> ""  # 显式指定不显示纹理
+    """
+    if hatch_pattern is None:
+        return ""
+    return _MPL_HATCH_PATTERN[hatch_pattern]

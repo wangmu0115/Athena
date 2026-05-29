@@ -113,6 +113,23 @@ type MarkerShape = Literal["circle", "square", "triangle", "diamond", "cross", "
     - none: 不显示标记。
 """
 
+type HatchPattern = Literal["diagonal", "back_diagonal", "vertical", "horizontal", "cross", "diagonal_cross", "dot", "circle", "large_circle", "star", "none"]
+"""柱状图填充纹理定义，用于描述柱子内部的纹理样式。
+
+取值说明：
+    - diagonal: 左下到右上的斜线纹理。
+    - back_diagonal: 左上到右下的斜线纹理。
+    - vertical: 垂直线纹理。
+    - horizontal: 水平线纹理。
+    - cross: 水平与垂直交叉网格纹理。
+    - diagonal_cross: 对角线交叉网格纹理。
+    - dot: 点状纹理。
+    - circle: 小圆点纹理。
+    - large_circle: 大圆点纹理。
+    - star: 星形纹理。
+    - none: 不显示纹理。
+"""
+
 
 type AxisScale = Literal["linear", "log"]
 """坐标轴缩放类型定义，用于描述坐标轴的数据映射方式。

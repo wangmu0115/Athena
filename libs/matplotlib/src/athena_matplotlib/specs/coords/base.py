@@ -9,7 +9,7 @@ from athena_matplotlib.types.styles import AxisScale
 
 
 class AxisSpec(_BaseSpec):
-    label: str = Field("", description="坐标轴标题")
+    label: str | None = Field(None, description="坐标轴标题")
     data_type: AxisDataType = Field("number", description="坐标轴数据类型")
     scale: AxisScale = Field("linear", description="坐标轴缩放方式")
     min: object | None = Field(None, description="坐标轴数据域最小值，类型应与坐标轴数据类型兼容")

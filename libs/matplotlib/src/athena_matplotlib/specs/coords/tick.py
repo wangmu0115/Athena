@@ -75,8 +75,16 @@ class TickSpec(_BaseSpec):
     locator: TickLocator = Field(..., description="刻度位置配置")
 
     @classmethod
+    def auto(cls) -> Self:
+        return cls.of(
+            formatter=TickLabelFormatter.auto(),
+            locator=TickLocator.auto(max_count=6),
+        )
+
+    @classmethod
     def of(
         cls,
+        *,
         formatter: TickLabelFormatter | None = None,
         locator: TickLocator | None = None,
     ) -> Self:

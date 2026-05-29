@@ -1,6 +1,6 @@
 from athena_matplotlib.datas.xy import XYSeriesData
 from athena_matplotlib.options.plots.data_label import DataLabelStyle
-from athena_matplotlib.options.plots.line_plot import DataLabelOptions, LinePlotOptions, MarkerOptions
+from athena_matplotlib.options.plots.line import DataLabelOptions, LinePlotOptions, MarkerOptions
 from athena_matplotlib.options.plots.marker import MarkerStyle
 from athena_matplotlib.options.rules.conditions import DataCondition, DataPredicate
 from athena_matplotlib.runtime.pipeline import Pipeline
