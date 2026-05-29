@@ -3,7 +3,7 @@ from typing import Literal, Self
 from pydantic import Field
 
 from athena_matplotlib.datas import XYSeriesData
-from athena_matplotlib.options import LinePlotOptions
+from athena_matplotlib.options.plots import LinePlotOptions
 from athena_matplotlib.specs.coords import Coord
 from athena_matplotlib.specs.plots.base import Plot
 

@@ -4,7 +4,7 @@ from matplotlib.axis import Axis
 from matplotlib.ticker import AutoLocator, FixedLocator, FuncFormatter, MaxNLocator, NullLocator
 
 from athena_core.values.fallbacks import first_not_none
-from athena_matplotlib.rendering.render_plan import AxisTickContext
+from athena_matplotlib.rendering.coords._render_plan import AxisTickContext
 from athena_matplotlib.specs.coords import TickSpec
 from athena_matplotlib.specs.coords.base import AxisSpec
 from athena_matplotlib.transforms.tick_labels import format_tick_label

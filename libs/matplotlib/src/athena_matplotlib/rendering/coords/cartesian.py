@@ -3,7 +3,7 @@ from matplotlib.axes import Axes
 from athena_matplotlib.decorations import apply_cartesian_style
 from athena_matplotlib.options import RenderFigureOptions
 from athena_matplotlib.rendering.color_cycle import ColorCycle
-from athena_matplotlib.rendering.coords._axes_runtime import AxesRuntime, resolve_axes_runtime
+from athena_matplotlib.rendering.coords._axes_runtime import AxesRuntime, build_axes_runtime
 from athena_matplotlib.rendering.coords._render_plan import AxisTickContext, resolve_cartesian_render_plan
 from athena_matplotlib.rendering.coords.legend import render_cartesian_legend
 from athena_matplotlib.rendering.coords.tick import render_axis_tick
@@ -19,7 +19,7 @@ class CartesianCoordRenderer:
 
     def render(self, axes: Axes, chart: ChartSpec, *, options: RenderFigureOptions):
         # 1. 运行时 Axes 配置，根据 Y 轴的位置可能有两个 Axes
-        axes_runtime: AxesRuntime = resolve_axes_runtime(axes, chart.coord)
+        axes_runtime: AxesRuntime = build_axes_runtime(axes, chart.coord)
         # 2. 轴线、轴标签、刻度和 Grid 渲染样式配置
         apply_cartesian_style(axes_runtime, chart.coord, options=options.cartesian)
         # 3. Plot artists

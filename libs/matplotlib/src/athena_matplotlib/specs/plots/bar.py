@@ -3,7 +3,7 @@ from typing import Annotated, Literal, Self
 from pydantic import Field
 
 from athena_matplotlib.datas import CategoricalSeriesData, XYSeriesData
-from athena_matplotlib.options.plots.bar import BarPlotOptions
+from athena_matplotlib.options.plots import BarPlotOptions
 from athena_matplotlib.specs.coords import Coord
 from athena_matplotlib.specs.plots.base import Plot
 
