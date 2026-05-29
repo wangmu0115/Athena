@@ -5,6 +5,7 @@ from athena_matplotlib.options import RenderFigureOptions
 from athena_matplotlib.rendering.axes_runtime import resolve_axes_runtime
 from athena_matplotlib.rendering.color_cycle import ColorCycle
 from athena_matplotlib.rendering.coords.tick import render_axis_tick
+from athena_matplotlib.rendering.plots.bar_plot import BarArtist
 from athena_matplotlib.rendering.plots.line_plot import LineArtist
 from athena_matplotlib.rendering.render_plan import AxisTickContext, resolve_cartesian_render_plan
 from athena_matplotlib.specs import ChartSpec
@@ -13,6 +14,7 @@ from athena_matplotlib.specs import ChartSpec
 class CartesianCoordRenderer:
     def __init__(self, color_cycle: ColorCycle):
         self._line_artist = LineArtist(color_cycle)
+        self._bar_artist = BarArtist(color_cycle)
 
     def render(self, axes: Axes, chart: ChartSpec, *, options: RenderFigureOptions):
         # 运行时 Axes 配置，根据 Y 轴的位置可能有两个 Axes
@@ -32,7 +34,11 @@ class CartesianCoordRenderer:
                     options=options.line_plot,
                 )
         if render_plan.bar_plots:
-            pass
+            self._bar_artist.draw(
+                axes_runtime.axes_for_y_axis(render_plan.bar_plots.plots[0].y_axis_side),
+                render_plan.bar_plots,
+                # options
+            )
 
         # Tick
         x_tick_context = AxisTickContext(values=render_plan.x_values, positions=render_plan.x_positions)

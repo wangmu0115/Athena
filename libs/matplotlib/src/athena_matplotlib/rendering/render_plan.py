@@ -64,7 +64,7 @@ def resolve_cartesian_render_plan(chart: ChartSpec) -> CartesianRenderPlan:
         raise ValueError("Only Cartesian coord can build cartesian render plan.")
 
     # 对齐 X 轴时，缺省值
-    missing_value = 0.0 if chart.bar_layout_model == "stack" else None
+    missing_value = 0.0 if chart.bar_layout_mode == "stack" else None
 
     aligned_xy_series = align_cartesian_plots_data(
         chart.plots,

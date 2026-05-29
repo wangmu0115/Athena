@@ -15,9 +15,9 @@ def render_axis_tick(axis: Axis, spec: AxisSpec, *, context: AxisTickContext | N
     if spec.tick is None:
         return
     # Locator
-    _render_axis_tick_locator(axis, spec.tick)
+    _render_axis_tick_locator(axis, spec.tick, data_type=spec.data_type, context=context)
     # Formatter
-    _render_axis_tick_formatter(axis, spec.tick, data_type=spec.data_type)
+    _render_axis_tick_formatter(axis, spec.tick, data_type=spec.data_type, context=context)
 
 
 def _render_axis_tick_locator(
