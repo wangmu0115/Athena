@@ -4,8 +4,8 @@ from pydantic import Field, field_serializer
 
 from athena_matplotlib.adapters import to_mpl_line_style
 from athena_matplotlib.options._base import _BaseOptions
-from athena_matplotlib.options.data_label import DataLabelOptions
-from athena_matplotlib.options.marker import MarkerOptions
+from athena_matplotlib.options.plots.data_label import DataLabelOptions
+from athena_matplotlib.options.plots.marker import MarkerOptions
 from athena_matplotlib.types import LineStyle
 
 

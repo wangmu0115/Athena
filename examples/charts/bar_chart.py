@@ -1,4 +1,5 @@
 from athena_matplotlib.datas import CategoricalSeriesData
+from athena_matplotlib.options.coords.legend import LegendOptions
 from athena_matplotlib.runtime.pipeline import Pipeline
 from athena_matplotlib.runtime.renderer import FigureRenderer
 from athena_matplotlib.runtime.writers import NullWriter
@@ -28,6 +29,7 @@ spec = ChartSpec(
     coord=coord,
     plots=plots,
     bar_layout_mode="group",
+    legend=LegendOptions.show(ncols=2),
 )
 
 renderer = FigureRenderer()

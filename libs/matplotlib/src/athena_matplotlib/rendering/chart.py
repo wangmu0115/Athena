@@ -13,8 +13,9 @@ class ChartRenderer:
         self._cartesian_renderer = CartesianCoordRenderer(color_cycle)
 
     def render(self, axes: Axes, chart: ChartSpec, *, options: RenderFigureOptions):
-        # 渲染图表样式
+        # 图表背景色和图表标题
         apply_chart_style(axes, chart, options=options.chart)
-        # 渲染坐标轴系统
-        if isinstance(chart.coord, CartesianCoord):
+        # 坐标系系统
+        if isinstance(chart.coord, CartesianCoord):  # 笛卡尔直角坐标系
             self._cartesian_renderer.render(axes, chart, options=options)
+        # elif isinstance(chart.coord, PolarCoord): # 极坐标系

@@ -20,12 +20,19 @@ class TickLineOptions(_BaseOptions):
     @classmethod
     def show(
         cls,
+        *,
         linecolor: str | None = None,
         linewidth: float | None = None,
         linelength: float | None = None,
         direction: TickDirection | None = None,
     ):
-        return cls(visible=True, linecolor=linecolor, linewidth=linewidth, linelength=linelength, direction=direction)
+        return cls(
+            visible=True,
+            linecolor=linecolor,
+            linewidth=linewidth,
+            linelength=linelength,
+            direction=direction,
+        )
 
 
 class TickLabelOptions(_BaseOptions):
@@ -41,6 +48,7 @@ class TickLabelOptions(_BaseOptions):
     @classmethod
     def show(
         cls,
+        *,
         labelsize: int | None = None,
         labelcolor: str | None = None,
         rotation: float | None = None,
@@ -52,12 +60,45 @@ class TickOptions(_BaseOptions):
     line: TickLineOptions | None = Field(None, description="刻度线配置项")
     label: TickLabelOptions | None = Field(None, description="刻度文本配置项")
 
-    def build_line_params(self) -> dict[str, object]:
-        if self.line is None:
-            return {}
-        return self.line.model_dump(exclude_none=True, by_alias=True)
+    @classmethod
+    def hide_all(cls) -> Self:
+        return cls.of(
+            spine=TickLineOptions.hide(),
+            label=TickLabelOptions.hide(),
+        )
 
-    def build_label_params(self) -> dict[str, object]:
-        if self.label is None:
-            return {}
-        return self.label.model_dump(exclude_none=True, by_alias=True)
+    @classmethod
+    def hide_line(
+        cls,
+        *,
+        labelsize: int | None = None,
+        labelcolor: str | None = None,
+        rotation: float | None = None,
+    ) -> Self:
+        return cls.of(
+            spine=TickLineOptions.hide(),
+            label=TickLabelOptions.show(labelsize=labelsize, labelcolor=labelcolor, rotation=rotation),
+        )
+
+    @classmethod
+    def hide_label(
+        cls,
+        *,
+        linecolor: str | None = None,
+        linewidth: float | None = None,
+        linelength: float | None = None,
+        direction: TickDirection | None = None,
+    ) -> Self:
+        return cls.of(
+            spine=TickLineOptions.show(
+                linecolor=linecolor,
+                linewidth=linewidth,
+                linelength=linelength,
+                direction=direction,
+            ),
+            label=TickLabelOptions.hide(),
+        )
+
+    @classmethod
+    def of(cls, *, line: TickLineOptions | None = None, label: TickLabelOptions | None = None) -> Self:
+        return cls(line=line, label=label)

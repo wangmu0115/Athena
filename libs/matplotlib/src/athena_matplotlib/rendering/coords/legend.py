@@ -1,42 +1,39 @@
-# from athena_matplotlib.rendering.axes_runtime import AxesRuntime
+from athena_core.values.fallbacks import first_not_none
+from athena_core.values.optional import safe_getattr
+from athena_matplotlib.options.coords.legend import LegendOptions
+from athena_matplotlib.rendering.coords._axes_runtime import AxesRuntime
 
 
-# def apply_cartesian_legend(
-#     axes_runtime: AxesRuntime,
-#     *,
-#     # options: "RenderFigureOptions",
-# ) -> None:
-#     legend_options = getattr(options, "legend", None)
-#     if legend_options is not None and legend_options.visible is False:
-#         return
+def render_cartesian_legend(
+    runtime: AxesRuntime,
+    *,
+    options: LegendOptions | None,
+    override: LegendOptions | None,
+):
+    visible = first_not_none(
+        safe_getattr(override, "visible"),
+        safe_getattr(options, "visible"),
+        default=True,
+    )
+    if not visible:
+        return
 
-#     handles = []
-#     labels = []
+    handles: list[object] = []
+    labels: list[str] = []
+    for axes in runtime.all_axes:
+        axes_handles, axes_labels = axes.get_legend_handles_labels()
+        for handle, label in zip(axes_handles, axes_labels, strict=True):
+            if not label or label.startswith("_"):
+                continue
+            handles.append(handle)
+            labels.append(label)
+    if not handles:
+        return
 
-#     for ax in axes_runtime.all_axes:
-#         ax_handles, ax_labels = ax.get_legend_handles_labels()
-#         for handle, label in zip(ax_handles, ax_labels):
-#             if not label or label.startswith("_"):
-#                 continue
-#             handles.append(handle)
-#             labels.append(label)
-
-#     if not handles:
-#         return
-
-#     legend_params = {}
-
-#     if legend_options is not None:
-#         legend_params.update(
-#             legend_options.model_dump(
-#                 exclude_none=True,
-#                 exclude={"visible"},
-#                 by_alias=True,
-#             )
-#         )
-
-#     axes_runtime.axes.legend(
-#         handles,
-#         labels,
-#         **legend_params,
-#     )
+    style_params: dict[str, object] = {}
+    if options is not None:
+        style_params.update(options.model_dump(exclude_none=True, exclude=["visible"], by_alias=True))
+    if override is not None:
+        style_params.update(override.model_dump(exclude_none=True, exclude=["visible"], by_alias=True))
+    # Apply legend and styles
+    runtime.primary.legend(handles, labels, **style_params)

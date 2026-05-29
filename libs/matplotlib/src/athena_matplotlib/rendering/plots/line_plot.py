@@ -8,7 +8,7 @@ from athena_matplotlib.rendering.plots.layers import (
     LineLayerArtist,
     MarkerLayerArtist,
 )
-from athena_matplotlib.rendering.render_plan import AlignedLinePlot
+from athena_matplotlib.rendering.coords._render_plan import AlignedLinePlot
 
 
 class LineArtist:

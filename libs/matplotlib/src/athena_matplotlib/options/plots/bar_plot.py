@@ -3,7 +3,7 @@ from typing import Literal, Self
 from pydantic import Field
 
 from athena_matplotlib.options._base import _BaseOptions
-from athena_matplotlib.options.data_label import DataLabelOptions
+from athena_matplotlib.options.plots.data_label import DataLabelOptions
 
 
 class BarLayoutOptions(_BaseOptions):

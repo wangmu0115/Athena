@@ -19,9 +19,6 @@ class GridOptions(_BaseOptions):
     def serialize_linestyle(self, value: LineStyle) -> str:
         return to_mpl_line_style(value)
 
-    def build_grid_params(self) -> dict[str, object]:
-        return self.model_dump(exclude_none=True, by_alias=True, exclude=["visible"])
-
     @classmethod
     def nature(cls, grid_axis: GridAxis = "both") -> Self:
         return cls.show(

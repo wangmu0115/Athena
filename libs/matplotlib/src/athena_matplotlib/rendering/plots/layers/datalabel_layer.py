@@ -4,7 +4,7 @@ from matplotlib.axes import Axes
 
 from athena_core.values.fallbacks import first_not_none
 from athena_core.values.optional import optional_or, safe_getattr
-from athena_matplotlib.options.data_label import DataLabelOptions, DataLabelStyle, DataLabelStyleRule
+from athena_matplotlib.options.plots.data_label import DataLabelOptions, DataLabelStyle, DataLabelStyleRule
 from athena_matplotlib.options.rules.data_context import DataContext
 from athena_matplotlib.options.rules.matches import match_data_condition
 

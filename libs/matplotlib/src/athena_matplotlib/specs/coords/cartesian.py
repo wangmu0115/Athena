@@ -74,6 +74,8 @@ class CartesianCoord(Coord):
     left_y_axis: CartesianAxisSpec | None = Field(None, description="左 Y 轴")
     right_y_axis: CartesianAxisSpec | None = Field(None, description="右 Y 轴")
 
+    legend_title: str | None = Field(None, description="图例标题")
+
     options: CartesianCoordOptions | None = Field(None, description="运行时样式配置")
 
     @classmethod

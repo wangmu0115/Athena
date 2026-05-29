@@ -12,6 +12,12 @@ class AxesRuntime:
     left_y: Axes | None
     right_y: Axes | None
 
+    @property
+    def all_axes(self) -> list[Axes]:
+        if self.left_y is not None and self.right_y is not None:
+            return [self.left_y, self.right_y]
+        return [self.primary]
+
     def axes_for_y_axis(self, side: Literal["left", "right"]) -> Axes:
         if side == "left" and self.left_y is not None:
             return self.left_y

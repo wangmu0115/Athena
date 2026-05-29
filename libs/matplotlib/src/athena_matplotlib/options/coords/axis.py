@@ -8,7 +8,7 @@ from athena_matplotlib.types import FontWeight, LineStyle
 
 
 class AxisSpineOptions(_BaseOptions):
-    visible: bool | None = Field(None, description="是否显示坐标轴")
+    visible: bool | None = Field(None, description="是否显示坐标轴线")
     linewidth: float | None = Field(None, gt=0, description="坐标轴线宽")
     linecolor: str | None = Field(None, description="坐标轴线颜色", alias="color")
     linestyle: LineStyle | None = Field(None, description="坐标轴线样式")
@@ -24,6 +24,7 @@ class AxisSpineOptions(_BaseOptions):
     @classmethod
     def show(
         cls,
+        *,
         linewidth: float | None = None,
         linecolor: str | None = None,
         linestyle: LineStyle | None = None,
@@ -44,6 +45,7 @@ class AxisLabelOptions(_BaseOptions):
     @classmethod
     def show(
         cls,
+        *,
         labelsize: int | None = None,
         labelweight: FontWeight | None = None,
         labelcolor: str | None = None,
@@ -55,12 +57,39 @@ class AxisOptions(_BaseOptions):
     spine: AxisSpineOptions | None = Field(None, description="坐标轴线配置项")
     label: AxisLabelOptions | None = Field(None, description="坐标轴标题配置项")
 
-    def build_spine_params(self) -> dict[str, object]:
-        if self.spine is None:
-            return {}
-        return self.spine.model_dump(exclude_none=True, by_alias=True)
+    @classmethod
+    def hide_all(cls) -> Self:
+        return cls.of(
+            spine=AxisSpineOptions.hide(),
+            label=AxisLabelOptions.hide(),
+        )
 
-    def build_label_params(self) -> dict[str, object]:
-        if self.label is None:
-            return {}
-        return self.label.model_dump(exclude_none=True, by_alias=True)
+    @classmethod
+    def hide_spine(
+        cls,
+        *,
+        labelsize: int | None = None,
+        labelweight: FontWeight | None = None,
+        labelcolor: str | None = None,
+    ) -> Self:
+        return cls.of(
+            spine=AxisSpineOptions.hide(),
+            label=AxisLabelOptions.show(labelsize=labelsize, labelweight=labelweight, labelcolor=labelcolor),
+        )
+
+    @classmethod
+    def hide_label(
+        cls,
+        *,
+        linewidth: float | None = None,
+        linecolor: str | None = None,
+        linestyle: LineStyle | None = None,
+    ) -> Self:
+        return cls.of(
+            spine=AxisSpineOptions.show(linewidth=linewidth, linecolor=linecolor, linestyle=linestyle),
+            label=AxisLabelOptions.hide(),
+        )
+
+    @classmethod
+    def of(cls, *, spine: AxisSpineOptions | None = None, label: AxisLabelOptions | None = None) -> Self:
+        return cls(spine=spine, label=label)

@@ -1,7 +1,7 @@
 from matplotlib.axes import Axes
 
-from athena_matplotlib.options.bar_plot import BarOptions
-from athena_matplotlib.options.line_plot import LineOptions
+from athena_matplotlib.options.plots.bar_plot import BarOptions
+from athena_matplotlib.options.plots.line_plot import LineOptions
 from athena_matplotlib.rendering.color_cycle import ColorCycle
 
 

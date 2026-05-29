@@ -3,6 +3,7 @@ from typing import Self
 from pydantic import Field, model_validator
 
 from athena_matplotlib.options.chart import ChartOptions
+from athena_matplotlib.options.coords.legend import LegendOptions
 from athena_matplotlib.specs._base import _BaseSpec
 from athena_matplotlib.specs.coords import CoordSpec
 from athena_matplotlib.specs.plots import PlotSpec
@@ -15,6 +16,7 @@ class ChartSpec(_BaseSpec):
     plots: list[PlotSpec] = Field(default_factory=list, description="图层列表")
 
     options: ChartOptions | None = Field(None, description="图表运行时样式配置")
+    legend: LegendOptions | None = Field(None, description="图表图例运行时样式配置")
 
     bar_layout_mode: BarLayoutMode = Field("group", description="当具有多个 Bar 图层时的布局方式")
     category_order: list[object] | None = Field(None, description="多个图层 X 轴对齐时的特定顺序")

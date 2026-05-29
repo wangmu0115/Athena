@@ -4,8 +4,8 @@ from matplotlib.axes import Axes
 
 import matplotlib as mpl
 from athena_matplotlib.adapters.styles import to_mpl_marker_shape
-from athena_matplotlib.options.line_plot import MarkerOptions
-from athena_matplotlib.options.marker import MarkerStyle, MarkerStyleRule
+from athena_matplotlib.options.plots.line_plot import MarkerOptions
+from athena_matplotlib.options.plots.marker import MarkerStyle, MarkerStyleRule
 from athena_matplotlib.options.rules.data_context import DataContext
 from athena_matplotlib.options.rules.matches import match_data_condition
 
