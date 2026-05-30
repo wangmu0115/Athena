@@ -5,6 +5,7 @@ requires-python = ">=3.12"
 [manifest]
 members = [
     "athena-core",
+    "athena-http",
     "athena-matplotlib",
 ]
 
@@ -38,6 +39,11 @@ requires-dist = [{ name = "pydantic", specifier = ">=2.13.4" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=9.0.3" }]
+
+[[package]]
+name = "athena-http"
+version = "1.0.0"
+source = { editable = "libs/http" }
 
 [[package]]
 name = "athena-matplotlib"

@@ -3,12 +3,12 @@ from matplotlib.axes import Axes
 from athena_core.values.optional import safe_getattr
 from athena_matplotlib.options import LinePlotOptions
 from athena_matplotlib.rendering.color_cycle import ColorCycle
+from athena_matplotlib.rendering.coords._render_plan import AlignedLinePlot
 from athena_matplotlib.rendering.plots.layers import (
     DataLabelLayerArtist,
     LineLayerArtist,
     MarkerLayerArtist,
 )
-from athena_matplotlib.rendering.coords._render_plan import AlignedLinePlot
 
 
 class LineArtist:

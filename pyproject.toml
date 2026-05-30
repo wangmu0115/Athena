@@ -40,4 +40,5 @@ preview=true
 known-first-party = [
     "athena_core",
     "athena_matplotlib",
+    "athena_http",
 ]
