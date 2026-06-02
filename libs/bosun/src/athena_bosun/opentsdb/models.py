@@ -176,11 +176,11 @@ class Query(_BaseOpenTSDBModel):
     multifields: MultiField | None = Field(None, description="多值配置")
 
     @classmethod
-    def strpquery(cls, query_string: str) -> Query:
+    def parse_query(cls, query_string: str) -> Query:
         """从 OpenTSDB 查询字符串解析并构造 `Query`。"""
-        from athena_bosun.opentsdb.parser import strpquery
+        from athena_bosun.opentsdb.parser import parse_query
 
-        return strpquery(query_string)
+        return parse_query(query_string)
 
     def to_query_string(self) -> str:
         """序列化为规范化 OpenTSDB 查询字符串。"""

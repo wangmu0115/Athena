@@ -4,17 +4,17 @@ from athena_bosun.opentsdb.enums import Aggregator, FilterType, MultiFunction
 from athena_bosun.opentsdb.exceptions import OpenTSDBParseError
 from athena_bosun.opentsdb.models import Query
 from athena_bosun.opentsdb.parser import (
-    strpdownsampling,
-    strpmultifield,
-    strpquery,
-    strprate,
-    strptagkv,
-    strptopk,
+    parse_downsampling,
+    parse_multifield,
+    parse_query,
+    parse_rate,
+    parse_tagkv,
+    parse_topk,
 )
 
 
 def test_parse_downsampling_normalizes_default_fill_policy():
-    downsampling = strpdownsampling("1m-avg")
+    downsampling = parse_downsampling("1m-avg")
 
     assert downsampling is not None
     assert downsampling.interval == "1m"
@@ -24,18 +24,18 @@ def test_parse_downsampling_normalizes_default_fill_policy():
 
 
 def test_parse_downsampling_returns_none_for_other_components():
-    assert strpdownsampling("rate{counter}") is None
+    assert parse_downsampling("rate{counter}") is None
 
 
 def test_parse_downsampling_rejects_invalid_aggregator():
     with pytest.raises(OpenTSDBParseError, match="Illegal OpenTSDB component"):
-        strpdownsampling("1m-unknown")
+        parse_downsampling("1m-unknown")
 
 
 def test_parse_rate_variants():
-    plain_rate = strprate("rate")
-    counter_rate = strprate("rate{counter}")
-    full_rate = strprate("rate{counter,,,diff,after_downsample}")
+    plain_rate = parse_rate("rate")
+    counter_rate = parse_rate("rate{counter}")
+    full_rate = parse_rate("rate{counter,,,diff,after_downsample}")
 
     assert plain_rate is not None
     assert plain_rate.counter is False
@@ -47,32 +47,32 @@ def test_parse_rate_variants():
     assert full_rate.counter is True
     assert full_rate.delta is True
     assert full_rate.downsample == "after_downsample"
-    assert strprate("top-10-max") is None
+    assert parse_rate("top-10-max") is None
 
 
 def test_parse_rate_rejects_malformed_rate_prefix():
     with pytest.raises(OpenTSDBParseError, match="Illegal rate string"):
-        strprate("rate {counter}")
+        parse_rate("rate {counter}")
 
 
 def test_parse_topk_variants():
-    topk = strptopk("bottom-5-avg")
+    topk = parse_topk("bottom-5-avg")
 
     assert topk is not None
     assert topk.top_bottom == "bottom"
     assert topk.num == 5
     assert topk.option == "avg"
     assert str(topk) == "bottom-5-avg"
-    assert strptopk("rate") is None
+    assert parse_topk("rate") is None
 
 
 def test_parse_topk_rejects_invalid_num():
     with pytest.raises(OpenTSDBParseError, match="Illegal topk string"):
-        strptopk("top-many-max")
+        parse_topk("top-many-max")
 
 
 def test_parse_tagkv_defaults_to_literal_or():
-    tagkv = strptagkv("host=a|b", group_by=True)
+    tagkv = parse_tagkv("host=a|b", group_by=True)
 
     assert tagkv.key == "host"
     assert tagkv.values == ["a", "b"]
@@ -82,14 +82,14 @@ def test_parse_tagkv_defaults_to_literal_or():
 
 
 def test_parse_tagkv_with_explicit_filter_type():
-    tagkv = strptagkv("host=not_literal_or(a|b)")
+    tagkv = parse_tagkv("host=not_literal_or(a|b)")
 
     assert tagkv.filter_type == FilterType.NOT_LITERAL_OR
     assert tagkv.values == ["a", "b"]
 
 
 def test_parse_multifield_plain_fields():
-    multifield = strpmultifield("rt.pct90,count.rate")
+    multifield = parse_multifield("rt.pct90,count.rate")
 
     assert multifield.fields == ["rt.pct90", "count.rate"]
     assert multifield.field_func is None
@@ -97,7 +97,7 @@ def test_parse_multifield_plain_fields():
 
 
 def test_parse_multifield_function_call():
-    multifield = strpmultifield("weighted_avg(value=rt.pct90,weight=count)")
+    multifield = parse_multifield("weighted_avg(value=rt.pct90,weight=count)")
 
     assert multifield.field_func == MultiFunction.WEIGHTED_AVG
     assert multifield.func_params == {"value": "rt.pct90", "weight": "count"}
@@ -106,7 +106,7 @@ def test_parse_multifield_function_call():
 
 
 def test_parse_full_query_with_optional_components():
-    query = strpquery(
+    query = parse_query(
         "sum:1m-avg:rate{counter,,,diff,after_downsample}:top-10-max:"
         "[tenant]service.latency{host=a|b}{env=prod}[rt.pct90,count.rate]"
     )
@@ -126,7 +126,7 @@ def test_parse_full_query_with_optional_components():
 
 
 def test_query_classmethod_delegates_to_parser():
-    query = Query.strpquery("sum:service.qps")
+    query = Query.parse_query("sum:service.qps")
 
     assert isinstance(query, Query)
     assert str(query) == "sum:[default]service.qps{}{}"
@@ -134,4 +134,4 @@ def test_query_classmethod_delegates_to_parser():
 
 def test_parse_query_rejects_empty_string():
     with pytest.raises(OpenTSDBParseError, match="query string is empty"):
-        strpquery("")
+        parse_query("")

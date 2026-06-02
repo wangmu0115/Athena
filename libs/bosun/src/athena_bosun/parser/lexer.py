@@ -8,7 +8,8 @@ from athena_bosun.parser.tokens import BUILTIN_FUNCS, BUILTIN_SYMBOLS, Token, To
 class Lexer:
     """Bosun 表达式词法分析器。
 
-    默认会先调用 `preprocess()`，将完整 Bosun 源文本转换为单个表达式。如果输入已经是预处理后的表达式，可以设置 `preprocessed=True` 跳过预处理。
+    默认会先调用 `preprocess()`，将完整 Bosun 源文本转换为单个表达式。
+    如果输入已经是预处理后的表达式，可以设置 `preprocessed=True` 跳过预处理。
 
     支持的 Token 包括：
         - 数字字面量，例如 `1`, `0.1`, `1e-8`, `0xff`

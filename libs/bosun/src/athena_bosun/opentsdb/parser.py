@@ -27,7 +27,7 @@ def _build_model[ModelT](factory: Callable[[], ModelT], source: str) -> ModelT:
         raise OpenTSDBParseError(f"Illegal OpenTSDB component: `{source}`.") from exc
 
 
-def strpdownsampling(downsampling_string: str) -> Downsampling | None:
+def parse_downsampling(downsampling_string: str) -> Downsampling | None:
     """解析 OpenTSDB 降采样字符串。
 
     - 支持 `interval-aggregator` 和 `interval-aggregator-fill_policy` 两种形式，例如 `1m-avg`、`1m-avg-none`。
@@ -54,7 +54,7 @@ def strpdownsampling(downsampling_string: str) -> Downsampling | None:
             return None
 
 
-def strprate(rate_string: str) -> Rate | None:
+def parse_rate(rate_string: str) -> Rate | None:
     """解析 OpenTSDB rate 或 diff 字符串。
 
     - 支持 `rate`、`rate{}`、`rate{counter}`，以及完整字段位格式 `rate{counter,,,diff,before_downsample}`。
@@ -85,7 +85,7 @@ def strprate(rate_string: str) -> Rate | None:
             raise OpenTSDBParseError(f"Illegal rate string: `{rate_string}`.")
 
 
-def strptopk(topk_string: str) -> TopK | None:
+def parse_topk(topk_string: str) -> TopK | None:
     """解析 OpenTSDB TopK 字符串。
 
     - 支持 `top|bottom-num-option` 格式，例如 `top-10-max`。
@@ -109,7 +109,7 @@ def strptopk(topk_string: str) -> TopK | None:
             return None
 
 
-def strptagkv(tagkv_string: str, group_by: bool = False) -> TagKv:
+def parse_tagkv(tagkv_string: str, group_by: bool = False) -> TagKv:
     """解析 OpenTSDB Tag 条件字符串。
 
     - 支持 `tagk=tagv1|tagv2` 和 `tagk=filter_type(tagv1|tagv2)` 两种形式。
@@ -136,7 +136,7 @@ def strptagkv(tagkv_string: str, group_by: bool = False) -> TagKv:
     return _build_model(lambda: TagKv(key=key, values=values, filter_type=filter_type, group_by=group_by), tagkv_string)
 
 
-def strpmultifield(multi_string: str) -> MultiField:
+def parse_multifield(multi_string: str) -> MultiField:
     """解析 OpenTSDB 多值字段字符串。
 
     - 支持普通字段列表和函数式字段两种形式：
@@ -164,7 +164,7 @@ def strpmultifield(multi_string: str) -> MultiField:
     return _build_model(lambda: MultiField(fields=fields, field_func=func, func_params=func_params), multi_string)
 
 
-def strpquery(query_string: str) -> Query:
+def parse_query(query_string: str) -> Query:
     """解析完整 OpenTSDB 查询字符串。
 
     - 解析顺序为 aggregator、可选 downsampling、可选 store、可选 rate、可选 topk，
@@ -182,7 +182,7 @@ def strpquery(query_string: str) -> Query:
 
     downsampling = None
     if component_index < len(query_components):
-        downsampling = strpdownsampling(query_components[component_index].strip())
+        downsampling = parse_downsampling(query_components[component_index].strip())
         if downsampling is not None:
             component_index += 1
 
@@ -191,13 +191,13 @@ def strpquery(query_string: str) -> Query:
 
     rate = None
     if component_index < len(query_components):
-        rate = strprate(query_components[component_index].strip())
+        rate = parse_rate(query_components[component_index].strip())
         if rate is not None:
             component_index += 1
 
     topk = None
     if component_index < len(query_components):
-        topk = strptopk(query_components[component_index].strip())
+        topk = parse_topk(query_components[component_index].strip())
         if topk is not None:
             component_index += 1
 
@@ -217,7 +217,7 @@ def strpquery(query_string: str) -> Query:
         if not metric_suffix.startswith("{") or not metric_suffix.endswith("}"):
             raise OpenTSDBParseError(f"Illegal metric tagkv string: `{metric_suffix}`.")
         filters = [
-            strptagkv(tagkv_string.strip(), False)
+            parse_tagkv(tagkv_string.strip(), False)
             for tagkv_string in metric_suffix[1:-1].split(",")
             if tagkv_string.strip()
         ]
@@ -257,7 +257,9 @@ def _parse_truncate_grouptagkvs(metric_string: str) -> tuple[list[TagKv], str]:
         group_tagkvs_string = metric_string[1:group_tagkvs_end_index]
 
     groups = [
-        strptagkv(tagkv_string.strip(), True) for tagkv_string in group_tagkvs_string.split(",") if tagkv_string.strip()
+        parse_tagkv(tagkv_string.strip(), True)
+        for tagkv_string in group_tagkvs_string.split(",")
+        if tagkv_string.strip()
     ]
     return groups, metric_string[len(group_tagkvs_string) + 2 :]
 
@@ -302,5 +304,5 @@ def _parse_truncate_multifields(metric_string: str) -> tuple[str, MultiField | N
     if multifields_start_index == -1:
         raise OpenTSDBParseError(f"Illegal metric string: `{metric_string}`.")
 
-    multifields = strpmultifield(metric_string[multifields_start_index + 1 : -1])
+    multifields = parse_multifield(metric_string[multifields_start_index + 1 : -1])
     return metric_string[:multifields_start_index], multifields

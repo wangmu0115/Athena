@@ -1,6 +1,6 @@
-from athena_bosun.opentsdb.parser import strpquery
+from athena_bosun.opentsdb.parser import parse_query
 
-query = strpquery(
+query = parse_query(
     "sum:1m-avg:rate{counter,,,diff,after_downsample}:top-10-max:"
     "[tenant]service.latency{host=a|b}{env=prod}[rt.pct90,count.rate]"
 )

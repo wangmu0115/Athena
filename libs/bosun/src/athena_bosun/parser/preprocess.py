@@ -50,7 +50,9 @@ def preprocess(source: str) -> str:
         展开变量后的最终表达式。
 
     Raises:
-        BosunPreprocessError: 当变量引用非法、变量未定义、表达式入口缺失，或表达式入口之后仍出现变量定义/查询表达式时抛出。
+        BosunPreprocessError:
+            当变量引用非法、变量未定义、表达式入口缺失，或表达式入口之后仍出现
+            变量定义/查询表达式时抛出。
     """
     statements = _split_statements(source)
     if not statements:

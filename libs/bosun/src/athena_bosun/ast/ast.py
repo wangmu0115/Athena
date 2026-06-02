@@ -1,139 +1,162 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 
-def extract_query(expr: Expression, queries: list[Query]):
+from athena_bosun.opentsdb import Query
+from athena_bosun.parser.tokens import Token
+
+type LiteralValue = int | float | str
+
+
+def extract_query(expr: Expression, queries: list[Query]) -> None:
+    """从表达式树中收集所有 `q(...)` 调用里的 OpenTSDB 查询。"""
     match expr:
         case NameExpression() | LiteralExpression():
-            ...
-        case UnaryOperatorExpression():
-            extract_query(expr.right, queries)
-        case BinaryOperatorExpression():
-            extract_query(expr.left, queries)
-            extract_query(expr.right, queries)
-        case CallExpression():
-            match expr.function:
-                case "q":  # q(query_string, start, end)
-                    queries.append(Query.strpquery(expr.args[0].literal))
-                case "shift" | "sum" | "avg" | "max" | "min" | "fv" | "nv" | "nanas":
-                    extract_query(expr.args[0], queries)
-                case _:
-                    raise NotImplementedError(f"[Extract Expr Queries] Not implemented call function: {expr.function}")
+            return
+        case UnaryOperatorExpression(right=right):
+            extract_query(right, queries)
+        case BinaryOperatorExpression(left=left, right=right):
+            extract_query(left, queries)
+            extract_query(right, queries)
+        case CallExpression(function="q", args=args):
+            queries.append(Query.parse_query(_require_string_literal(args, "q")))
+        case CallExpression(function=function, args=args) if function in _QUERY_WRAPPER_FUNCTIONS:
+            extract_query(args[0], queries)
+        case CallExpression(function=function):
+            raise NotImplementedError(f"[Extract Expr Queries] Not implemented call function: {function}")
         case _:
             raise NotImplementedError(f"[Extract Expr Queries] Not implemented expression: {expr}")
 
 
 def extract_queries_formula(expr: Expression, named_queries: dict[str, Query]) -> str:
+    """将表达式树中的 `q(...)` 调用替换为命名查询变量。"""
     match expr:
-        case NameExpression():
-            return expr.name
-        case LiteralExpression():
-            return expr.literal
-        case UnaryOperatorExpression():
-            right = extract_queries_formula(expr.right, named_queries)
-            return f"({expr.operator.text}{right})"
-        case BinaryOperatorExpression():
-            left = extract_queries_formula(expr.left, named_queries)
-            right = extract_queries_formula(expr.right, named_queries)
-            return f"({left}{expr.operator.text}{right})"
-        case CallExpression():
-            match expr.function:
-                case "q":
-                    query = Query.strpquery(expr.args[0].literal)
-                    for name, namedquery in named_queries.items():
-                        if query == namedquery:
-                            return name
-                case "shift" | "sum" | "avg" | "max" | "min" | "fv" | "nv" | "nanas":
-                    return extract_queries_formula(expr.args[0], named_queries)
-                case _:
-                    raise NotImplementedError(f"[Extract Expr Queries Formula] Not implemented call function: {expr.function}")
+        case NameExpression(name=name):
+            return name
+        case LiteralExpression(literal=literal):
+            return str(literal)
+        case UnaryOperatorExpression(operator=operator, right=right):
+            return f"({operator.text}{extract_queries_formula(right, named_queries)})"
+        case BinaryOperatorExpression(left=left, operator=operator, right=right):
+            left_formula = extract_queries_formula(left, named_queries)
+            right_formula = extract_queries_formula(right, named_queries)
+            return f"({left_formula}{operator.text}{right_formula})"
+        case CallExpression(function="q", args=args):
+            query = Query.parse_query(_require_string_literal(args, "q"))
+            for name, named_query in named_queries.items():
+                if query == named_query:
+                    return name
+            raise ValueError(f"Query is not registered in named_queries: {query}")
+        case CallExpression(function=function, args=args) if function in _QUERY_WRAPPER_FUNCTIONS:
+            return extract_queries_formula(args[0], named_queries)
+        case CallExpression(function=function):
+            raise NotImplementedError(f"[Extract Expr Queries Formula] Not implemented call function: {function}")
         case _:
             raise NotImplementedError(f"[Extract Expr Queries Formula] Not implemented expression: {expr}")
 
 
+@dataclass(frozen=True, slots=True)
 class Program:
-    def __init__(self, expression: Expression):
-        self.expression = expression
+    """Bosun 表达式 AST 根节点。"""
+
+    expression: Expression
 
     def extract_all_queries(self) -> list[Query]:
-        queries = []
+        """提取表达式中出现的查询，并按首次出现顺序去重。"""
+        queries: list[Query] = []
         extract_query(self.expression, queries)
-        distincted_queries = []
-        for query in queries:
-            if query not in distincted_queries:
-                distincted_queries.append(query)
-        return distincted_queries
 
-    def extract_calc_formula(self):
+        distinct_queries: list[Query] = []
+        for query in queries:
+            if query not in distinct_queries:
+                distinct_queries.append(query)
+        return distinct_queries
+
+    def extract_calc_formula(self) -> str:
+        """生成命名查询定义和替换后的计算公式。"""
         named_queries = {f"$kpi{index}": query for index, query in enumerate(self.extract_all_queries())}
         formula = extract_queries_formula(self.expression, named_queries)
-
-        return f"{'\n\n'.join(f'{name}={str(query)}' for name, query in named_queries.items())}\n\n{formula}"
-
-    def pprint(self):
-        pass
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}(expression={self.expression!r})"
+        query_definitions = "\n\n".join(f"{name}={query}" for name, query in named_queries.items())
+        return f"{query_definitions}\n\n{formula}"
 
 
 class Expression:
-    def __repr__(self):
-        return f"{self.__class__.__name__}({', '.join(f'{attr_name}={attr_value!r}' for attr_name, attr_value in self.__dict__.items())})"
+    """Bosun 表达式 AST 节点基类。"""
 
 
-class NameExpression(Expression):  # 名称表达式
-    def __init__(self, name: str):
-        self.name = name
+@dataclass(frozen=True, slots=True)
+class NameExpression(Expression):
+    """名称表达式，例如函数名或变量名。"""
 
-    def __str__(self):
+    name: str
+
+    def __str__(self) -> str:
         return self.name
 
 
-LiteralType = TypeVar("LiteralType", int, float, str)
+@dataclass(frozen=True, slots=True)
+class LiteralExpression(Expression):
+    """字面量表达式。"""
 
+    literal: LiteralValue
 
-class LiteralExpression(Expression, Generic[LiteralType]):
-    def __init__(self, literal: LiteralType):
-        self.literal = literal
-
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.literal)
 
 
-class IntLiteralExpression(LiteralExpression[int]): ...
+class IntLiteralExpression(LiteralExpression): ...
 
 
-class FloatLiteralExpression(LiteralExpression[float]): ...
+class FloatLiteralExpression(LiteralExpression): ...
 
 
-class StrLiteralExpression(LiteralExpression[str]):
-    def __str__(self):
+class StrLiteralExpression(LiteralExpression):
+    """字符串字面量表达式。"""
+
+    literal: str
+
+    def __str__(self) -> str:
         return f'"{self.literal}"'
 
 
+@dataclass(frozen=True, slots=True)
 class UnaryOperatorExpression(Expression):
-    def __init__(self, operator: Token, right: Expression):
-        self.operator = operator
-        self.right = right
+    """一元运算表达式。"""
 
-    def __str__(self):
-        return f"({self.operator.text}{str(self.right)})"
+    operator: Token
+    right: Expression
+
+    def __str__(self) -> str:
+        return f"({self.operator.text}{self.right})"
 
 
+@dataclass(frozen=True, slots=True)
 class BinaryOperatorExpression(Expression):
-    def __init__(self, left: Expression, operator: Token, right: Expression):
-        self.left = left
-        self.operator = operator
-        self.right = right
+    """二元运算表达式。"""
 
-    def __str__(self):
-        return f"({str(self.left)} {self.operator.text} {str(self.right)})"
+    left: Expression
+    operator: Token
+    right: Expression
+
+    def __str__(self) -> str:
+        return f"({self.left} {self.operator.text} {self.right})"
 
 
+@dataclass(frozen=True, slots=True)
 class CallExpression(Expression):
-    def __init__(self, function: str, args: list[Expression]):
-        self.function = function
-        self.args = args
+    """函数调用表达式。"""
 
-    def __str__(self):
+    function: str
+    args: list[Expression]
+
+    def __str__(self) -> str:
         return f"{self.function}({','.join(str(arg) for arg in self.args)})"
+
+
+_QUERY_WRAPPER_FUNCTIONS = frozenset({"shift", "sum", "avg", "max", "min", "fv", "nv", "nanas"})
+
+
+def _require_string_literal(args: list[Expression], function: str) -> str:
+    if not args or not isinstance(args[0], StrLiteralExpression):
+        raise ValueError(f"`{function}` first argument must be a string literal.")
+    return args[0].literal
