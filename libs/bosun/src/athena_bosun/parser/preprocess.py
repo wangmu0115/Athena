@@ -8,10 +8,6 @@ type VariableStore = dict[str, str]
 
 type AssignmentKind = Literal["variable", "alert_expression", "metadata"]
 
-_ALERT_EXPRESSION_KEYS = {"warn", "crit"}
-
-_METADATA_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-
 
 def preprocess(source: str) -> str:
     """预处理 Bosun 源文本。
@@ -19,7 +15,8 @@ def preprocess(source: str) -> str:
     该函数用于将 Bosun 源文本转换为单个可供 Lexer 解析的表达式，支持两类输入：
 
     1. 查询表达式
-
+        $start=2026-05-30 12:00
+        $end=2026-05-30 13:00
         $err_kpi = "sum:1m-sum-zero:metric.error"
         $all_kpi = "sum:1m-sum-zero:metric.total"
         1 - (
@@ -65,14 +62,19 @@ def preprocess(source: str) -> str:
 
     for statement in statements:
         expression = _decompose_statement(statement, store)
+        if expression is None:  # 变量定义或元数据配置
+            if result is not None and _is_variable_assignment(statement):
+                raise BosunPreprocessError(f"Variable assignment cannot appear after expression entry: {statement}.")
+            continue
 
         if result is not None:
-            raise BosunPreprocessError(f"Only the last statement can be an expression: {statement}.")
+            raise BosunPreprocessError(f"Multiple expression entries found: {result_statement}, {statement}.")
 
-    result = _decompose_statement(statements[-1], store)
+        result = expression
+        result_statement = statement
+
     if result is None:
-        raise BosunPreprocessError("The last statement must be a query expression.")
-
+        raise BosunPreprocessError("Bosun source does not contain an expression entry.")
     return result
 
 
@@ -100,7 +102,6 @@ def _split_statements(source: str) -> list[str]:
 
     paren_depth = 0
     in_string = False
-    escaped = False
     for line_no, raw_line in enumerate(source.splitlines(), start=1):
         line = raw_line.strip()
         if not line:  # 空行
@@ -109,14 +110,7 @@ def _split_statements(source: str) -> list[str]:
             continue
 
         buffer.append(line)
-
         for ch in line:
-            if ch == "\\" and in_string:  # 字符串中的转义字符
-                escaped = True
-                continue
-            if escaped:  # \ 后面的字符是转义字符
-                escaped = False
-                continue
             if ch == '"':  # 进入字符串或者退出字符串
                 in_string = not in_string
                 continue
@@ -148,75 +142,114 @@ def _split_statements(source: str) -> list[str]:
 def _decompose_statement(statement: str, store: VariableStore) -> str | None:
     """解析单条 Bosun 语句。
 
-    Bosun 语句分为三类：
+    Bosun 语句一共分为四类：
 
-    1. variable
-        `$xxx = ...` 形式的变量定义语句。
+    1. 变量定义，解析变量定义并写入到变量表中，返回结果为 `None`。
+        $metric = os.cpu
+        $query = q("avg:$metric{host=*}", "5m", "")
 
-    2. expression
+    2. 查询表达式入口，展开变量后返回。
+        avg($query)
+        $expr_0 || $expr_1
 
+    3. 告警表达式入口，展开变量后返回。
+        warn = $expr_0 || $expr_1
+        crit = avg($query) > 100
 
-    支持两种语句形式：
-
-        1. 变量定义: `$metric = os.cpu`，会将展开后的结果写入变量表。
-        2. 查询表达式: `avg($metric)`，会返回展开后的表达式内容。
-
-    Args:
-        statement: 单条 Bosun 语句。
-        store: 变量存储表。
-
-    Returns:
-        - 变量定义语句返回 None
-        - 表达式语句返回展开后的表达式
+    4. 元数据配置，会被忽略并返回 `None`。
+        runEvery = 1
+        nullAsZero = false
+        fullJoinGroup = true
     """
-    lhs, sep, rhs = statement.partition("=")
-    if sep != "=":
+    assign_position = _find_top_level_assignment(statement)
+
+    if assign_position is None:  # 查询表达式入口，展开变量后返回
         return _expand_expression(statement, store)
 
-    kind = _classify_assignment_lhs(lhs)
+    name = statement[:assign_position].strip()
+    value = statement[assign_position + 1 :].strip()
+    if not value:
+        raise BosunPreprocessError(f"Assignment value is empty: {statement}.")
 
-    if kind == "variable":
-        name = lhs.strip()
-        store[name] = _expand_expression(rhs.strip(), store)
-        return None
+    kind = _classify_assignment_name(name)
+    match kind:
+        case "variable":
+            store[name] = _expand_expression(value, store)
+            return None
+        case "alert_expression":
+            return _expand_expression(value, store)
+        case "metadata":
+            return None
+        case _:
+            raise BosunPreprocessError(f"Unsupported assignment kind: {kind}.")
 
-    if kind == "alert_expression":
-        return _expand_expression(rhs.strip(), store)
+
+def _find_top_level_assignment(statement: str) -> int | None:
+    """查找顶层赋值符号 `=` 的位置，只识别不在字符串、不在括号内部的 `=`。
+
+    1. `$metric = "sum:metric{host=*}"`: 会识别 `$metric = ...` 中的 `=`。
+    2. `q("sum:metric{host=*}", "5m", "")`: 不会把字符串中的 `host=*` 误判为赋值语句。
+    """
+    paren_depth = 0
+    in_string = False
+
+    for index, ch in enumerate(statement):
+        if ch == '"':
+            in_string = not in_string
+            continue
+        if in_string:
+            continue
+        if ch == "(":
+            paren_depth += 1
+            continue
+        if ch == ")":
+            paren_depth -= 1
+            continue
+
+        if ch == "=" and paren_depth == 0:
+            prev_ch = statement[index - 1] if index > 0 else ""
+            next_ch = statement[index + 1] if index + 1 < len(statement) else ""
+            if prev_ch in {"!", ">", "<", "="} or next_ch == "=":
+                # 跳过 `==`, `!=`, `>=`, `<=`
+                continue
+            return index
 
     return None
 
 
-def _classify_assignment_lhs(lhs: str) -> AssignmentKind:
-    """根据赋值语句左侧内容判断赋值类型。
-
-    判断规则：
+def _classify_assignment_name(name: str) -> AssignmentKind:
+    """根据赋值语句左侧名称判断赋值类型。
 
     - `$xxx`：变量定义
     - `warn` / `crit`：告警表达式入口
-    - 其他名称：元数据配置
-
-    Args:
-        lhs:
-            赋值语句左侧文本。
-
-    Returns:
-        赋值类型。
+    - 判断是否为元数据配置：变量名称是否以字母开头，后接字母或数字
+    - 其他：非法赋值名称
     """
-    name = lhs.strip()
-
     if name.startswith("$"):
+        if len(name) == 1:
+            raise BosunPreprocessError("Invalid variable name: '$'.")
+        for index, ch in enumerate(name[1:], start=1):
+            if (index == 1 and not _is_identifier_start(ch)) or (index > 1 and not _is_identifier_part(ch)):
+                raise BosunPreprocessError(f"Invalid variable name: {name}")
         return "variable"
 
-    if name in _ALERT_EXPRESSION_KEYS:
+    if name in {"warn", "crit"}:
         return "alert_expression"
 
-    return "metadata"
+    if re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$").match(name):
+        return "metadata"
+
+    raise BosunPreprocessError(f"Unknown assignment name: {name!r}.")
 
 
 def _is_variable_assignment(statement: str) -> bool:
     """判断语句是否为变量定义语句。"""
-    lhs, sep, _ = statement.partition("=")
-    return sep == "=" and lhs.strip().startswith("$")
+    assign_pos = _find_top_level_assignment(statement)
+    if assign_pos is None:
+        return False
+
+    name = statement[:assign_pos].strip()
+    return name.startswith("$")
 
 
 def _expand_expression(expression: str, store: VariableStore) -> str:
@@ -282,7 +315,7 @@ def _extract_simple_placeholder(expression: str, position: int) -> str:
             break
 
     placeholder = expression[start:end]
-    if len(placeholder) <= 1:
+    if len(placeholder) <= 1 or not _is_identifier_start(placeholder[1]):
         raise BosunPreprocessError(f"Invalid placeholder expression: {placeholder}.")
 
     return placeholder
@@ -301,7 +334,12 @@ def _extract_braced_placeholder(expression: str, position: int) -> str:
     while end < len(expression):
         ch = expression[end]
         if ch == "}":
-            return expression[start : end + 1]
+            placeholder = expression[start : end + 1]
+            if placeholder == r"${}":
+                raise BosunPreprocessError(r"Invalid placeholder expression: ${}.")
+            if not _is_identifier_start(placeholder[2]):  # ${? → `?`必须是合法的变量起始字符
+                raise BosunPreprocessError(f"Invalid placeholder expression: {placeholder}.")
+            return placeholder
 
         if _is_identifier_part(ch) or ch == ":":
             end += 1
