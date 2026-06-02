@@ -3,7 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from athena_bosun.opentsdb.models import Downsampling, MultiField, Query, Rate, TagKv, TopK
+    from athena_bosun.opentsdb.models import (
+        Downsampling,
+        MultiField,
+        Query,
+        Rate,
+        TagKv,
+        TopK,
+    )
 
 
 def serialize_downsampling(downsampling: Downsampling) -> str:

@@ -3,7 +3,7 @@ from athena_bosun.ast import (
     CallExpression,
     Program,
     extract_all_queries,
-    extract_calc_formula,
+    render_calc_formula,
 )
 from athena_bosun.parser import Lexer, Parser, TokenType
 
@@ -55,9 +55,9 @@ def test_program_extract_all_queries_deduplicates_queries():
     ]
 
 
-def test_program_extract_calc_formula_replaces_queries_with_names():
+def test_program_render_calc_formula_replaces_queries_with_names():
     program = parse_expression('q("sum:service.qps", "5m", "") + avg(q("avg:service.qps", "5m", ""))')
 
-    assert extract_calc_formula(program) == (
+    assert render_calc_formula(program) == (
         "$kpi0=sum:[default]service.qps{}{}\n\n$kpi1=avg:[default]service.qps{}{}\n\n($kpi0+$kpi1)"
     )

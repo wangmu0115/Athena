@@ -16,7 +16,12 @@ if TYPE_CHECKING:
         StrLiteralExpression,
         UnaryOperatorExpression,
     )
-    from athena_bosun.ast.queries import extract_all_queries, extract_query, render_calc_formula, render_expression_formula
+    from athena_bosun.ast.queries import (
+        extract_all_queries,
+        extract_query,
+        render_calc_formula,
+        render_expression_formula,
+    )
 
 __all__ = (
     "BinaryOperatorExpression",

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 from collections.abc import Callable
 
@@ -5,14 +7,7 @@ from pydantic import ValidationError
 
 from athena_bosun.opentsdb.enums import FilterType
 from athena_bosun.opentsdb.exceptions import OpenTSDBParseError
-from athena_bosun.opentsdb.models import (
-    Downsampling,
-    MultiField,
-    Query,
-    Rate,
-    TagKv,
-    TopK,
-)
+from athena_bosun.opentsdb.models import Downsampling, MultiField, Query, Rate, TagKv, TopK
 
 
 def _build_model[ModelT](factory: Callable[[], ModelT], source: str) -> ModelT:

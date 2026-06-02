@@ -25,7 +25,8 @@ _QUERY_WRAPPER_FUNCTIONS = frozenset({
 def extract_query(expr: Expression, queries: list[Query]) -> None:
     """从表达式树中收集所有 `q(...)` 调用中的 OpenTSDB `Query`。
 
-    该函数会递归遍历表达式树，并把每个 `q(query_string, start, end)` 的第一个字符串参数解析为 `Query` 后追加到 `queries`。
+    该函数会递归遍历表达式树，并把每个 `q(query_string, start, end)`
+    的第一个字符串参数解析为 `Query` 后追加到 `queries`。
     `sum`、`avg`、`shift`、`nv` 等包装函数会继续向第一个参数内部递归，暂不支持的函数会抛出 `NotImplementedError`。
     """
     match expr:
@@ -99,7 +100,7 @@ def render_expression_formula(expr: Expression, named_queries: dict[str, Query])
             return render_expression_formula(args[0], named_queries)
         case CallExpression(function=function):
             raise NotImplementedError(f"[Extract Expr Queries Formula] Not implemented call function: {function}.")
-        
+
         case _:
             raise NotImplementedError(f"[Extract Expr Queries Formula] Not implemented expression: {expr}.")
 

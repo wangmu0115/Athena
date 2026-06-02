@@ -1,14 +1,38 @@
 [project]
 name = "athena-bosun"
 version = "1.0.0"
-description = "Add your description here"
+description = "Bosun expression preprocessing, parsing, and OpenTSDB query utilities for Athena."
 readme = "README.md"
 authors = [
     { name = "wangmu", email = "wangmu8889@gmail.com" }
 ]
 requires-python = ">=3.12"
+license = "MIT"
+keywords = [
+    "athena",
+    "bosun",
+    "opentsdb",
+    "parser",
+    "monitoring",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Monitoring",
+    "Typing :: Typed",
+]
 dependencies = [
     "athena-core",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
 ]
 
 [build-system]
