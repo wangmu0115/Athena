@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
-from athena_bosun.ast.ast import (
+from athena_bosun.ast.nodes import (
     BinaryOperatorExpression,
     CallExpression,
     Expression,

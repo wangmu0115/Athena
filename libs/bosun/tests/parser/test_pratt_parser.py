@@ -1,4 +1,10 @@
-from athena_bosun.ast.ast import BinaryOperatorExpression, CallExpression, Program
+from athena_bosun.ast import (
+    BinaryOperatorExpression,
+    CallExpression,
+    Program,
+    extract_all_queries,
+    extract_calc_formula,
+)
 from athena_bosun.parser import Lexer, Parser, TokenType
 
 
@@ -41,7 +47,7 @@ def test_program_extract_all_queries_deduplicates_queries():
         'q("sum:service.qps", "5m", "") + nv(q("sum:service.qps", "5m", ""), 0) + q("avg:service.qps", "5m", "")'
     )
 
-    queries = program.extract_all_queries()
+    queries = extract_all_queries(program)
 
     assert [str(query) for query in queries] == [
         "sum:[default]service.qps{}{}",
@@ -52,6 +58,6 @@ def test_program_extract_all_queries_deduplicates_queries():
 def test_program_extract_calc_formula_replaces_queries_with_names():
     program = parse_expression('q("sum:service.qps", "5m", "") + avg(q("avg:service.qps", "5m", ""))')
 
-    assert program.extract_calc_formula() == (
+    assert extract_calc_formula(program) == (
         "$kpi0=sum:[default]service.qps{}{}\n\n$kpi1=avg:[default]service.qps{}{}\n\n($kpi0+$kpi1)"
     )

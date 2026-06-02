@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from athena_bosun.ast.ast import Expression, Program
+from athena_bosun.ast.nodes import Expression, Program
 from athena_bosun.parser.exceptions import ParserError
 from athena_bosun.parser.lexer import Lexer
 from athena_bosun.parser.parselets import Precedence, standard_infix_parselets, standard_prefix_parselets
