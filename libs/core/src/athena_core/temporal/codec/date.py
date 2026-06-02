@@ -99,7 +99,9 @@ class DateCodec:
             case "formatted":
                 return value.strftime(format_pattern or self._options.format_pattern)
             case "datetime":
-                return resolve_date_boundary(value, tz, boundary_policy=boundary_policy or self._options.boundary_policy)
+                return resolve_date_boundary(
+                    value, tz, boundary_policy=boundary_policy or self._options.boundary_policy
+                )
             case "timestamp_s" | "timestamp_ms":
                 dt = resolve_date_boundary(value, tz, boundary_policy=boundary_policy or self._options.boundary_policy)
                 return int(dt.timestamp()) if resolved == "timestamp_s" else int(dt.timestamp() * 1000)

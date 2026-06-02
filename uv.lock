@@ -43,7 +43,7 @@ dev = [{ name = "pytest", specifier = ">=9.0.3" }]
 
 [[package]]
 name = "athena-core"
-version = "1.0.0"
+version = "1.0.1"
 source = { editable = "libs/core" }
 dependencies = [
     { name = "pydantic" },

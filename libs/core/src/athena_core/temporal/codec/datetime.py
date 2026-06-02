@@ -70,7 +70,9 @@ class DateTimeCodec:
             case datetime():
                 return self._from_datetime(value, tz, naive_datetime_policy=naive_datetime_policy)
             case date():
-                return resolve_date_boundary(value, tz, boundary_policy=boundary_policy or self._options.boundary_policy)
+                return resolve_date_boundary(
+                    value, tz, boundary_policy=boundary_policy or self._options.boundary_policy
+                )
             case int() | float():
                 return self._from_timestamp(value, tz, timestamp_unit=timestamp_unit)
             case str():
