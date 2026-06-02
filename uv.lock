@@ -26,6 +26,12 @@ wheels = [
 name = "athena-bosun"
 version = "1.0.0"
 source = { editable = "libs/bosun" }
+dependencies = [
+    { name = "athena-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "athena-core", editable = "libs/core" }]
 
 [[package]]
 name = "athena-core"

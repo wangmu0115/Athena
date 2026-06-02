@@ -20,6 +20,12 @@
         },
         
     },
+    "python.analysis.extraPaths": [
+        "libs/core/src",
+        "libs/http/src",
+        "libs/matplotlib/src",
+        "libs/bosun/src"
+    ],
     "python.analysis.autoImportCompletions": true,
     "python.analysis.fixAll": ["source.unusedImports"],  
     "editor.defaultFormatter": "charliermarsh.ruff",
@@ -36,8 +42,7 @@
         "**/.nox": true,
         "**/.pytest_cache": true,
         "**/.ruff_cache": true,
-        "**/.tox": true,
-        "**/.vscode": true
+        "**/.tox": true
     },
     "terminal.integrated.defaultProfile.osx": "zsh",
     "ruff.lineLength": 160,
