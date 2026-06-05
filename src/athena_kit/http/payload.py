@@ -94,7 +94,7 @@ def extract_payload(
     """Extract selected values from an HTTP response JSON payload.
 
     This function only handles business payload parsing and validation. HTTP-layer status validation
-    should be handled by `AsyncHttpClient` or its exception middleware before this function is called.
+    should be handled by `response.raise_for_status()` or `raise_for_status_hook` before this function is called.
 
     Args:
         response: HTTP response object.

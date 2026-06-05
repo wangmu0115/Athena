@@ -3,18 +3,17 @@ import asyncio
 import httpx
 import pytest
 
-from athena_kit.http import AsyncHttpClient, extract_payload
+from athena_kit.http import AsyncHttpClient, RequestIDOptions, extract_payload
 from athena_kit.http.exceptions import PayloadBizStatusError
-from athena_kit.http.middleware_config import RequestIDOptions
-from athena_kit.http.middlewares.retry import RetryMiddleware
+from athena_kit.http.hooks import make_request_id_hook, raise_for_status_hook
 
 
 def test_public_exports_are_lazy_loaded() -> None:
-    from athena_kit.http import Extensions, HttpClientError, LoggingOptions
+    from athena_kit.http import LoggingOptions, make_logging_hooks
 
-    assert Extensions.__name__ == "Extensions"
-    assert HttpClientError.__name__ == "HttpClientError"
+    assert AsyncHttpClient.__name__ == "AsyncHttpClient"
     assert LoggingOptions.__name__ == "LoggingOptions"
+    assert callable(make_logging_hooks)
 
 
 def test_extract_payload_reads_nested_values() -> None:
@@ -30,7 +29,19 @@ def test_extract_payload_raises_for_business_status() -> None:
         extract_payload(response, None)
 
 
-def test_request_id_middleware_injects_header() -> None:
+def test_request_id_hook_injects_header() -> None:
+    async def run_hook() -> httpx.Request:
+        request = httpx.Request("GET", "https://example.test/items")
+        hook = make_request_id_hook(RequestIDOptions(id_factory=lambda: "request-1"))
+        await hook(request)
+        return request
+
+    request = asyncio.run(run_hook())
+
+    assert request.headers["X-Request-ID"] == "request-1"
+
+
+def test_async_http_client_uses_httpx_event_hooks() -> None:
     seen_request: httpx.Request | None = None
 
     async def handler(request: httpx.Request) -> httpx.Response:
@@ -44,19 +55,22 @@ def test_request_id_middleware_injects_header() -> None:
         async with AsyncHttpClient(
             base_url="https://example.test",
             transport=transport,
-            request_id_options=RequestIDOptions(id_factory=lambda: "request-1"),
+            request_id=RequestIDOptions(id_factory=lambda: "request-2"),
         ) as client:
             await client.get("/items")
 
     asyncio.run(run_request())
 
     assert seen_request is not None
-    assert seen_request.headers["X-Request-ID"] == "request-1"
+    assert seen_request.headers["X-Request-ID"] == "request-2"
 
 
-def test_retry_after_parser_accepts_delta_seconds() -> None:
-    assert RetryMiddleware._parse_retry_after("3") == 3.0
+def test_raise_for_status_hook_delegates_to_httpx() -> None:
+    request = httpx.Request("GET", "https://example.test/items")
+    response = httpx.Response(500, request=request)
 
+    async def run_hook() -> None:
+        await raise_for_status_hook(response)
 
-def test_retry_after_parser_rejects_invalid_values() -> None:
-    assert RetryMiddleware._parse_retry_after("not-a-date") is None
+    with pytest.raises(httpx.HTTPStatusError):
+        asyncio.run(run_hook())
