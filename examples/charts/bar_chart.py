@@ -1,12 +1,12 @@
-from athena_matplotlib.datas import CategoricalSeriesData
-from athena_matplotlib.options.coords.legend import LegendOptions
-from athena_matplotlib.runtime.pipeline import Pipeline
-from athena_matplotlib.runtime.renderer import FigureRenderer
-from athena_matplotlib.runtime.writers import NullWriter
-from athena_matplotlib.specs.chart import ChartSpec
-from athena_matplotlib.specs.coords.cartesian import CartesianAxisSpec, CartesianCoord
-from athena_matplotlib.specs.coords.tick import TickSpec
-from athena_matplotlib.specs.plots.bar import BarPlot
+from athena_kit.matplotlib.datas import CategoricalSeriesData
+from athena_kit.matplotlib.options.coords.legend import LegendOptions
+from athena_kit.matplotlib.runtime.pipeline import Pipeline
+from athena_kit.matplotlib.runtime.renderer import FigureRenderer
+from athena_kit.matplotlib.runtime.writers import NullWriter
+from athena_kit.matplotlib.specs.chart import ChartSpec
+from athena_kit.matplotlib.specs.coords.cartesian import CartesianAxisSpec, CartesianCoord
+from athena_kit.matplotlib.specs.coords.tick import TickSpec
+from athena_kit.matplotlib.specs.plots.bar import BarPlot
 
 datas = {
     "P0": CategoricalSeriesData.from_tuples(("Q1", 12), ("Q2", 8), ("Q3", 9), ("Q4", 4)),

@@ -1,4 +1,4 @@
-from athena_bosun.opentsdb.parser import parse_query
+from athena_kit.bosun.opentsdb.parser import parse_query
 
 query = parse_query(
     "sum:1m-avg:rate{counter,,,diff,after_downsample}:top-10-max:"

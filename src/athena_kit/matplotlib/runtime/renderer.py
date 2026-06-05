@@ -1,0 +1,107 @@
+import uuid
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.gridspec import GridSpec
+
+from athena_kit.core.values.optional import optional_map_or, safe_getattr
+from athena_kit.matplotlib.options import RenderFigureOptions
+from athena_kit.matplotlib.rendering import ChartRenderer, ColorCycle
+from athena_kit.matplotlib.runtime.context import build_rc_params
+from athena_kit.matplotlib.specs import ChartSpec, FigureGridLayout, FigureSpec
+from athena_kit.matplotlib.styles import Theme
+
+type RenderSpec = ChartSpec | FigureSpec
+
+
+@dataclass
+class RenderResult:
+    figure: Figure
+    """Matplotlib `Figure`"""
+    metadata: dict[str, object] = field(default_factory=dict)
+    """元数据信息"""
+
+
+class BaseRenderer(ABC):
+    def __init__(self, name: str, *, theme: Theme):
+        self._name = name  # tracing
+        self._theme = theme
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def theme(self) -> Theme:
+        return self._theme
+
+    def render(self, spec: RenderSpec, *, options: RenderFigureOptions | None = None) -> RenderResult:
+        figure_spec = FigureSpec.from_chart(spec) if isinstance(spec, ChartSpec) else spec
+        return self._render_figure(
+            figure_spec,
+            options=options or RenderFigureOptions.default(),
+        )
+
+    @abstractmethod
+    def _render_figure(self, spec: FigureSpec, *, options: RenderFigureOptions) -> RenderResult: ...
+
+
+class FigureRenderer(BaseRenderer):
+    def __init__(self, name: str = "", *, theme: Theme | None = None):
+        super().__init__(
+            name=name or uuid.uuid4(),
+            theme=theme or Theme.default(),
+        )
+        self._post_init()
+
+    def _post_init(self):
+        color_cycle = ColorCycle(safe_getattr(self.theme.palette, "colors"))
+        self._chart_renderer = ChartRenderer(color_cycle)
+
+    def _render_figure(self, spec: FigureSpec, *, options: RenderFigureOptions) -> RenderResult:
+        with mpl.rc_context(build_rc_params(self.theme)):  # 主体上下文中渲染图片
+            # Figure
+            figure: Figure = self._create_figure(spec, options=options)
+            # Layout
+            gs = self._add_gridspec(figure, spec.layout)
+            # Render Charts
+            for chart_placement in spec.charts:
+                row = chart_placement.row - 1
+                col = chart_placement.row - 1
+                axes = figure.add_subplot(
+                    gs[row : row + chart_placement.row_span, col : col + chart_placement.col_span]
+                )
+                self._chart_renderer.render(axes, chart_placement.chart, options=options)
+
+        return RenderResult(
+            figure=figure,
+            metadata={"renderer": self.name},
+        )
+
+    def _create_figure(self, spec: FigureSpec, *, options: RenderFigureOptions) -> Figure:
+        fig = plt.figure(**options.build_figure_params())
+        if spec.title:
+            fig.suptitle(
+                spec.title,
+                **optional_map_or(
+                    options.figure,
+                    lambda x: x.build_title_params(),
+                    default={},
+                ),
+            )
+        return fig
+
+    def _add_gridspec(self, figure: Figure, layout: FigureGridLayout) -> GridSpec:
+        if layout is None:
+            raise ValueError("Figure Layout must be resolved before rendering.")
+
+        gridspec_params: dict[str, object] = {}
+        if layout.hspace is not None:
+            gridspec_params["hspace"] = layout.hspace
+        if layout.wspace is not None:
+            gridspec_params["wspace"] = layout.wspace
+
+        return figure.add_gridspec(nrows=layout.rows, ncols=layout.cols, **gridspec_params)

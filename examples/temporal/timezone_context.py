@@ -1,5 +1,5 @@
-from athena_core.temporal.codec import parse_datetime
-from athena_core.temporal.timezone import get_timezone, timezone_context
+from athena_kit.core.temporal.codec import parse_datetime
+from athena_kit.core.temporal.timezone import get_timezone, timezone_context
 
 print(get_timezone())
 

@@ -1,4 +1,4 @@
-from athena_core.temporal.codec import DateTimeCodec, DateTimeCodecOptions
+from athena_kit.core.temporal.codec import DateTimeCodec, DateTimeCodecOptions
 
 codec = DateTimeCodec(
     DateTimeCodecOptions(

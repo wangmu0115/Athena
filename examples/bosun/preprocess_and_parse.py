@@ -1,5 +1,5 @@
-from athena_bosun import Lexer, Parser, preprocess
-from athena_bosun.ast import extract_all_queries
+from athena_kit.bosun import Lexer, Parser, preprocess
+from athena_kit.bosun.ast import extract_all_queries
 
 source = """
 $metric = "sum:service.qps"

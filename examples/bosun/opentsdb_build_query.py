@@ -1,5 +1,5 @@
-from athena_bosun.opentsdb.enums import Aggregator, FilterType
-from athena_bosun.opentsdb.models import Downsampling, MultiField, Query, Rate, TagKv, TopK
+from athena_kit.bosun.opentsdb.enums import Aggregator, FilterType
+from athena_kit.bosun.opentsdb.models import Downsampling, MultiField, Query, Rate, TagKv, TopK
 
 query = Query(
     aggregator=Aggregator.MAX,

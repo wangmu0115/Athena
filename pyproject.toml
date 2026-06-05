@@ -1,10 +1,51 @@
-[tool.uv.workspace]
-members=[
-    "libs/*",
+[project]
+name = "athena-kit"
+version = "1.0.0"
+description = "A modular Python toolkit for Athena projects."
+readme = "README.md"
+authors = [
+    { name = "wangmu", email = "wangmu8889@gmail.com" }
 ]
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.13.4",
+]
+license = "MIT"
+keywords = ["athena", "toolkit", "utilities", "temporal", "pydantic"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.optional-dependencies]
+dataframe = [
+    "pandas>=2.3.3",
+]
+http = [
+    "httpx>=0.28.1",
+]
+matplotlib = [
+    "matplotlib>=3.10.9",
+]
+all = [
+    "httpx>=0.28.1",
+    "matplotlib>=3.10.9",
+    "pandas>=2.3.3",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.25,<0.10.0"]
+build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "pytest>=9.0.3",
     "ruff>=0.15.12",
 ]
 
@@ -12,11 +53,10 @@ dev = [
 line-length = 120
 target-version = "py312"
 src = [
-    "libs",
-    "apps",
     "src",
+    "tests",
+    "examples",
 ]
-
 
 [tool.ruff.lint]
 select = [
@@ -34,12 +74,9 @@ quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
 docstring-code-format = true
-preview=true
+preview = true
 
 [tool.ruff.lint.isort]
 known-first-party = [
-    "athena_core",
-    "athena_matplotlib",
-    "athena_http",
-    "athena_bosun",
+    "athena_kit",
 ]
