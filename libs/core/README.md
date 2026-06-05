@@ -47,6 +47,19 @@ class User(BaseAthenaModel):
 
 `BaseAthenaModel` 默认禁止额外字段、支持字段别名填充，并开启字符串首尾空白清理，适合在 Athena 项目中作为统一的数据模型基础。
 
+### 表格行模型
+
+```python
+from athena_core import BaseTableRow, TableField
+
+
+class UserRow(BaseTableRow):
+    name: str = TableField(title="姓名", order=1)
+    age: int = TableField(title="年龄", order=2)
+```
+
+`BaseTableRow` 可将 Pydantic 模型转换为表格 headers 与 row values，并配合 `TableRepository` / `TableBackend` 对接具体存储。DataFrame 映射能力依赖 pandas，需要使用 `athena-core[dataframe]` 安装。
+
 ### 值处理 helper
 
 ```python
@@ -63,6 +76,7 @@ length = optional_map(value, len)
 - `athena_core.temporal`：负责日期、时间、日期时间的标准化处理，以及全局默认时区和临时时区上下文管理。
 - `athena_core.temporal.codec`：提供 `parse_*` 与 `format_*` 函数，以及可复用的 codec 类。它将输入兼容、时区归一、输出格式选择收敛到统一入口。
 - `athena_core.models`：提供 `BaseAthenaModel` 和带中文标签能力的枚举基类，用于减少业务包重复定义模型配置和枚举转换逻辑。
+- `athena_core.tabular`：提供表格行模型、字段元数据、单元格编解码和后端协议。pandas DataFrame 适配位于可选 extra 中。
 - `athena_core.values`：提供与 `None`、默认值、fallback 值相关的小型函数，保持业务代码中的空值处理表达清晰。
 
 整体设计上，`athena-core` 不承载具体业务语义，只提供跨项目通用的基础设施。顶层 `athena_core` 会导出常用 API，子模块也保留更细粒度的导入路径，方便调用方按需选择。
@@ -83,6 +97,15 @@ length = optional_map(value, len)
 - `BaseAthenaModel`
 - `LabelIntEnum`
 - `LabelStrEnum`
+
+表格：
+
+- `BaseTableRow`
+- `TableField` / `SourceField`
+- `TableRepository`
+- `TableBackend` / `TableLocator`
+- `encode_field_value()` / `decode_cell_value()`
+- `dataframe_to_models()` / `models_to_dataframe()` / `table_rows_to_dataframe()`，需安装 `athena-core[dataframe]`
 
 值处理：
 
