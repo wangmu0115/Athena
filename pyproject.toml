@@ -15,7 +15,6 @@ keywords = ["athena", "toolkit", "utilities", "temporal", "pydantic"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -40,7 +39,7 @@ all = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.9.25,<0.10.0"]
+requires = ["uv_build>=0.9.25,<0.12.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
