@@ -1,5 +1,3 @@
-import httpx
-
 # with httpx.Client() as client:
 #     headers = {"X-Custom": "xvalue"}
 #     resp = client.get("https://example.com", headers=headers)
@@ -55,3 +53,40 @@ import httpx
 #     resp = client.send(req)
 # print(resp)  # <Response [200 OK]>
 # print(resp.request.headers)  # Headers({'host': 'example.com', 'accept': '*/*', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.28.1', 'x-client-id': '123'})
+
+# with httpx.Client(base_url="http://httpbin.org") as client:
+#     resp = client.get("headers")
+
+# print(resp.request.url)
+
+# params = {"key1": "value1", "key2": ["value2", "value3"]}
+# # params = "key1=value1&key2=value2"
+# # params = [("key1", "value1"), ("key2", "value2")]
+
+# resp = httpx.get("https://httpbin.org/get", params=params)
+# print(resp.url)
+
+# resp = httpx.get("https://api.github.com/events")
+# resp.encoding = "ISO-8859-1"
+# print(f"{resp.text!r}")
+# print(resp.encoding)
+# print(resp.content)
+# print(resp.json())
+
+# headers = {"user-agent": "my-app/0.0.1"}
+# resp = httpx.get("https://httpbin.org/headers", headers=headers)
+# # Headers({..., 'user-agent': 'my-app/0.0.1', ...})
+# print(resp.request.headers)
+
+import httpx
+
+# data = {"key1": "value1", "key2": ["value2", "value3"]}
+# resp = httpx.post("https://httpbin.org/post", data=data)
+# print(resp.text)
+
+# data = {"integer": 123, "boolean": True, "list": ["a", "b", "c"]}
+# resp = httpx.post("https://httpbin.org/post", json=data)
+# print(resp.text)
+resp = httpx.get("https://httpbin.org/get")
+print(resp.status_code)
+print(resp.status_code == httpx.codes.OK)
