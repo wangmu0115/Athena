@@ -1,19 +1,19 @@
 import asyncio
 
-import httpx
 import pytest
 
+import httpx
 from athena_kit.http import AsyncHttpClient, RequestIDOptions, extract_payload
 from athena_kit.http.exceptions import PayloadBizStatusError
-from athena_kit.http.hooks import make_request_id_hook, raise_for_status_hook
+from athena_kit.http.hooks import create_async_request_id_hook, create_request_id_hook, raise_for_status_hook
 
 
 def test_public_exports_are_lazy_loaded() -> None:
-    from athena_kit.http import LoggingOptions, make_logging_hooks
+    from athena_kit.http import LoggingOptions, create_logging_hooks
 
     assert AsyncHttpClient.__name__ == "AsyncHttpClient"
     assert LoggingOptions.__name__ == "LoggingOptions"
-    assert callable(make_logging_hooks)
+    assert callable(create_logging_hooks)
 
 
 def test_extract_payload_reads_nested_values() -> None:
@@ -30,9 +30,18 @@ def test_extract_payload_raises_for_business_status() -> None:
 
 
 def test_request_id_hook_injects_header() -> None:
+    request = httpx.Request("GET", "https://example.test/items")
+    hook = create_request_id_hook(RequestIDOptions(id_factory=lambda: "request-1"))
+
+    hook(request)
+
+    assert request.headers["X-Request-ID"] == "request-1"
+
+
+def test_async_request_id_hook_injects_header() -> None:
     async def run_hook() -> httpx.Request:
         request = httpx.Request("GET", "https://example.test/items")
-        hook = make_request_id_hook(RequestIDOptions(id_factory=lambda: "request-1"))
+        hook = create_async_request_id_hook(RequestIDOptions(id_factory=lambda: "request-1"))
         await hook(request)
         return request
 
@@ -69,8 +78,5 @@ def test_raise_for_status_hook_delegates_to_httpx() -> None:
     request = httpx.Request("GET", "https://example.test/items")
     response = httpx.Response(500, request=request)
 
-    async def run_hook() -> None:
-        await raise_for_status_hook(response)
-
     with pytest.raises(httpx.HTTPStatusError):
-        asyncio.run(run_hook())
+        raise_for_status_hook(response)

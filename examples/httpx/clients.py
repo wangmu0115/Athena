@@ -87,6 +87,39 @@ import httpx
 # data = {"integer": 123, "boolean": True, "list": ["a", "b", "c"]}
 # resp = httpx.post("https://httpbin.org/post", json=data)
 # print(resp.text)
-resp = httpx.get("https://httpbin.org/get")
-print(resp.status_code)
-print(resp.status_code == httpx.codes.OK)
+# resp = httpx.get("https://httpbin.org/get")
+# print(resp.status_code)
+# print(resp.status_code == httpx.codes.OK)
+
+# not_found = httpx.get("https://httpbin.org/status/404")
+# print(not_found.status_code)
+# not_found.raise_for_status()
+
+# try:
+#     response = httpx.get("https://www.example.com")
+#     response.raise_for_status()
+# except httpx.RequestError as exc:
+#     print(f"An error occurred while requesting {exc.request.url!r}.")
+# except httpx.HTTPStatusError as exc:
+#     print(f"Error response {exc.response.status_code} while requesting {exc.request.url!r}.")
+
+# response = httpx.get("https://www.example.com/")
+# try:
+#     response.raise_for_status()
+# except httpx.HTTPStatusError as exc:
+#     print(f"Error response {exc.response.status_code} while requesting {exc.request.url!r}.")
+
+
+response = httpx.get("http://github.com", follow_redirects=True)
+print(response.status_code)
+print(response.url)
+print(response.request.url)
+print(response.history)
+print(response.next_request)
+
+
+response = httpx.get("http://github.com")
+print(response.status_code)
+print(response.url)
+print(response.history)
+print(response.next_request)

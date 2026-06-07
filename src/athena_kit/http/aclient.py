@@ -1,8 +1,7 @@
 from typing import Any
 
 import httpx
-
-from athena_kit.http.hooks import EventHook, LoggingOptions, RequestIDOptions, merge_event_hooks
+from athena_kit.http.hooks import AsyncEventHooks, LoggingOptions, RequestIDOptions, merge_async_event_hooks
 
 
 class AsyncHttpClient(httpx.AsyncClient):
@@ -26,7 +25,7 @@ class AsyncHttpClient(httpx.AsyncClient):
         logging_options: LoggingOptions | bool = False,
         raise_for_status: bool = False,
         retries: int = 0,
-        event_hooks: dict[str, list[EventHook]] | None = None,
+        event_hooks: AsyncEventHooks | None = None,
         transport: httpx.AsyncBaseTransport | None = None,
         **kwargs: Any,
     ):
@@ -44,7 +43,7 @@ class AsyncHttpClient(httpx.AsyncClient):
 
         super().__init__(
             *args,
-            event_hooks=merge_event_hooks(
+            event_hooks=merge_async_event_hooks(
                 event_hooks,
                 request_id=resolved_request_id,
                 logging_options=resolved_logging,
