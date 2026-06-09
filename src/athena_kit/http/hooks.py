@@ -1,4 +1,4 @@
-"""HTTPX event hook helpers for Athena HTTP clients.
+"""HTTPX event hook helpers for Athena HTTP Clients.
 
 References:
     HTTPX Event Hooks: https://www.python-httpx.org/advanced/event-hooks/
@@ -14,10 +14,10 @@ from typing import TypedDict
 
 import httpx
 
-type AsyncRequestHook = Callable[[httpx.Request], Awaitable[None]]
-type AsyncResponseHook = Callable[[httpx.Response], Awaitable[None]]
 type RequestHook = Callable[[httpx.Request], None]
 type ResponseHook = Callable[[httpx.Response], None]
+type AsyncRequestHook = Callable[[httpx.Request], Awaitable[None]]
+type AsyncResponseHook = Callable[[httpx.Response], Awaitable[None]]
 
 
 class EventHooks(TypedDict, total=False):

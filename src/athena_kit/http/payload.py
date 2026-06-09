@@ -1,9 +1,8 @@
 from collections.abc import Callable, Sequence
 from typing import Any, overload
 
-from httpx import Response
-
 from athena_kit.http import InvalidPayloadError, PayloadBizStatusError
+from httpx import Response
 
 Payload = dict[str, Any]
 EnsureSuccess = Callable[[Payload], None]

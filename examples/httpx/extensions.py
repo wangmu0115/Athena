@@ -21,17 +21,9 @@
 # print(resp.encoding)  # shift-jis
 # print(resp.text)  # 文本会使用 Content-Type charset 解码，
 # # 否则使用 "shift-jis" 解码。
-from charset_normalizer import detect
-
 import httpx
 
-
-def autodetect(content) -> str:
-    print(detect(content))
-    return detect(content)["encoding"]
-
-
-with httpx.Client(default_encoding=autodetect) as client:
-    resp = client.get("https://httpbin.org/get")
-
-print(resp.encoding)  # ascii
+headers = {"user-agent": "my-app/0.0.1"}
+with httpx.Client(headers=headers) as client:
+    resp = client.get("http://httpbin.org/headers")
+print(resp.request.headers["user-agent"])  # my-app/0.0.1
