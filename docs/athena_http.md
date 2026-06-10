@@ -349,8 +349,8 @@ data = extract_response_json_value(response, "data", validator=validate_payload)
 
 `athena_kit.http` 提供 `retry` 和 `retry_async` 两个轻量重试 helper。它们只负责重试循环、指数退避、jitter、结果判断、异常判断和可选日志记录；是否应该重试由调用方根据 HTTP 状态码、异常类型或业务异常自行决定。
 
-如果需要熔断、全链路超时预算、before/after 回调、复杂统计或更强的策略组合，可以直接使用
-[tenacity](https://tenacity.readthedocs.io/en/latest/) 或 [litl/backoff](https://github.com/litl/backoff) 等专门的重试库。
+**如果需要熔断、全链路超时预算、before/after 回调、复杂统计或更强的策略组合，可以直接使用
+[tenacity](https://tenacity.readthedocs.io/en/latest/) 等专门的重试库。**
 
 ### 5.1. 同步重试
 
