@@ -29,6 +29,9 @@ dataframe = [
 http = [
     "httpx>=0.28.1",
 ]
+lark = [
+    "httpx>=0.28.1",
+]
 matplotlib = [
     "matplotlib>=3.10.9",
 ]

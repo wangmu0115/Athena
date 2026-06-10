@@ -52,6 +52,9 @@ dataframe = [
 http = [
     { name = "httpx" },
 ]
+lark = [
+    { name = "httpx" },
+]
 matplotlib = [
     { name = "matplotlib" },
 ]
@@ -66,13 +69,14 @@ dev = [
 requires-dist = [
     { name = "httpx", marker = "extra == 'all'", specifier = ">=0.28.1" },
     { name = "httpx", marker = "extra == 'http'", specifier = ">=0.28.1" },
+    { name = "httpx", marker = "extra == 'lark'", specifier = ">=0.28.1" },
     { name = "matplotlib", marker = "extra == 'all'", specifier = ">=3.10.9" },
     { name = "matplotlib", marker = "extra == 'matplotlib'", specifier = ">=3.10.9" },
     { name = "pandas", marker = "extra == 'all'", specifier = ">=2.3.3" },
     { name = "pandas", marker = "extra == 'dataframe'", specifier = ">=2.3.3" },
     { name = "pydantic", specifier = ">=2.13.4" },
 ]
-provides-extras = ["dataframe", "http", "matplotlib", "all"]
+provides-extras = ["dataframe", "http", "lark", "matplotlib", "all"]
 
 [package.metadata.requires-dev]
 dev = [
