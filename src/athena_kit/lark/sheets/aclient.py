@@ -1,47 +1,57 @@
 from datetime import datetime
 from typing import Any
+from uuid import uuid4
 
-from athena_kit.http import AsyncHttpClient, extract_response_json_value, extract_response_json_values
+import httpx
+from athena_kit.http import extract_response_json_value, extract_response_json_values
 from athena_kit.lark.models.sheets import (
-    CreateSpreadsheetRequest,
     SheetsBatchUpdateRequest,
     SheetUpdateRequest,
     SheetWriteRequest,
 )
-from athena_kit.lark.sheet.constants import (
-    CREATE_SPREADSHEET_API_URL,
+from athena_kit.lark.sheets.constants import (
     OPERATE_SHEET_API_URL,
     READ_SINGLE_RANGE_API_URL,
     WRITE_SINGLE_RANGE_API_URL,
 )
-from athena_kit.lark.sheet.models import SheetWritePayload
-from athena_kit.lark.sheet.range import calculate_range
-from athena_kit.lark.validators import LARK_SUCCESS_VALIDATOR
+from athena_kit.lark.sheets.models import SheetWritePayload
+from athena_kit.lark.sheets.range import calculate_range
+from athena_kit.lark.sheets.validators import SHEETS_SUCCESS_VALIDATOR
 
 
-class LarkSheetClient:
-    """Low-level Lark Sheet API client."""
+def _ensure_title(title: str | None) -> str:
+    if title is None or not title.strip():
+        return f"{datetime.now():%Y%m%d}_{uuid4().hex[:8]}"
+    return title.strip()
 
-    def __init__(self, aclient: AsyncHttpClient):
+
+class LarkSheetsAsyncClient:
+    def __init__(self, aclient: httpx.AsyncClient):
         self._aclient = aclient
 
-    async def create_spreadsheet(
-        self,
-        folder_token: str,
-        title: str | None = None,
-    ) -> tuple[str, str]:
-        title = title or datetime.now().strftime("%Y%m%d_%H%M%S")
-        request = CreateSpreadsheetRequest(folder_token=folder_token, title=title)
-        response = await self._aclient.post(CREATE_SPREADSHEET_API_URL, json=request.model_dump())
+    async def create_spreadsheet(self, folder_token: str, title: str | None = None) -> tuple[str, str]:
+        """在指定文件夹中创建飞书电子表格文档。
 
-        spreadsheet_token, url = extract_response_json_values(
+        Args:
+            folder_token: 目标文件夹的 token。
+            title: 新文档标题。传入 `None` 或空白字符串时，会自动生成 `YYYYMMDD_xxxxxxxx` 格式的随机标题，
+                其中后缀来自 `uuid4().hex` 的前 8 位。
+
+        Returns:
+            新建电子表格的 spreadsheet_token 和访问 URL。
+
+        References:
+            https://open.feishu.cn/document/server-docs/docs/sheets-v3/spreadsheet/create
+        """
+        response = await self._aclient.post(
+            "/sheets/v3/spreadsheets",
+            json={"folder_token": folder_token, "title": _ensure_title(title)},
+        )
+        return extract_response_json_values(
             response,
             ["data.spreadsheet.spreadsheet_token", "data.spreadsheet.url"],
-            validator=LARK_SUCCESS_VALIDATOR,
+            validator=SHEETS_SUCCESS_VALIDATOR,
         )
-        if not isinstance(spreadsheet_token, str) or not isinstance(url, str):
-            raise TypeError("Lark create spreadsheet response should contain spreadsheet_token and url strings.")
-        return spreadsheet_token, url
 
     async def add_sheet(
         self,
@@ -49,7 +59,7 @@ class LarkSheetClient:
         sheet_title: str | None = None,
         sheet_index: int = 0,
     ) -> str:
-        sheet_title = sheet_title or datetime.now().strftime("%Y%m%d_%H%M%S")
+        sheet_title = _ensure_title(sheet_title)
         sheet_request = SheetUpdateRequest.add_sheet(sheet_title, sheet_index)
         request = SheetsBatchUpdateRequest(requests=[sheet_request])
         response = await self._aclient.post(
@@ -59,7 +69,7 @@ class LarkSheetClient:
         sheet_id = extract_response_json_value(
             response,
             "data.replies[0].addSheet.properties.sheetId",
-            validator=LARK_SUCCESS_VALIDATOR,
+            validator=SHEETS_SUCCESS_VALIDATOR,
         )
         if not isinstance(sheet_id, str):
             raise TypeError("Lark add sheet response should contain a sheetId string.")
@@ -104,7 +114,7 @@ class LarkSheetClient:
             batch_revision, batch_updated_rows = extract_response_json_values(
                 response,
                 ["data.revision", "data.updatedRows"],
-                validator=LARK_SUCCESS_VALIDATOR,
+                validator=SHEETS_SUCCESS_VALIDATOR,
             )
             if not isinstance(batch_revision, int) or not isinstance(batch_updated_rows, int):
                 raise TypeError("Lark write response should contain integer revision and updatedRows.")
@@ -146,11 +156,7 @@ class LarkSheetClient:
         max_rows_per_request = 1000
         current_start_row = start_row
         while end_row is None or current_start_row <= end_row:
-            n_rows = (
-                max_rows_per_request
-                if end_row is None
-                else min(end_row - current_start_row + 1, max_rows_per_request)
-            )
+            n_rows = max_rows_per_request if end_row is None else min(end_row - current_start_row + 1, max_rows_per_request)
             query_range = calculate_range(
                 sheet_id,
                 n_rows=n_rows,
@@ -162,7 +168,7 @@ class LarkSheetClient:
             raw_rows_values = extract_response_json_value(
                 response,
                 "data.valueRange.values",
-                validator=LARK_SUCCESS_VALIDATOR,
+                validator=SHEETS_SUCCESS_VALIDATOR,
             )
             if raw_rows_values is None:
                 raw_rows_values = []
@@ -170,9 +176,7 @@ class LarkSheetClient:
                 raise TypeError("Lark query response values should be a list.")
 
             batch_rows_values = [
-                row_values
-                for row_values in raw_rows_values
-                if isinstance(row_values, list) and not all(value is None for value in row_values)
+                row_values for row_values in raw_rows_values if isinstance(row_values, list) and not all(value is None for value in row_values)
             ]
             if not batch_rows_values:
                 break
@@ -205,7 +209,7 @@ class LarkSheetClient:
         raw_headers = extract_response_json_value(
             response,
             "data.valueRange.values",
-            validator=LARK_SUCCESS_VALIDATOR,
+            validator=SHEETS_SUCCESS_VALIDATOR,
         )
         if not raw_headers:
             return []

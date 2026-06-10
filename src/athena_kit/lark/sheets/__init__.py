@@ -3,19 +3,22 @@ from typing import TYPE_CHECKING
 from athena_kit._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_kit.lark.sheet.backend import LarkSheetBackend, LarkSheetLocator
-    from athena_kit.lark.sheet.client import LarkSheetClient
+    from athena_kit.lark.sheets.aclient import LarkSheetsAsyncClient
+    from athena_kit.lark.sheets.backend import LarkSheetBackend, LarkSheetLocator
+    from athena_kit.lark.sheets.validators import SHEETS_SUCCESS_VALIDATOR
 
 __all__ = (
-    "LarkSheetClient",
+    "LarkSheetsAsyncClient",
     "LarkSheetLocator",
     "LarkSheetBackend",
+    "SHEETS_SUCCESS_VALIDATOR",
 )
 
 _dynamic_imports = {
-    "LarkSheetClient": "client",
+    "LarkSheetsAsyncClient": "aclient",
     "LarkSheetLocator": "backend",
     "LarkSheetBackend": "backend",
+    "SHEETS_SUCCESS_VALIDATOR": "validators",
 }
 
 

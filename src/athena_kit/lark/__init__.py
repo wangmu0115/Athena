@@ -3,25 +3,20 @@ from typing import TYPE_CHECKING
 from athena_kit._import_utils import import_attr
 
 if TYPE_CHECKING:
-    from athena_kit.lark.auth import LarkTenantAccessTokenAuth, LarkTenantTokenOptions
-    from athena_kit.lark.client import LarkClient
+    from athena_kit.lark.aclient import AsyncLarkClient
+    from athena_kit.lark.auth import LarkTenantAccessTokenAuth
     from athena_kit.lark.config import LarkConfig, LarkSheetLocatorConfig
-    from athena_kit.lark.validators import LARK_SUCCESS_VALIDATOR
 
 __all__ = (
+    "AsyncLarkClient",
     "LarkTenantAccessTokenAuth",
-    "LarkTenantTokenOptions",
-    "LARK_SUCCESS_VALIDATOR",
-    "LarkClient",
     "LarkConfig",
     "LarkSheetLocatorConfig",
 )
 
 _dynamic_imports = {
+    "AsyncLarkClient": "aclient",
     "LarkTenantAccessTokenAuth": "auth",
-    "LarkTenantTokenOptions": "auth",
-    "LARK_SUCCESS_VALIDATOR": "validators",
-    "LarkClient": "client",
     "LarkConfig": "config",
     "LarkSheetLocatorConfig": "config",
 }

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from athena_kit.core.tabular import TableLocator
-from athena_kit.lark.sheet import LarkSheetClient
+from athena_kit.lark.sheets import LarkSheetsAsyncClient
 
 
 @dataclass(slots=True)
@@ -12,7 +12,7 @@ class LarkSheetLocator:
 
 
 class LarkSheetBackend:
-    def __init__(self, client: LarkSheetClient):
+    def __init__(self, client: LarkSheetsAsyncClient):
         self._client = client
 
     async def write_table(
