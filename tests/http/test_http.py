@@ -3,14 +3,21 @@ import asyncio
 import pytest
 
 import httpx
-from athena_kit.http import AsyncHttpClient, RequestIDOptions, extract_payload
+from athena_kit.http import AsyncHttpClient, extract_payload
 from athena_kit.http.exceptions import PayloadBizStatusError
-from athena_kit.http.hooks import create_async_request_id_hook, create_request_id_hook, raise_for_status_hook
+from athena_kit.http.hooks import (
+    LoggingOptions,
+    RaiseForStatusOptions,
+    RequestIDOptions,
+    create_async_request_id_hook,
+    create_logging_hooks,
+    create_raise_for_status_hook,
+    create_request_id_hook,
+    raise_for_status_hook,
+)
 
 
 def test_public_exports_are_lazy_loaded() -> None:
-    from athena_kit.http import LoggingOptions, create_logging_hooks
-
     assert AsyncHttpClient.__name__ == "AsyncHttpClient"
     assert LoggingOptions.__name__ == "LoggingOptions"
     assert callable(create_logging_hooks)
@@ -80,3 +87,27 @@ def test_raise_for_status_hook_delegates_to_httpx() -> None:
 
     with pytest.raises(httpx.HTTPStatusError):
         raise_for_status_hook(response)
+
+
+def test_raise_for_status_hook_allows_redirects_by_default() -> None:
+    request = httpx.Request("GET", "https://example.test/items")
+    response = httpx.Response(302, headers={"location": "https://example.test/new-items"}, request=request)
+
+    raise_for_status_hook(response)
+
+
+def test_raise_for_status_hook_can_raise_on_redirects() -> None:
+    request = httpx.Request("GET", "https://example.test/items")
+    response = httpx.Response(302, headers={"location": "https://example.test/new-items"}, request=request)
+    hook = create_raise_for_status_hook(RaiseForStatusOptions(raise_on_redirects=True))
+
+    with pytest.raises(httpx.HTTPStatusError):
+        hook(response)
+
+
+def test_raise_for_status_hook_allows_configured_status_codes() -> None:
+    request = httpx.Request("GET", "https://example.test/items")
+    response = httpx.Response(404, request=request)
+    hook = create_raise_for_status_hook(RaiseForStatusOptions(allowed_status_codes={404}))
+
+    hook(response)

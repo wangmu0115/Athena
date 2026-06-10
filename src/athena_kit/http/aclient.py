@@ -1,7 +1,13 @@
 from typing import Any
 
 import httpx
-from athena_kit.http.hooks import AsyncEventHooks, LoggingOptions, RequestIDOptions, merge_async_event_hooks
+from athena_kit.http.hooks import (
+    AsyncEventHooks,
+    LoggingOptions,
+    RaiseForStatusOptions,
+    RequestIDOptions,
+    merge_async_event_hooks,
+)
 
 
 class AsyncHttpClient(httpx.AsyncClient):
@@ -23,7 +29,7 @@ class AsyncHttpClient(httpx.AsyncClient):
         *args: Any,
         request_id: RequestIDOptions | bool = False,
         logging_options: LoggingOptions | bool = False,
-        raise_for_status: bool = False,
+        raise_for_status: bool | RaiseForStatusOptions = False,
         retries: int = 0,
         event_hooks: AsyncEventHooks | None = None,
         transport: httpx.AsyncBaseTransport | None = None,
