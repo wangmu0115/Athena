@@ -10,16 +10,14 @@ from typing import TYPE_CHECKING
 from athena_kit._import_utils import import_attr
 
 if TYPE_CHECKING:
+    from athena_kit.http.hooks.event_hooks import build_async_event_hooks, build_event_hooks
     from athena_kit.http.hooks.logging import LoggingOptions, create_async_logging_hooks, create_logging_hooks
-    from athena_kit.http.hooks.merge import merge_async_event_hooks, merge_event_hooks
-    from athena_kit.http.hooks.raise_for_status import (
-        RaiseForStatusOptions,
-        async_raise_for_status_hook,
-        create_async_raise_for_status_hook,
-        create_raise_for_status_hook,
-        raise_for_status_hook,
-    )
     from athena_kit.http.hooks.request_id import RequestIDOptions, create_async_request_id_hook, create_request_id_hook
+    from athena_kit.http.hooks.response_status import (
+        ResponseStatusOptions,
+        create_async_response_status_hook,
+        create_response_status_hook,
+    )
     from athena_kit.http.hooks.types import (
         AsyncEventHooks,
         AsyncRequestHook,
@@ -35,20 +33,18 @@ __all__ = (
     "AsyncResponseHook",
     "EventHooks",
     "LoggingOptions",
-    "RaiseForStatusOptions",
+    "ResponseStatusOptions",
     "RequestHook",
     "RequestIDOptions",
     "ResponseHook",
-    "async_raise_for_status_hook",
+    "build_async_event_hooks",
+    "build_event_hooks",
     "create_async_logging_hooks",
-    "create_async_raise_for_status_hook",
+    "create_async_response_status_hook",
     "create_async_request_id_hook",
     "create_logging_hooks",
-    "create_raise_for_status_hook",
+    "create_response_status_hook",
     "create_request_id_hook",
-    "merge_async_event_hooks",
-    "merge_event_hooks",
-    "raise_for_status_hook",
 )
 
 _dynamic_imports = {
@@ -57,20 +53,18 @@ _dynamic_imports = {
     "AsyncResponseHook": "types",
     "EventHooks": "types",
     "LoggingOptions": "logging",
-    "RaiseForStatusOptions": "raise_for_status",
+    "ResponseStatusOptions": "response_status",
     "RequestHook": "types",
     "RequestIDOptions": "request_id",
     "ResponseHook": "types",
+    "build_async_event_hooks": "event_hooks",
+    "build_event_hooks": "event_hooks",
     "create_async_logging_hooks": "logging",
-    "create_async_raise_for_status_hook": "raise_for_status",
+    "create_async_response_status_hook": "response_status",
     "create_async_request_id_hook": "request_id",
     "create_logging_hooks": "logging",
-    "create_raise_for_status_hook": "raise_for_status",
+    "create_response_status_hook": "response_status",
     "create_request_id_hook": "request_id",
-    "async_raise_for_status_hook": "raise_for_status",
-    "raise_for_status_hook": "raise_for_status",
-    "merge_async_event_hooks": "merge",
-    "merge_event_hooks": "merge",
 }
 
 

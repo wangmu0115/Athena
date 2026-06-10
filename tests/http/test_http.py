@@ -7,13 +7,12 @@ from athena_kit.http import AsyncHttpClient, extract_payload
 from athena_kit.http.exceptions import PayloadBizStatusError
 from athena_kit.http.hooks import (
     LoggingOptions,
-    RaiseForStatusOptions,
     RequestIDOptions,
+    ResponseStatusOptions,
     create_async_request_id_hook,
     create_logging_hooks,
-    create_raise_for_status_hook,
     create_request_id_hook,
-    raise_for_status_hook,
+    create_response_status_hook,
 )
 
 
@@ -81,33 +80,35 @@ def test_async_http_client_uses_httpx_event_hooks() -> None:
     assert seen_request.headers["X-Request-ID"] == "request-2"
 
 
-def test_raise_for_status_hook_delegates_to_httpx() -> None:
+def test_response_status_hook_delegates_to_httpx() -> None:
     request = httpx.Request("GET", "https://example.test/items")
     response = httpx.Response(500, request=request)
-
-    with pytest.raises(httpx.HTTPStatusError):
-        raise_for_status_hook(response)
-
-
-def test_raise_for_status_hook_allows_redirects_by_default() -> None:
-    request = httpx.Request("GET", "https://example.test/items")
-    response = httpx.Response(302, headers={"location": "https://example.test/new-items"}, request=request)
-
-    raise_for_status_hook(response)
-
-
-def test_raise_for_status_hook_can_raise_on_redirects() -> None:
-    request = httpx.Request("GET", "https://example.test/items")
-    response = httpx.Response(302, headers={"location": "https://example.test/new-items"}, request=request)
-    hook = create_raise_for_status_hook(RaiseForStatusOptions(raise_on_redirects=True))
+    hook = create_response_status_hook()
 
     with pytest.raises(httpx.HTTPStatusError):
         hook(response)
 
 
-def test_raise_for_status_hook_allows_configured_status_codes() -> None:
+def test_response_status_hook_allows_redirects_by_default() -> None:
+    request = httpx.Request("GET", "https://example.test/items")
+    response = httpx.Response(302, headers={"location": "https://example.test/new-items"}, request=request)
+    hook = create_response_status_hook()
+
+    hook(response)
+
+
+def test_response_status_hook_can_raise_on_redirects() -> None:
+    request = httpx.Request("GET", "https://example.test/items")
+    response = httpx.Response(302, headers={"location": "https://example.test/new-items"}, request=request)
+    hook = create_response_status_hook(ResponseStatusOptions(raise_on_redirects=True))
+
+    with pytest.raises(httpx.HTTPStatusError):
+        hook(response)
+
+
+def test_response_status_hook_allows_configured_status_codes() -> None:
     request = httpx.Request("GET", "https://example.test/items")
     response = httpx.Response(404, request=request)
-    hook = create_raise_for_status_hook(RaiseForStatusOptions(allowed_status_codes={404}))
+    hook = create_response_status_hook(ResponseStatusOptions(allowed_status_codes={404}))
 
     hook(response)
