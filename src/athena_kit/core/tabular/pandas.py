@@ -2,12 +2,12 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from athena_kit.core.tabular.schema import BaseTableRow
+from athena_kit.core.tabular.row import TableRow
 
 try:
     import pandas as pd
 except ImportError as exc:  # pragma: no cover - exercised only without optional dependency.
-    msg = "athena_kit.core.tabular.dataframe requires pandas. Install it with `athena-kit[dataframe]`."
+    msg = "athena_kit.core.tabular.pandas requires pandas. Install it with `athena-kit[dataframe]`."
     raise ImportError(msg) from exc
 
 if TYPE_CHECKING:
@@ -24,7 +24,7 @@ def dataframe_to_models[T: BaseModel](
     extra_fields: dict[str, Any] | None = None,
     strict: bool = True,
 ) -> list[T]:
-    """Map a pandas DataFrame into a list of Pydantic models."""
+    """将 pandas DataFrame 转换为 Pydantic 模型列表。"""
     extra_fields = extra_fields or {}
     rows = []
 
@@ -46,7 +46,7 @@ def dataframe_to_models[T: BaseModel](
 
 
 def models_to_dataframe(models: list[BaseModel], *, by_alias: bool = True) -> DataFrame:
-    """Convert Pydantic models to a pandas DataFrame."""
+    """将 Pydantic 模型列表转换为 pandas DataFrame。"""
     if not models:
         return pd.DataFrame()
 
@@ -54,14 +54,15 @@ def models_to_dataframe(models: list[BaseModel], *, by_alias: bool = True) -> Da
 
 
 def table_rows_to_dataframe(rows: list[BaseModel]) -> DataFrame:
+    """将表格行模型列表转换为 pandas DataFrame。"""
     if not rows:
         return pd.DataFrame()
 
     row_type = rows[0].__class__
-    if issubclass(row_type, BaseTableRow):
+    if issubclass(row_type, TableRow):
         return pd.DataFrame(
-            [row.to_row_values() for row in rows],
-            columns=row_type.headers(),
+            [row.to_table_row() for row in rows],
+            columns=row_type.table_headers(),
         )
 
     return models_to_dataframe(rows, by_alias=True)

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from athena_kit.core.tabular import TableLocator
+from athena_kit.core.tabular import AsyncTableBackend, TableLocator
 from athena_kit.lark.sheets import LarkSheetsAsyncClient
 
 
@@ -11,7 +11,7 @@ class LarkSheetLocator:
     sheet_id: str
 
 
-class LarkSheetBackend:
+class LarkSheetBackend(AsyncTableBackend):
     def __init__(self, client: LarkSheetsAsyncClient):
         self._client = client
 
@@ -41,6 +41,8 @@ class LarkSheetBackend:
         end_row: int | None = None,
         start_col: int = 1,
         end_col: int | None = None,
+        has_headers: bool = True,
+        return_headers: bool = True,
     ) -> tuple[list[str], list[list[Any]]]:
         lark_locator = self._ensure_lark_locator(locator)
 
@@ -51,6 +53,8 @@ class LarkSheetBackend:
             end_row=end_row,
             start_col=start_col,
             end_col=end_col,
+            has_headers=has_headers,
+            return_headers=return_headers,
         )
 
     @staticmethod
