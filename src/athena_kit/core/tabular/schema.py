@@ -1,7 +1,7 @@
 from typing import Any, Self
 
 from athena_kit.core.models import BaseAthenaModel
-from athena_kit.core.tabular.codec import decode_cell_value, encode_field_value
+from athena_kit.core.tabular.serialization import deserialize_cell_value, serialize_cell_value
 
 
 class BaseTableRow(BaseAthenaModel):
@@ -21,7 +21,7 @@ class BaseTableRow(BaseAthenaModel):
     def to_row_values(self) -> list[Any]:
         cls = self.__class__
         return [
-            encode_field_value(
+            serialize_cell_value(
                 getattr(self, field_name),
                 cls.model_fields[field_name].annotation,
             )
@@ -38,7 +38,7 @@ class BaseTableRow(BaseAthenaModel):
             if not field_name:
                 continue
             raw_value = row_values[index] if index < len(row_values) else None
-            payload[field_name] = decode_cell_value(
+            payload[field_name] = deserialize_cell_value(
                 raw_value,
                 cls.model_fields[field_name].annotation,
             )

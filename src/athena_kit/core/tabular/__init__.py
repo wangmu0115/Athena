@@ -4,17 +4,17 @@ from athena_kit._import_utils import import_attr
 
 if TYPE_CHECKING:
     from athena_kit.core.tabular.backend import TableBackend, TableLocator
-    from athena_kit.core.tabular.codec import decode_cell_value, encode_field_value
     from athena_kit.core.tabular.dataframe import dataframe_to_models, models_to_dataframe, table_rows_to_dataframe
     from athena_kit.core.tabular.fields import SourceField, TableField
     from athena_kit.core.tabular.repository import TableRepository
     from athena_kit.core.tabular.schema import BaseTableRow
+    from athena_kit.core.tabular.serialization import deserialize_cell_value, serialize_cell_value
 
 __all__ = (
     "TableLocator",
     "TableBackend",
-    "encode_field_value",
-    "decode_cell_value",
+    "serialize_cell_value",
+    "deserialize_cell_value",
     "TableField",
     "SourceField",
     "BaseTableRow",
@@ -27,8 +27,8 @@ __all__ = (
 _dynamic_imports = {
     "TableLocator": "backend",
     "TableBackend": "backend",
-    "encode_field_value": "codec",
-    "decode_cell_value": "codec",
+    "serialize_cell_value": "serialization",
+    "deserialize_cell_value": "serialization",
     "TableField": "fields",
     "SourceField": "fields",
     "BaseTableRow": "schema",

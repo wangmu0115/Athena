@@ -28,7 +28,7 @@ class LarkSheetBackend:
         return await self._client.overwrite_values(
             spreadsheet_token=lark_locator.spreadsheet_token,
             sheet_id=lark_locator.sheet_id,
-            value_headers=headers,
+            headers=headers,
             rows_values=rows_values,
             start_row=start_row,
         )
