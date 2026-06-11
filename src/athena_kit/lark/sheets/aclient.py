@@ -277,9 +277,7 @@ class LarkSheetsAsyncClient:
 
         while end_row is None or current_start_row <= end_row:
             n_rows = (
-                max_rows_per_request
-                if end_row is None
-                else min(end_row - current_start_row + 1, max_rows_per_request)
+                max_rows_per_request if end_row is None else min(end_row - current_start_row + 1, max_rows_per_request)
             )
             query_range = build_a1_range(
                 sheet_id,

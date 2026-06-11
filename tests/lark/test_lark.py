@@ -236,9 +236,7 @@ def test_lark_sheets_client_create_and_add_sheet_requests() -> None:
     assert requests[0].method == "POST"
     assert _request_json(requests[0]) == {"folder_token": "folder-1", "title": "title-1"}
     assert requests[1].url.path == "/sheets/v2/spreadsheets/spreadsheet-1/sheets_batch_update"
-    assert _request_json(requests[1]) == {
-        "requests": [{"addSheet": {"properties": {"title": "Sheet 1", "index": 1}}}]
-    }
+    assert _request_json(requests[1]) == {"requests": [{"addSheet": {"properties": {"title": "Sheet 1", "index": 1}}}]}
 
 
 def test_lark_sheets_client_batch_add_sheets_requests() -> None:
@@ -344,9 +342,7 @@ def test_lark_sheets_client_overwrite_values() -> None:
     result = asyncio.run(run())
 
     assert result == (7, 2, 2)
-    assert seen_payloads == [
-        {"valueRange": {"range": "sheet-1!A1:B2", "values": [["name", "value"], ["alpha", 1]]}}
-    ]
+    assert seen_payloads == [{"valueRange": {"range": "sheet-1!A1:B2", "values": [["name", "value"], ["alpha", 1]]}}]
 
 
 def test_lark_sheets_client_overwrite_headers_only() -> None:

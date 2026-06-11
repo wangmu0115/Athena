@@ -181,3 +181,30 @@ uv run ruff check src tests examples
 uv run ruff format --check src tests examples
 uv run pytest tests
 ```
+
+## 发布到 PyPI
+
+发布前确认版本号已经更新，并且 `pyproject.toml` 和 `src/athena_kit/__init__.py` 中的版本一致。
+
+```shell
+uv sync --extra all
+uv run ruff check src tests examples
+uv run ruff format --check src tests examples
+uv run pytest tests
+rm -rf dist
+uv build
+uv publish
+```
+
+如果是第一次发布，先在 PyPI 创建 API Token，然后按 `uv publish` 的提示输入 token；也可以提前设置环境变量：
+
+```shell
+export UV_PUBLISH_TOKEN="pypi-..."
+uv publish
+```
+
+发布完成后，在其他项目中安装：
+
+```shell
+uv add athena-kit
+```
