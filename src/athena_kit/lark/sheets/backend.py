@@ -6,14 +6,20 @@ from athena_kit.lark.sheets import LarkSheetsAsyncClient
 
 
 @dataclass(slots=True)
-class LarkSheetLocator:
+class LarkSheetsLocator:
     spreadsheet_token: str
     sheet_id: str
 
 
-class LarkSheetBackend(AsyncTableBackend):
-    def __init__(self, client: LarkSheetsAsyncClient):
-        self._client = client
+def _ensure_lark_locator(locator: TableLocator) -> LarkSheetsLocator:
+    if not isinstance(locator, LarkSheetsLocator):
+        raise TypeError(f"AsyncLarkSheetsBackend requires LarkSheetsLocator, got {type(locator).__name__}.")
+    return locator
+
+
+class AsyncLarkSheetsBackend(AsyncTableBackend):
+    def __init__(self, aclient: LarkSheetsAsyncClient):
+        self._aclient = aclient
 
     async def write_table(
         self,
@@ -23,9 +29,9 @@ class LarkSheetBackend(AsyncTableBackend):
         *,
         start_row: int = 1,
     ) -> tuple[int, int, int]:
-        lark_locator = self._ensure_lark_locator(locator)
+        lark_locator = _ensure_lark_locator(locator)
 
-        return await self._client.overwrite_values(
+        return await self._aclient.overwrite_values(
             spreadsheet_token=lark_locator.spreadsheet_token,
             sheet_id=lark_locator.sheet_id,
             headers=headers,
@@ -44,9 +50,9 @@ class LarkSheetBackend(AsyncTableBackend):
         has_headers: bool = True,
         return_headers: bool = True,
     ) -> tuple[list[str], list[list[Any]]]:
-        lark_locator = self._ensure_lark_locator(locator)
+        lark_locator = _ensure_lark_locator(locator)
 
-        return await self._client.query_values(
+        return await self._aclient.query_values(
             spreadsheet_token=lark_locator.spreadsheet_token,
             sheet_id=lark_locator.sheet_id,
             start_row=start_row,
@@ -56,9 +62,3 @@ class LarkSheetBackend(AsyncTableBackend):
             has_headers=has_headers,
             return_headers=return_headers,
         )
-
-    @staticmethod
-    def _ensure_lark_locator(locator: TableLocator) -> LarkSheetLocator:
-        if not isinstance(locator, LarkSheetLocator):
-            raise TypeError(f"LarkSheetBackend requires LarkSheetLocator, got {type(locator).__name__}.")
-        return locator

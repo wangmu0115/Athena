@@ -11,8 +11,7 @@ from athena_kit.http import AsyncHttpClient
 from athena_kit.http.hooks import RequestIDOptions
 from athena_kit.lark import AsyncLarkClient, LarkTenantAccessTokenAuth
 from athena_kit.lark.sheets import (
-    LarkSheetBackend,
-    LarkSheetLocator,
+    AsyncLarkSheetsBackend,
     LarkSheetsAsyncClient,
 )
 from athena_kit.lark.sheets.a1_notation import build_a1_range, column_index_to_name, column_name_to_index
@@ -28,7 +27,7 @@ def test_public_exports_are_lazy_loaded() -> None:
     assert AsyncLarkClient.__name__ == "AsyncLarkClient"
     assert LarkTenantAccessTokenAuth.__name__ == "LarkTenantAccessTokenAuth"
     assert LarkSheetsAsyncClient.__name__ == "LarkSheetsAsyncClient"
-    assert LarkSheetBackend.__name__ == "LarkSheetBackend"
+    assert AsyncLarkSheetsBackend.__name__ == "AsyncLarkSheetsBackend"
 
 
 def test__ensure_title_uses_existing_title() -> None:
@@ -462,12 +461,14 @@ def test_lark_sheets_client_query_values_can_omit_returned_headers() -> None:
 
 
 def test_lark_sheet_backend_requires_lark_locator() -> None:
-    backend = LarkSheetBackend(LarkSheetsAsyncClient(AsyncHttpClient(base_url="https://example.test")))
+    backend = AsyncLarkSheetsBackend(LarkSheetsAsyncClient(AsyncHttpClient(base_url="https://example.test")))
 
-    with pytest.raises(TypeError):
-        backend._ensure_lark_locator(object())
+    async def run() -> None:
+        await backend.write_table(
+            object(),
+            headers=["name"],
+            rows_values=[["alpha"]],
+        )
 
-    assert backend._ensure_lark_locator(LarkSheetLocator("spreadsheet-1", "sheet-1")) == LarkSheetLocator(
-        "spreadsheet-1",
-        "sheet-1",
-    )
+    with pytest.raises(TypeError, match="AsyncLarkSheetsBackend requires LarkSheetsLocator"):
+        asyncio.run(run())
