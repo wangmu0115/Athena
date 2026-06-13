@@ -21,10 +21,8 @@ def add_timestamp(req: httpx.Request):
 
 
 client = httpx.Client(event_hooks={"request": [add_timestamp], "response": [raise_on_non_2xx]})
-# {'request': [<function add_timestamp at 0x108815120>], 'response': [<function raise_on_non_2xx at 0x1082427a0>]}
 print(client.event_hooks)
 client.event_hooks["request"].append(log_request)
-# {'request': [<function add_timestamp at 0x108815120>, <function log_request at 0x1082307c0>], 'response': [<function raise_on_non_2xx at 0x1082427a0>, <function log_response at 0x108242160>]}
 client.event_hooks["response"].append(log_response)
 print(client.event_hooks)
 

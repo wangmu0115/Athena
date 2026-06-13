@@ -4,21 +4,18 @@ from athena_kit._import_utils import import_attr
 
 if TYPE_CHECKING:
     from athena_kit.lark.sheets.aclient import LarkSheetsAsyncClient
-    from athena_kit.lark.sheets.backend import LarkSheetBackend, LarkSheetLocator
-    from athena_kit.lark.sheets.validators import SHEETS_SUCCESS_VALIDATOR
+    from athena_kit.lark.sheets.backend import AsyncLarkSheetsBackend, LarkSheetsLocator
 
 __all__ = (
     "LarkSheetsAsyncClient",
-    "LarkSheetLocator",
-    "LarkSheetBackend",
-    "SHEETS_SUCCESS_VALIDATOR",
+    "LarkSheetsLocator",
+    "AsyncLarkSheetsBackend",
 )
 
 _dynamic_imports = {
     "LarkSheetsAsyncClient": "aclient",
-    "LarkSheetLocator": "backend",
-    "LarkSheetBackend": "backend",
-    "SHEETS_SUCCESS_VALIDATOR": "validators",
+    "LarkSheetsLocator": "backend",
+    "AsyncLarkSheetsBackend": "backend",
 }
 
 

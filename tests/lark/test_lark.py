@@ -4,21 +4,19 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 import httpx
 from athena_kit.http import AsyncHttpClient
 from athena_kit.http.hooks import RequestIDOptions
-from athena_kit.http.response_json import ResponseJSONValidationError
 from athena_kit.lark import AsyncLarkClient, LarkTenantAccessTokenAuth
 from athena_kit.lark.sheets import (
-    SHEETS_SUCCESS_VALIDATOR,
-    LarkSheetBackend,
-    LarkSheetLocator,
+    AsyncLarkSheetsBackend,
     LarkSheetsAsyncClient,
 )
+from athena_kit.lark.sheets.a1_notation import build_a1_range, column_index_to_name, column_name_to_index
 from athena_kit.lark.sheets.aclient import _ensure_title
-from athena_kit.lark.sheets.models import SheetWritePayload
-from athena_kit.lark.sheets.range import calculate_range, col_to_index, index_to_col
+from athena_kit.lark.sheets.requests import SheetWritePayload
 
 
 def _request_json(request: httpx.Request) -> dict[str, Any]:
@@ -29,16 +27,7 @@ def test_public_exports_are_lazy_loaded() -> None:
     assert AsyncLarkClient.__name__ == "AsyncLarkClient"
     assert LarkTenantAccessTokenAuth.__name__ == "LarkTenantAccessTokenAuth"
     assert LarkSheetsAsyncClient.__name__ == "LarkSheetsAsyncClient"
-    assert LarkSheetBackend.__name__ == "LarkSheetBackend"
-
-
-def test_sheets_success_validator_accepts_zero_code() -> None:
-    SHEETS_SUCCESS_VALIDATOR({"code": 0, "msg": "ok"})
-
-
-def test_sheets_success_validator_rejects_nonzero_code() -> None:
-    with pytest.raises(ResponseJSONValidationError):
-        SHEETS_SUCCESS_VALIDATOR({"code": 999, "msg": "failed"})
+    assert AsyncLarkSheetsBackend.__name__ == "AsyncLarkSheetsBackend"
 
 
 def test__ensure_title_uses_existing_title() -> None:
@@ -141,26 +130,30 @@ def test_async_lark_client_can_be_closed_explicitly(monkeypatch: pytest.MonkeyPa
     ],
 )
 def test_col_index_roundtrip(col: str, index: int) -> None:
-    assert col_to_index(col) == index
-    assert index_to_col(index) == col
+    assert column_name_to_index(col) == index
+    assert column_index_to_name(index) == col
 
 
-def test_calculate_range() -> None:
-    assert calculate_range("sheet1", n_rows=5, n_cols=4) == "sheet1!A1:D5"
-    assert calculate_range("sheet1", n_rows=2, n_cols=2, start_row=3, start_col=27) == "sheet1!AA3:AB4"
+def test_build_a1_range() -> None:
+    assert build_a1_range("sheet1", n_rows=5, n_cols=4) == "sheet1!A1:D5"
+    assert build_a1_range("sheet1", n_rows=2, n_cols=2, start_row=3, start_col=27) == "sheet1!AA3:AB4"
 
 
-def test_sheet_write_payload_encodes_values_and_validates_width() -> None:
+def test_sheet_write_payload_encodes_values_and_allows_rows_wider_than_headers() -> None:
     payload = SheetWritePayload.from_rows_values(
         headers=["name", "tags"],
-        rows_values=[[" alpha ", ["x", "y"]]],
+        rows_values=[[" alpha ", ["x", "y"], "extra"]],
     )
 
-    assert payload.shape() == (2, 2)
-    assert payload.to_table_2dvalues() == [["name", "tags"], ["alpha", "x, y"]]
+    assert payload.shape() == (2, 3)
+    assert payload.to_table_2dvalues() == [["name", "tags"], ["alpha", '["x", "y"]', "extra"]]
 
-    with pytest.raises(ValueError):
-        SheetWritePayload.from_rows_values(headers=["name"], rows_values=[["alpha", "extra"]])
+
+def test_sheet_write_payload_allows_header_only_write() -> None:
+    payload = SheetWritePayload.from_rows_values(headers=["name", "value"], rows_values=[])
+
+    assert payload.shape() == (1, 2)
+    assert payload.to_table_2dvalues() == [["name", "value"]]
 
 
 def test_lark_auth_caches_tenant_access_token() -> None:
@@ -243,9 +236,55 @@ def test_lark_sheets_client_create_and_add_sheet_requests() -> None:
     assert requests[0].method == "POST"
     assert _request_json(requests[0]) == {"folder_token": "folder-1", "title": "title-1"}
     assert requests[1].url.path == "/sheets/v2/spreadsheets/spreadsheet-1/sheets_batch_update"
-    assert _request_json(requests[1]) == {
-        "requests": [{"addSheet": {"properties": {"title": "Sheet 1", "index": 1}}}]
+    assert _request_json(requests[1]) == {"requests": [{"addSheet": {"properties": {"title": "Sheet 1", "index": 1}}}]}
+
+
+def test_lark_sheets_client_batch_add_sheets_requests() -> None:
+    requests: list[httpx.Request] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "code": 0,
+                "data": {
+                    "replies": [
+                        {"addSheet": {"properties": {"sheetId": "sheet-1"}}},
+                        {"addSheet": {"properties": {"sheetId": "sheet-2"}}},
+                    ]
+                },
+            },
+        )
+
+    async def run() -> list[str]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkSheetsAsyncClient(aclient).batch_add_sheets(
+                "spreadsheet-1",
+                ["Sheet 1", "Sheet 2"],
+                start_index=2,
+            )
+
+    sheet_ids = asyncio.run(run())
+
+    assert sheet_ids == ["sheet-1", "sheet-2"]
+    assert requests[0].url.path == "/sheets/v2/spreadsheets/spreadsheet-1/sheets_batch_update"
+    assert _request_json(requests[0]) == {
+        "requests": [
+            {"addSheet": {"properties": {"title": "Sheet 1", "index": 2}}},
+            {"addSheet": {"properties": {"title": "Sheet 2", "index": 3}}},
+        ]
     }
+
+
+def test_lark_sheets_client_batch_add_sheets_rejects_empty_titles() -> None:
+    async def run() -> None:
+        async with AsyncHttpClient(base_url="https://example.test") as aclient:
+            await LarkSheetsAsyncClient(aclient).batch_add_sheets("spreadsheet-1", [])
+
+    with pytest.raises(ValidationError):
+        asyncio.run(run())
 
 
 def test_lark_sheets_client_uses_default_titles(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -296,16 +335,36 @@ def test_lark_sheets_client_overwrite_values() -> None:
             return await LarkSheetsAsyncClient(aclient).overwrite_values(
                 "spreadsheet-1",
                 "sheet-1",
-                value_headers=["name", "value"],
+                headers=["name", "value"],
                 rows_values=[["alpha", 1]],
             )
 
     result = asyncio.run(run())
 
     assert result == (7, 2, 2)
-    assert seen_payloads == [
-        {"valueRange": {"range": "sheet-1!A1:B2", "values": [["name", "value"], ["alpha", 1]]}}
-    ]
+    assert seen_payloads == [{"valueRange": {"range": "sheet-1!A1:B2", "values": [["name", "value"], ["alpha", 1]]}}]
+
+
+def test_lark_sheets_client_overwrite_headers_only() -> None:
+    seen_payloads: list[dict[str, Any]] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        seen_payloads.append(_request_json(request))
+        return httpx.Response(200, request=request, json={"code": 0, "data": {"revision": 7, "updatedRows": 1}})
+
+    async def run() -> tuple[int, int, int]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkSheetsAsyncClient(aclient).overwrite_values(
+                "spreadsheet-1",
+                "sheet-1",
+                headers=["name", "value"],
+                rows_values=[],
+            )
+
+    result = asyncio.run(run())
+
+    assert result == (7, 1, 2)
+    assert seen_payloads == [{"valueRange": {"range": "sheet-1!A1:B1", "values": [["name", "value"]]}}]
 
 
 def test_lark_sheets_client_query_values() -> None:
@@ -315,7 +374,7 @@ def test_lark_sheets_client_query_values() -> None:
         requested_paths.append(request.url.path)
         if "A1:CV1" in request.url.path:
             values = [["name", "value", None, "ignored"]]
-        elif "A2:B1001" in request.url.path:
+        elif "A2:B501" in request.url.path:
             values = [["alpha", 1], [None, None]]
         else:
             values = []
@@ -331,18 +390,81 @@ def test_lark_sheets_client_query_values() -> None:
     assert rows == [["alpha", 1]]
     assert requested_paths == [
         "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A1:CV1",
-        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A2:B1001",
-        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A1002:B2001",
+        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A2:B501",
+        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A502:B1001",
+    ]
+
+
+def test_lark_sheets_client_query_values_without_headers() -> None:
+    requested_paths: list[str] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requested_paths.append(request.url.path)
+        values = [["alpha", 1], ["beta", 2]] if "A1:B500" in request.url.path else []
+        return httpx.Response(200, request=request, json={"code": 0, "data": {"valueRange": {"values": values}}})
+
+    async def run() -> tuple[list[str], list[list[Any]]]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkSheetsAsyncClient(aclient).query_values(
+                "spreadsheet-1",
+                "sheet-1",
+                start_row=1,
+                end_col=2,
+                has_headers=False,
+            )
+
+    headers, rows = asyncio.run(run())
+
+    assert headers == []
+    assert rows == [["alpha", 1], ["beta", 2]]
+    assert requested_paths == [
+        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A1:B500",
+        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A501:B1000",
+    ]
+
+
+def test_lark_sheets_client_query_values_can_omit_returned_headers() -> None:
+    requested_paths: list[str] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requested_paths.append(request.url.path)
+        if "A1:CV1" in request.url.path:
+            values = [["name", "value", None]]
+        elif "A10:B509" in request.url.path:
+            values = [["alpha", 1]]
+        else:
+            values = []
+        return httpx.Response(200, request=request, json={"code": 0, "data": {"valueRange": {"values": values}}})
+
+    async def run() -> tuple[list[str], list[list[Any]]]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkSheetsAsyncClient(aclient).query_values(
+                "spreadsheet-1",
+                "sheet-1",
+                start_row=10,
+                return_headers=False,
+            )
+
+    headers, rows = asyncio.run(run())
+
+    assert headers == []
+    assert rows == [["alpha", 1]]
+    assert requested_paths == [
+        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A1:CV1",
+        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A10:B509",
+        "/sheets/v2/spreadsheets/spreadsheet-1/values/sheet-1!A510:B1009",
     ]
 
 
 def test_lark_sheet_backend_requires_lark_locator() -> None:
-    backend = LarkSheetBackend(LarkSheetsAsyncClient(AsyncHttpClient(base_url="https://example.test")))
+    backend = AsyncLarkSheetsBackend(LarkSheetsAsyncClient(AsyncHttpClient(base_url="https://example.test")))
 
-    with pytest.raises(TypeError):
-        backend._ensure_lark_locator(object())
+    async def run() -> None:
+        await backend.write_table(
+            object(),
+            headers=["name"],
+            rows_values=[["alpha"]],
+        )
 
-    assert backend._ensure_lark_locator(LarkSheetLocator("spreadsheet-1", "sheet-1")) == LarkSheetLocator(
-        "spreadsheet-1",
-        "sheet-1",
-    )
+    with pytest.raises(TypeError, match="AsyncLarkSheetsBackend requires LarkSheetsLocator"):
+        asyncio.run(run())

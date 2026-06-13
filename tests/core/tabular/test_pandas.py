@@ -7,22 +7,22 @@ from pydantic import BaseModel
 pd = pytest.importorskip("pandas")
 tabular = importlib.import_module("athena_kit.core.tabular")
 
-BaseTableRow = tabular.BaseTableRow
-SourceField = tabular.SourceField
-TableField = tabular.TableField
+SourceCell = tabular.SourceCell
+TableCell = tabular.TableCell
+TableRow = tabular.TableRow
 dataframe_to_models = tabular.dataframe_to_models
 table_rows_to_dataframe = tabular.table_rows_to_dataframe
 
 
 class SourceModel(BaseModel):
-    trade_date: date = SourceField(required=True)
-    symbol: str = SourceField(source="代码")
-    amount: int = SourceField(source="成交额")
+    trade_date: date = SourceCell(required=True)
+    symbol: str = SourceCell(source="代码")
+    amount: int = SourceCell(source="成交额")
 
 
-class RowModel(BaseTableRow):
-    symbol: str = TableField(title="股票代码", order=1)
-    amount: int = TableField(title="成交额", order=2)
+class RowModel(TableRow):
+    symbol: str = TableCell(title="股票代码", order=1)
+    amount: int = TableCell(title="成交额", order=2)
 
 
 def test_dataframe_to_models_with_extra_fields_and_sources():

@@ -46,13 +46,13 @@
 # headers = {"X-Api-Key": "Cli-Api", "X-Client-ID": "123"}
 # with httpx.Client(headers=headers) as client:
 #     req = client.build_request("GET", "https://example.com")
-#     print(req.headers)  # Headers({'host': 'example.com', 'accept': '*/*', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.28.1', 'x-api-key': 'Cli-Api', 'x-client-id': '123'})
+#     print(req.headers)
 
 #     #
 #     del req.headers["X-Api-Key"]
 #     resp = client.send(req)
 # print(resp)  # <Response [200 OK]>
-# print(resp.request.headers)  # Headers({'host': 'example.com', 'accept': '*/*', 'accept-encoding': 'gzip, deflate', 'connection': 'keep-alive', 'user-agent': 'python-httpx/0.28.1', 'x-client-id': '123'})
+# print(resp.request.headers)
 
 # with httpx.Client(base_url="http://httpbin.org") as client:
 #     resp = client.get("headers")

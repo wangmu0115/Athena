@@ -11,6 +11,7 @@ dependencies = [
     "pydantic>=2.13.4",
 ]
 license = "MIT"
+license-files = ["LICENSE"]
 keywords = ["athena", "toolkit", "utilities", "temporal", "pydantic"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -21,6 +22,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
+
+[project.urls]
+Homepage = "https://github.com/wangmu0115/Athena"
+Repository = "https://github.com/wangmu0115/Athena"
+Issues = "https://github.com/wangmu0115/Athena/issues"
 
 [project.optional-dependencies]
 dataframe = [
