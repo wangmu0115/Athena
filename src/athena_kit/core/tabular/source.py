@@ -2,7 +2,6 @@ from collections.abc import Callable
 from typing import Any
 
 from pydantic import Field
-from pydantic.fields import FieldInfo
 
 
 def SourceCell(
@@ -11,7 +10,7 @@ def SourceCell(
     required: bool = False,
     transform: Callable[[Any], Any] | None = None,
     **kwargs: Any,
-) -> FieldInfo:
+) -> Any:
     """创建带有外部来源映射元信息的 Pydantic 字段。
 
     `SourceCell` 描述外部数据结构的列如何映射到模型字段，例如 pandas DataFrame、CSV、飞书表格或数据库查询结果。

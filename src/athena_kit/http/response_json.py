@@ -132,7 +132,7 @@ def _get_json_value(value: JSONValue, path: JSONPath, *, default: JSONValue = No
 
     for part in parts:
         child = _get_json_child(current, part)
-        if child is _MISSING:
+        if isinstance(child, _Missing):
             return default
         current = child
 
