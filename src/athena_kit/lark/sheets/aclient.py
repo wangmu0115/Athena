@@ -52,11 +52,12 @@ class LarkSheetsAsyncClient:
             "/sheets/v3/spreadsheets",
             json={"folder_token": folder_token, "title": _ensure_title(title)},
         )
-        return extract_response_json_values(
+        spreadsheet_token, url = extract_response_json_values(
             response,
             ["data.spreadsheet.spreadsheet_token", "data.spreadsheet.url"],
             validator=_SHEETS_SUCCESS_VALIDATOR,
         )
+        return (str(spreadsheet_token), str(url))
 
     async def batch_add_sheets(
         self,
@@ -95,7 +96,7 @@ class LarkSheetsAsyncClient:
             "data.replies",
             validator=_SHEETS_SUCCESS_VALIDATOR,
         )
-        return [reply["addSheet"]["properties"]["sheetId"] for reply in payload_replies]
+        return [reply["addSheet"]["properties"]["sheetId"] for reply in payload_replies]  # pyright: ignore
 
     async def add_sheet(
         self,
@@ -208,6 +209,9 @@ class LarkSheetsAsyncClient:
                 ["data.revision", "data.updatedRows"],
                 validator=_SHEETS_SUCCESS_VALIDATOR,
             )
+            if not isinstance(revision, int) or not isinstance(batch_updated_rows, int):
+                raise ValueError("The Lark API is responding incorrectly.")
+
             updated_rows += batch_updated_rows
 
         return revision, updated_rows, n_cols
@@ -307,7 +311,7 @@ class LarkSheetsAsyncClient:
             if not batch_rows_values:
                 break
 
-            rows_values.extend(batch_rows_values)
+            rows_values.extend(batch_rows_values)  # pyright: ignore[reportArgumentType]
             current_start_row += n_rows
 
         return headers if has_headers and return_headers else [], rows_values
