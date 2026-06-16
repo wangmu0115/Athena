@@ -171,7 +171,6 @@ rows = await repository.list_all()
 - `athena_kit.http`：基于 HTTPX 的同步/异步 HTTP 工具。
 - `athena_kit.lark`：飞书开放平台异步客户端和 Sheets 工具。
 - `athena_kit.matplotlib`：声明式图表渲染工具。
-- `athena_kit.bosun`：Bosun 表达式解析和 OpenTSDB 查询工具。
 
 ## 开发
 
