@@ -4,6 +4,7 @@ import httpx
 from athena_kit.http import AsyncHttpClient
 from athena_kit.http.hooks import AsyncEventHooks, LoggingOptions, RequestIDOptions, ResponseStatusOptions
 from athena_kit.lark.auth import LarkTenantAccessTokenAuth
+from athena_kit.lark.drives.aclient import LarkDrivesAsyncClient
 from athena_kit.lark.sheets import LarkSheetsAsyncClient
 
 
@@ -33,7 +34,7 @@ class AsyncLarkClient:
         timeout: float | httpx.Timeout = 30.0,
         request_id: bool | RequestIDOptions = False,
         logging: bool | LoggingOptions = False,
-        response_status: bool | ResponseStatusOptions = False,
+        response_status: bool | ResponseStatusOptions = True,
         event_hooks: AsyncEventHooks | None = None,
         **kwargs: Any,
     ):
@@ -53,6 +54,7 @@ class AsyncLarkClient:
         )
         # 注册 sheets 资源异步客户端
         self.sheets = LarkSheetsAsyncClient(self._aclient)
+        self.drives = LarkDrivesAsyncClient(self._aclient)
 
     async def __aenter__(self) -> Self:
         await self._aclient.__aenter__()

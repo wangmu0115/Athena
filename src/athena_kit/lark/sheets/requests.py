@@ -6,9 +6,9 @@ from athena_kit.core.tabular import serialize_cell_value
 
 
 class SheetUpdateRequest(BaseModel):
-    addSheet: dict[str, Any] | None = Field(None, description="Add sheet")
-    copySheet: dict[str, Any] | None = Field(None, description="Copy sheet")
-    deleteSheet: dict[str, Any] | None = Field(None, description="Delete sheet")
+    addSheet: dict[str, Any] | None = Field(default=None, description="Add sheet")
+    copySheet: dict[str, Any] | None = Field(default=None, description="Copy sheet")
+    deleteSheet: dict[str, Any] | None = Field(default=None, description="Delete sheet")
 
     @classmethod
     def add_sheet(cls, title: str, index: int) -> Self:
