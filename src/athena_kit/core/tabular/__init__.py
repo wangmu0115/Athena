@@ -5,7 +5,7 @@ from athena_kit._import_utils import import_attr
 if TYPE_CHECKING:
     from athena_kit.core.tabular.backend import AsyncTableBackend, TableBackend, TableLocator
     from athena_kit.core.tabular.cell import TableCell
-    from athena_kit.core.tabular.pandas import dataframe_to_models, models_to_dataframe, table_rows_to_dataframe
+    from athena_kit.core.tabular.pandas import dataframe_to_models
     from athena_kit.core.tabular.repository import AsyncTableRepository, TableRepository
     from athena_kit.core.tabular.row import TableRow
     from athena_kit.core.tabular.serialization import deserialize_cell_value, serialize_cell_value
@@ -23,8 +23,6 @@ __all__ = (
     "TableRepository",
     "AsyncTableRepository",
     "dataframe_to_models",
-    "models_to_dataframe",
-    "table_rows_to_dataframe",
 )
 
 _dynamic_imports = {
@@ -39,8 +37,6 @@ _dynamic_imports = {
     "TableRepository": "repository",
     "AsyncTableRepository": "repository",
     "dataframe_to_models": "pandas",
-    "models_to_dataframe": "pandas",
-    "table_rows_to_dataframe": "pandas",
 }
 
 

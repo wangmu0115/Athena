@@ -1,30 +1,43 @@
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from pydantic import BaseModel
 
-from athena_kit.core.tabular.row import TableRow
-
 try:
     import pandas as pd
-except ImportError as exc:  # pragma: no cover - exercised only without optional dependency.
-    msg = "athena_kit.core.tabular.pandas requires pandas. Install it with `athena-kit[dataframe]`."
+except ImportError as exc:
+    # pragma: no cover - exercised only without optional dependency.
+    msg = "athena_kit.core.tabular.pandas requires `pandas`. Install it with `athena-kit[pandas]`."
     raise ImportError(msg) from exc
-
-if TYPE_CHECKING:
-    from pandas import DataFrame, Series
-else:
-    DataFrame = pd.DataFrame
-    Series = pd.Series
 
 
 def dataframe_to_models[T: BaseModel](
-    df: DataFrame,
+    df: pd.DataFrame,
     model_cls: type[T],
     *,
     extra_fields: dict[str, Any] | None = None,
     strict: bool = True,
 ) -> list[T]:
-    """将 pandas DataFrame 转换为 Pydantic 模型列表。"""
+    """将 pandas DataFrame 转换为 Pydantic 模型列表。
+
+    该函数适合读取外部二维数据，并将每一行映射为一个 Pydantic 模型实例。
+    目标模型字段可以使用 `SourceCell` 声明来源列、必填策略和转换函数，未使用 `SourceCell` 的字段会默认尝试读取同名列。
+
+    字段解析规则：
+        - 如果字段通过 `SourceCell(source=...)` 声明来源列，会优先从这些列名中读取值。
+        - 如果未声明 `source`，会使用模型字段名作为来源列名。
+        - 如果 DataFrame 中没有匹配列，但 `extra_fields` 中存在同名字段，则使用 `extra_fields` 的值。
+        - 如果字段声明了 `SourceCell(transform=...)`，会在读取并归一化空值后调用该转换函数。
+        - `None`、空白字符串和 pandas 空值会被视为 `None`。
+
+    Args:
+        df: 来源 DataFrame。
+        model_cls: 目标 Pydantic 模型类，字段可使用 `SourceCell` 补充来源映射元信息。
+        extra_fields: 可选的额外字段值，用于补充 DataFrame 中不存在的字段。
+        strict: 是否在映射阶段对缺失来源列提前抛出 `ValueError`。
+
+    Returns:
+        转换并通过 `model_cls.model_validate()` 校验后的模型列表。
+    """
     extra_fields = extra_fields or {}
     rows = []
 
@@ -34,43 +47,21 @@ def dataframe_to_models[T: BaseModel](
             value = _parse_field_value(
                 record=record,
                 field_name=field_name,
-                field_extra=field.json_schema_extra or {},
+                field_extra=_normalize_field_extra(field.json_schema_extra),
                 extra_fields=extra_fields,
                 strict=strict,
                 row_index=row_index,
             )
             payload[field_name] = value
+
         rows.append(model_cls.model_validate(payload))
 
     return rows
 
 
-def models_to_dataframe(models: list[BaseModel], *, by_alias: bool = True) -> DataFrame:
-    """将 Pydantic 模型列表转换为 pandas DataFrame。"""
-    if not models:
-        return pd.DataFrame()
-
-    return pd.DataFrame([model.model_dump(by_alias=by_alias) for model in models])
-
-
-def table_rows_to_dataframe(rows: list[BaseModel]) -> DataFrame:
-    """将表格行模型列表转换为 pandas DataFrame。"""
-    if not rows:
-        return pd.DataFrame()
-
-    row_type = rows[0].__class__
-    if issubclass(row_type, TableRow):
-        return pd.DataFrame(
-            [row.to_table_row() for row in rows],
-            columns=row_type.table_headers(),
-        )
-
-    return models_to_dataframe(rows, by_alias=True)
-
-
 def _parse_field_value(
     *,
-    record: Series,
+    record: pd.Series,
     field_name: str,
     field_extra: dict[str, Any],
     extra_fields: dict[str, Any],
@@ -81,17 +72,19 @@ def _parse_field_value(
     required = bool(field_extra.get("required", False))
     transform = field_extra.get("transform")
 
+    # 解析所有的 source 字段
     source_candidates = _normalize_sources(source, field_name)
 
-    found = False
-    value = None
-    used_source = None
-    for candidate in source_candidates:
-        if candidate in record:
+    found = False  # 是否成功映射到值
+    value = None  # 映射值
+    used_source = None  # 使用的来源字段
+    for source_candidate in source_candidates:
+        if source_candidate in record:
             found = True
-            value = record.get(candidate)
-            used_source = candidate
+            value = record.get(source_candidate)
+            used_source = source_candidate
             break
+
     if not found and field_name in extra_fields:
         found = True
         value = extra_fields.get(field_name)
@@ -105,6 +98,7 @@ def _parse_field_value(
     value = _normalize_pandas_value(value)
     if value is None:
         return None
+
     if transform is not None:
         try:
             value = transform(value)
@@ -114,6 +108,13 @@ def _parse_field_value(
             ) from exc
 
     return value
+
+
+def _normalize_field_extra(field_extra: Any) -> dict[str, Any]:
+    if isinstance(field_extra, dict):
+        return field_extra
+
+    return {}
 
 
 def _normalize_sources(source: str | list[str] | tuple[str, ...] | None, field_name: str) -> list[str]:

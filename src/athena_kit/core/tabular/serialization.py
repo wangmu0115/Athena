@@ -71,9 +71,9 @@ def deserialize_cell_value(value: object, value_type: Any) -> Any:
     if value_type is str:
         return str(value).strip()
     if value_type is int:
-        return int(value)
+        return _deserialize_int(value)
     if value_type is float:
-        return float(value)
+        return _deserialize_float(value)
     if value_type is bool:
         return _deserialize_bool(value)
     if value_type is datetime:
@@ -122,6 +122,14 @@ def _deserialize_sequence(
     if container_cls is set:
         return set(items)
     raise TypeError(f"Unsupported container type: {container_cls!r}")
+
+
+def _deserialize_int(value: Any) -> int:
+    return int(value)
+
+
+def _deserialize_float(value: Any) -> float:
+    return float(value)
 
 
 def _deserialize_bool(value: Any) -> bool:

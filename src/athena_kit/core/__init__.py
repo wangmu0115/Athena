@@ -15,9 +15,7 @@ if TYPE_CHECKING:
         TableRow,
         dataframe_to_models,
         deserialize_cell_value,
-        models_to_dataframe,
         serialize_cell_value,
-        table_rows_to_dataframe,
     )
     from athena_kit.core.temporal import (
         DateBoundaryPolicy,
@@ -86,8 +84,6 @@ __all__ = (
     "TableRepository",
     "AsyncTableRepository",
     "dataframe_to_models",
-    "models_to_dataframe",
-    "table_rows_to_dataframe",
     "TemporalCodec",
     "DateCodec",
     "DateCodecOptions",
@@ -150,8 +146,6 @@ _dynamic_imports = {
     "TableRepository": "tabular",
     "AsyncTableRepository": "tabular",
     "dataframe_to_models": "tabular",
-    "models_to_dataframe": "tabular",
-    "table_rows_to_dataframe": "tabular",
     "TemporalCodec": "temporal.codec",
     "DateCodec": "temporal.codec",
     "DateCodecOptions": "temporal.codec",

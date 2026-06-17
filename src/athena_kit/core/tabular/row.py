@@ -72,7 +72,7 @@ class TableRow(BaseModel):
     def _field_header(cls, field_name: str) -> str:
         field = cls.model_fields[field_name]
         extra = field.json_schema_extra or {}
-        return extra.get("title") or field.alias or field_name
+        return str(extra.get("title")) or field.alias or field_name
 
     @classmethod
     def _header_to_field_name(cls) -> dict[str, str]:
