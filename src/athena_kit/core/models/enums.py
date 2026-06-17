@@ -2,15 +2,16 @@ from enum import IntEnum, StrEnum
 from typing import Any, ClassVar, Self
 
 
-class LabelEnumMixin[ValueT: (int, str)]:
-    """为枚举类增加标签和别名查询能力的 Mixin。
+class _LabelEnum[ValueT: (int, str)]:
+    """为枚举类增加标签和别名。
 
-    该 Mixin 适合与 `IntEnum` 或 `StrEnum` 组合使用，用于让枚举成员同时具备：
+    该类适合与 `IntEnum` 或 `StrEnum` 组合使用，用于让枚举成员同时具备：
         - 原始枚举值：`value`
         - 展示标签：`label`
         - 查询别名：`aliases`
 
     枚举成员应按如下格式声明：
+
     ```python
     MEMBER = value, label, alias1, alias2, ...
     ```
@@ -28,7 +29,7 @@ class LabelEnumMixin[ValueT: (int, str)]:
         case_sensitive_map: dict[str, Any] = {}
         case_insensitive_map: dict[str, Any] = {}
 
-        for item in cls:
+        for item in cls:  # pyright: ignore
             texts = (item.label, *item.aliases)
             for text in texts:
                 if text in case_sensitive_map and case_sensitive_map[text] is not item:
@@ -48,7 +49,7 @@ class LabelEnumMixin[ValueT: (int, str)]:
         """根据原始值安全获取枚举成员。"""
         if value is None:
             return None
-        return cls._value2member_map_.get(value)
+        return cls._value2member_map_.get(value)  # pyright: ignore
 
     @classmethod
     def from_value(cls, value: ValueT) -> Self:
@@ -57,7 +58,7 @@ class LabelEnumMixin[ValueT: (int, str)]:
         Raises:
             ValueError: 当 `value` 不是合法枚举值时抛出。
         """
-        return cls(value)
+        return cls(value)  # pyright: ignore
 
     @classmethod
     def safe_from_label(cls, label: str | None, *, case_sensitive: bool = True) -> Self | None:
@@ -85,14 +86,14 @@ class LabelEnumMixin[ValueT: (int, str)]:
     def to_dict(self) -> dict[str, Any]:
         """将枚举成员转换为包含 `name`、`value`、`label` 和 `aliases` 的字典。"""
         return {
-            "name": self.name,
-            "value": self.value,
+            "name": self.name,  # pyright: ignore
+            "value": self.value,  # pyright: ignore
             "label": self.label,
             "aliases": self.aliases,
         }
 
 
-class LabelIntEnum(LabelEnumMixin[int], IntEnum):
+class LabelIntEnum(_LabelEnum[int], IntEnum):
     """带标签和别名能力的整数枚举基类，枚举值类型为 `int`。"""
 
     def __new__(cls, value: int, label: str, *aliases: str):
@@ -103,7 +104,7 @@ class LabelIntEnum(LabelEnumMixin[int], IntEnum):
         return obj
 
 
-class LabelStrEnum(LabelEnumMixin[str], StrEnum):
+class LabelStrEnum(_LabelEnum[str], StrEnum):
     """带标签和别名能力的字符串枚举基类，枚举值类型为 `str`。"""
 
     def __new__(cls, value: str, label: str, *aliases: str):

@@ -6,8 +6,12 @@ import pytest
 import httpx
 from athena_kit.http import (
     AsyncHttpClient,
+    AsyncRouteRateLimiter,
+    AsyncSlidingWindowRateLimiter,
     HttpClient,
     RetryOptions,
+    RouteRateLimiter,
+    SlidingWindowRateLimiter,
     create_biz_code_validator,
     extract_response_json_value,
     extract_response_json_values,
@@ -178,6 +182,119 @@ def test_http_client_uses_httpx_event_hooks() -> None:
 
     assert seen_request is not None
     assert seen_request.headers["X-Request-ID"] == "request-3"
+
+
+def test_sliding_window_rate_limiter_waits_when_window_is_full() -> None:
+    now = 0.0
+    sleeps: list[float] = []
+
+    def clock() -> float:
+        return now
+
+    def sleep(seconds: float) -> None:
+        nonlocal now
+        sleeps.append(seconds)
+        now += seconds
+
+    limiter = SlidingWindowRateLimiter(limit=2, period=10, clock=clock, sleep=sleep)
+
+    limiter.acquire()
+    limiter.acquire()
+    limiter.acquire()
+
+    assert sleeps == [10]
+
+
+def test_http_client_uses_rate_limiter() -> None:
+    paths: list[str] = []
+
+    class RecordingRateLimiter:
+        def acquire(self, request: httpx.Request | None = None) -> None:
+            assert request is not None
+            paths.append(request.url.path)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, request=request, json={"code": 0})
+
+    with HttpClient(
+        base_url="https://example.test",
+        transport=httpx.MockTransport(handler),
+        rate_limiter=RecordingRateLimiter(),
+    ) as client:
+        client.get("/items")
+
+    assert paths == ["/items"]
+
+
+def test_route_rate_limiter_matches_method_and_path() -> None:
+    paths: list[str] = []
+
+    class RecordingRateLimiter:
+        def acquire(self, request: httpx.Request | None = None) -> None:
+            assert request is not None
+            paths.append(request.url.path)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, request=request, json={"code": 0})
+
+    with HttpClient(
+        base_url="https://example.test",
+        transport=httpx.MockTransport(handler),
+        rate_limiter=RouteRateLimiter({("GET", "/limited"): RecordingRateLimiter()}),
+    ) as client:
+        client.get("/limited")
+        client.post("/limited")
+        client.get("/other")
+
+    assert paths == ["/limited"]
+
+
+def test_async_sliding_window_rate_limiter_waits_when_window_is_full() -> None:
+    now = 0.0
+    sleeps: list[float] = []
+
+    def clock() -> float:
+        return now
+
+    async def sleep(seconds: float) -> None:
+        nonlocal now
+        sleeps.append(seconds)
+        now += seconds
+
+    async def run_limiter() -> None:
+        limiter = AsyncSlidingWindowRateLimiter(limit=2, period=10, clock=clock, sleep=sleep)
+        await limiter.acquire()
+        await limiter.acquire()
+        await limiter.acquire()
+
+    asyncio.run(run_limiter())
+
+    assert sleeps == [10]
+
+
+def test_async_http_client_uses_rate_limiter() -> None:
+    paths: list[str] = []
+
+    class RecordingRateLimiter:
+        async def acquire(self, request: httpx.Request | None = None) -> None:
+            assert request is not None
+            paths.append(request.url.path)
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, request=request, json={"code": 0})
+
+    async def run_request() -> None:
+        async with AsyncHttpClient(
+            base_url="https://example.test",
+            transport=httpx.MockTransport(handler),
+            rate_limiter=AsyncRouteRateLimiter({("GET", "/items"): RecordingRateLimiter()}),
+        ) as client:
+            await client.get("/items")
+            await client.post("/items")
+
+    asyncio.run(run_request())
+
+    assert paths == ["/items"]
 
 
 def test_retry_retries_by_result() -> None:

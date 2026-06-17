@@ -5,6 +5,17 @@ from athena_kit._import_utils import import_attr
 if TYPE_CHECKING:
     from athena_kit.http.aclient import AsyncHttpClient
     from athena_kit.http.client import HttpClient
+    from athena_kit.http.rate_limit import (
+        AsyncCompositeRateLimiter,
+        AsyncRateLimiter,
+        AsyncRouteRateLimiter,
+        AsyncSlidingWindowRateLimiter,
+        CompositeRateLimiter,
+        RateLimit,
+        RateLimiter,
+        RouteRateLimiter,
+        SlidingWindowRateLimiter,
+    )
     from athena_kit.http.response_json import (
         InvalidResponseJSONError,
         JSONArray,
@@ -25,6 +36,15 @@ if TYPE_CHECKING:
 __all__ = (
     "AsyncHttpClient",
     "HttpClient",
+    "AsyncCompositeRateLimiter",
+    "AsyncRateLimiter",
+    "AsyncRouteRateLimiter",
+    "AsyncSlidingWindowRateLimiter",
+    "CompositeRateLimiter",
+    "RateLimit",
+    "RateLimiter",
+    "RouteRateLimiter",
+    "SlidingWindowRateLimiter",
     "InvalidResponseJSONError",
     "JSONArray",
     "JSONObject",
@@ -46,6 +66,15 @@ __all__ = (
 _dynamic_imports = {
     "AsyncHttpClient": "aclient",
     "HttpClient": "client",
+    "AsyncCompositeRateLimiter": "rate_limit",
+    "AsyncRateLimiter": "rate_limit",
+    "AsyncRouteRateLimiter": "rate_limit",
+    "AsyncSlidingWindowRateLimiter": "rate_limit",
+    "CompositeRateLimiter": "rate_limit",
+    "RateLimit": "rate_limit",
+    "RateLimiter": "rate_limit",
+    "RouteRateLimiter": "rate_limit",
+    "SlidingWindowRateLimiter": "rate_limit",
     "InvalidResponseJSONError": "response_json",
     "JSONArray": "response_json",
     "JSONObject": "response_json",

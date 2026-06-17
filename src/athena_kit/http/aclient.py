@@ -8,6 +8,7 @@ from athena_kit.http.hooks import (
     ResponseStatusOptions,
     build_async_event_hooks,
 )
+from athena_kit.http.rate_limit import AsyncRateLimiter
 
 
 class AsyncHttpClient(httpx.AsyncClient):
@@ -24,8 +25,10 @@ class AsyncHttpClient(httpx.AsyncClient):
         logging: bool | LoggingOptions = False,
         response_status: bool | ResponseStatusOptions = False,
         event_hooks: AsyncEventHooks | None = None,
+        rate_limiter: AsyncRateLimiter | None = None,
         **kwargs: Any,
     ):
+        self._rate_limiter = rate_limiter
         super().__init__(
             *args,
             event_hooks=build_async_event_hooks(
@@ -36,3 +39,8 @@ class AsyncHttpClient(httpx.AsyncClient):
             ),
             **kwargs,
         )
+
+    async def send(self, request: httpx.Request, *args: Any, **kwargs: Any) -> httpx.Response:
+        if self._rate_limiter is not None:
+            await self._rate_limiter.acquire(request)
+        return await super().send(request, *args, **kwargs)

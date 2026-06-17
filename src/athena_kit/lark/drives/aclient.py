@@ -1,7 +1,7 @@
 import httpx
 from athena_kit.http.response_json import create_biz_code_validator, extract_response_json_values
 from athena_kit.lark.drives.mapstruct import mapping_files
-from athena_kit.lark.drives.requests import FetchFilesRequest
+from athena_kit.lark.drives.requests import CreateFolderRequest, FetchFilesRequest
 from athena_kit.lark.drives.responses import LarkFile
 
 _DRIVE_SUCCESS_VALIDATOR = create_biz_code_validator(
@@ -49,3 +49,35 @@ class LarkDrivesAsyncClient:
                 break
 
         return all_lark_files
+
+    async def create_folder(self, folder_name: str, parent_folder_token: str) -> tuple[str, str]:
+        """在指定父文件夹下创建一个空文件夹。为避免误创建到根目录，要求显式传入非空 `parent_folder_token`。
+
+        Args:
+            folder_name: 要创建的文件夹名称，不能为空。
+            parent_folder_token: 父文件夹 token，不能为空；不支持用空字符串表示根目录。
+
+        Returns:
+            新建文件夹的 token 和 URL。
+
+        Raises:
+            ValueError: 当 `folder_name` 或 `parent_folder_token` 为空时抛出。
+
+        References:
+            https://open.feishu.cn/document/server-docs/docs/drive-v1/folder/create_folder
+        """
+        if not folder_name:
+            raise ValueError("`folder_name` should not be empty.")
+        if not parent_folder_token:
+            raise ValueError("`parent_folder_token` should not be empty.")
+        request = CreateFolderRequest(folder_name=folder_name, parent_folder_token=parent_folder_token)
+        response = await self._aclient.post(
+            "/drive/v1/files/create_folder",
+            json=request.to_dict(),
+        )
+        folder_token, url = extract_response_json_values(
+            response,
+            ["data.token", "data.url"],
+            validator=_DRIVE_SUCCESS_VALIDATOR,
+        )
+        return (str(folder_token), str(url))

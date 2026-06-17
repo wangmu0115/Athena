@@ -11,6 +11,7 @@ async def main():
     async with AsyncLarkClient(app_id, app_secret, logging=LoggingOptions(level=logging.WARNING)) as client:
         folder_token = "EmbrfoG9MlJC9YdTOuucPLmjnHg"
         print(await client.drives.list_files(folder_token))
+        print(await client.drives.create_folder("测试", folder_token))
 
 
 if __name__ == "__main__":
