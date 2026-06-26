@@ -1,4 +1,11 @@
 {
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    "ruff.path": ["${workspaceFolder}/.venv/bin/ruff"]
+    "ruff.path": ["${workspaceFolder}/.venv/bin/ruff"],
+    "python.analysis.autoImportCompletions": true,
+    // "python.analysis.packageIndexDepths": [
+    //     {
+    //         "name": "lark-oapi",
+    //         "depth": 10,
+    //     }
+    // ]
 }

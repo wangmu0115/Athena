@@ -10,6 +10,7 @@ import httpx
 from athena_kit.http import AsyncHttpClient
 from athena_kit.http.hooks import RequestIDOptions
 from athena_kit.lark import AsyncLarkClient, LarkTenantAccessTokenAuth
+from athena_kit.lark.bitables import LarkBitableFieldsAsyncClient, LarkBitablesAsyncClient
 from athena_kit.lark.sheets import (
     AsyncLarkSheetsBackend,
     LarkSheetsAsyncClient,
@@ -28,6 +29,164 @@ def test_public_exports_are_lazy_loaded() -> None:
     assert LarkTenantAccessTokenAuth.__name__ == "LarkTenantAccessTokenAuth"
     assert LarkSheetsAsyncClient.__name__ == "LarkSheetsAsyncClient"
     assert AsyncLarkSheetsBackend.__name__ == "AsyncLarkSheetsBackend"
+    assert LarkBitablesAsyncClient.__name__ == "LarkBitablesAsyncClient"
+    assert LarkBitableFieldsAsyncClient.__name__ == "LarkBitableFieldsAsyncClient"
+
+
+def test_lark_bitables_client_search_records_paginates() -> None:
+    requests: list[httpx.Request] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if request.url.params.get("page_token") is None:
+            data = {
+                "has_more": True,
+                "page_token": "page-2",
+                "items": [{"record_id": "rec-1", "fields": {"name": "alpha"}}],
+            }
+        else:
+            data = {
+                "has_more": False,
+                "page_token": "",
+                "items": [{"record_id": "rec-2", "fields": {"name": "beta"}, "created_time": 123}],
+            }
+        return httpx.Response(200, request=request, json={"code": 0, "data": data})
+
+    async def run() -> list[dict[str, Any]]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkBitablesAsyncClient(aclient).records.search_records(
+                "app-1",
+                "table-1",
+                view_id="view-1",
+                field_names=["name"],
+                page_size=100,
+            )
+
+    records = asyncio.run(run())
+
+    assert records == [
+        {"record_id": "rec-1", "fields": {"name": "alpha"}},
+        {"record_id": "rec-2", "fields": {"name": "beta"}, "created_time": 123},
+    ]
+    assert [request.url.path for request in requests] == [
+        "/bitable/v1/apps/app-1/tables/table-1/records/search",
+        "/bitable/v1/apps/app-1/tables/table-1/records/search",
+    ]
+    assert [request.url.params["page_size"] for request in requests] == ["100", "100"]
+    assert requests[1].url.params["page_token"] == "page-2"
+    assert _request_json(requests[0]) == {
+        "view_id": "view-1",
+        "field_names": ["name"],
+    }
+    assert "page_token" not in _request_json(requests[1])
+
+
+def test_lark_bitables_client_search_records_honors_limit() -> None:
+    requests: list[httpx.Request] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "code": 0,
+                "data": {
+                    "has_more": True,
+                    "page_token": "page-2",
+                    "items": [
+                        {"record_id": "rec-1", "fields": {}},
+                        {"record_id": "rec-2", "fields": {}},
+                    ],
+                },
+            },
+        )
+
+    async def run() -> list[dict[str, Any]]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkBitablesAsyncClient(aclient).records.search_records("app-1", "table-1", limit=1)
+
+    records = asyncio.run(run())
+
+    assert records == [{"record_id": "rec-1", "fields": {}}]
+    assert len(requests) == 1
+    assert requests[0].url.params["page_size"] == "200"
+
+
+def test_lark_bitables_client_search_records_validates_limit() -> None:
+    async def run() -> None:
+        async with AsyncHttpClient(base_url="https://example.test") as aclient:
+            records = LarkBitablesAsyncClient(aclient).records
+            assert await records.search_records("app-1", "table-1", limit=0) == []
+            await records.search_records("app-1", "table-1", limit=-1)
+
+    with pytest.raises(ValueError, match="limit"):
+        asyncio.run(run())
+
+
+def test_lark_bitables_fields_client_lists_all_fields() -> None:
+    requests: list[httpx.Request] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if request.url.params.get("page_token") is None:
+            data = {
+                "has_more": True,
+                "page_token": "page-2",
+                "items": [
+                    {
+                        "field_id": "fld-1",
+                        "field_name": "Name",
+                        "type": 1,
+                        "property": None,
+                        "is_primary": True,
+                        "ui_type": "Text",
+                    }
+                ],
+            }
+        else:
+            data = {
+                "has_more": False,
+                "page_token": "",
+                "items": [
+                    {
+                        "field_id": "fld-2",
+                        "field_name": "Status",
+                        "type": 3,
+                        "property": {"options": []},
+                    }
+                ],
+            }
+        return httpx.Response(200, request=request, json={"code": 0, "data": data})
+
+    async def run() -> list[dict[str, Any]]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkBitableFieldsAsyncClient(aclient).list_fields(
+                "app-1",
+                "table-1",
+                view_id="view-1",
+                text_field_as_array=True,
+            )
+
+    fields = asyncio.run(run())
+
+    assert fields == [
+        {
+            "field_id": "fld-1",
+            "field_name": "Name",
+            "type": 1,
+            "property": None,
+            "is_primary": True,
+            "ui_type": "Text",
+        },
+        {"field_id": "fld-2", "field_name": "Status", "type": 3, "property": {"options": []}},
+    ]
+    assert [request.url.path for request in requests] == [
+        "/bitable/v1/apps/app-1/tables/table-1/fields",
+        "/bitable/v1/apps/app-1/tables/table-1/fields",
+    ]
+    assert str(requests[0].url.params) == "page_size=100&view_id=view-1&text_field_as_array=true"
+    assert requests[1].url.params["page_token"] == "page-2"
 
 
 def test__ensure_title_uses_existing_title() -> None:

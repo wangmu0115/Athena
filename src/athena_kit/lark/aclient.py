@@ -4,6 +4,7 @@ import httpx
 from athena_kit.http import AsyncHttpClient
 from athena_kit.http.hooks import AsyncEventHooks, LoggingOptions, RequestIDOptions, ResponseStatusOptions
 from athena_kit.lark.auth import LarkTenantAccessTokenAuth
+from athena_kit.lark.bitables import LarkBitablesAsyncClient
 from athena_kit.lark.drives.aclient import LarkDrivesAsyncClient
 from athena_kit.lark.sheets import LarkSheetsAsyncClient
 
@@ -55,6 +56,7 @@ class AsyncLarkClient:
         # 注册 sheets 资源异步客户端
         self.sheets = LarkSheetsAsyncClient(self._aclient)
         self.drives = LarkDrivesAsyncClient(self._aclient)
+        self.bitables = LarkBitablesAsyncClient(self._aclient)
 
     async def __aenter__(self) -> Self:
         await self._aclient.__aenter__()
