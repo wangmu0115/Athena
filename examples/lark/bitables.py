@@ -10,9 +10,10 @@ async def main():
         # spreadsheet, url = await client.sheets.create_spreadsheet("AnS1fzXXCluTEYdIB7FcGNQCnnd")
         # print(spreadsheet)
         # print(url)
-        app_token = "HoE7btqu4aXXpfsRpXEc9NFqnzb"
-        table_id = "tblYe4Ljda0mhCMt"
-        print(await client.bitables.search_records(app_token, table_id, page_size=3))
+        app_token = "OMpvbN8T1aFkkysB57ncuBTpnmb"
+        table_id = "tblm5MUWbSAByUsa"
+        print(await client.bitables.fields.get_table_fields(app_token, table_id))
+        print(await client.bitables.records.get_table_records(app_token, table_id))
 
 
 if __name__ == "__main__":

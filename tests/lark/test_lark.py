@@ -1,6 +1,6 @@
 import asyncio
 import json
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -10,7 +10,12 @@ import httpx
 from athena_kit.http import AsyncHttpClient
 from athena_kit.http.hooks import RequestIDOptions
 from athena_kit.lark import AsyncLarkClient, LarkTenantAccessTokenAuth
-from athena_kit.lark.bitables import LarkBitableFieldsAsyncClient, LarkBitablesAsyncClient
+from athena_kit.lark.bitables import (
+    BitableFieldType,
+    BitableFieldUiType,
+    LarkBitableFieldsAsyncClient,
+    LarkBitablesAsyncClient,
+)
 from athena_kit.lark.sheets import (
     AsyncLarkSheetsBackend,
     LarkSheetsAsyncClient,
@@ -31,6 +36,12 @@ def test_public_exports_are_lazy_loaded() -> None:
     assert AsyncLarkSheetsBackend.__name__ == "AsyncLarkSheetsBackend"
     assert LarkBitablesAsyncClient.__name__ == "LarkBitablesAsyncClient"
     assert LarkBitableFieldsAsyncClient.__name__ == "LarkBitableFieldsAsyncClient"
+    assert BitableFieldType.TEXT == 1
+    assert BitableFieldType.TEXT.label == "文本"
+    assert BitableFieldType.STAGE == 24
+    assert BitableFieldType.BUTTON == 3001
+    assert BitableFieldUiType.EMAIL == "Email"
+    assert BitableFieldUiType.EMAIL.label == "邮箱"
 
 
 def test_lark_bitables_client_search_records_paginates() -> None:
@@ -48,13 +59,13 @@ def test_lark_bitables_client_search_records_paginates() -> None:
             data = {
                 "has_more": False,
                 "page_token": "",
-                "items": [{"record_id": "rec-2", "fields": {"name": "beta"}, "created_time": 123}],
+                "items": [{"record_id": "rec-2", "fields": {"name": "beta"}}],
             }
         return httpx.Response(200, request=request, json={"code": 0, "data": data})
 
     async def run() -> list[dict[str, Any]]:
         async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
-            return await LarkBitablesAsyncClient(aclient).records.search_records(
+            return await LarkBitablesAsyncClient(aclient).records.get_table_records(
                 "app-1",
                 "table-1",
                 view_id="view-1",
@@ -66,7 +77,7 @@ def test_lark_bitables_client_search_records_paginates() -> None:
 
     assert records == [
         {"record_id": "rec-1", "fields": {"name": "alpha"}},
-        {"record_id": "rec-2", "fields": {"name": "beta"}, "created_time": 123},
+        {"record_id": "rec-2", "fields": {"name": "beta"}},
     ]
     assert [request.url.path for request in requests] == [
         "/bitable/v1/apps/app-1/tables/table-1/records/search",
@@ -79,6 +90,56 @@ def test_lark_bitables_client_search_records_paginates() -> None:
         "field_names": ["name"],
     }
     assert "page_token" not in _request_json(requests[1])
+
+
+def test_lark_bitables_client_get_table_records_can_include_metadata() -> None:
+    requests: list[httpx.Request] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "code": 0,
+                "data": {
+                    "has_more": False,
+                    "page_token": "",
+                    "items": [
+                        {
+                            "record_id": "rec-1",
+                            "fields": {"name": "alpha"},
+                            "created_by": {"id": "ou-1", "name": "Alice"},
+                            "created_time": 1691049973000,
+                            "last_modified_by": {"id": "ou-2", "name": "Bob"},
+                            "last_modified_time": 1702455191000,
+                        }
+                    ],
+                },
+            },
+        )
+
+    async def run() -> list[dict[str, Any]]:
+        async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
+            return await LarkBitablesAsyncClient(aclient).records.get_table_records(
+                "app-1",
+                "table-1",
+                include_metadata=True,
+            )
+
+    records = asyncio.run(run())
+
+    assert _request_json(requests[0]) == {"automatic_fields": True}
+    assert records == [
+        {
+            "record_id": "rec-1",
+            "fields": {"name": "alpha"},
+            "created_by": {"id": "ou-1", "name": "Alice"},
+            "created_time": datetime(2023, 8, 3, 8, 6, 13, tzinfo=UTC),
+            "last_modified_by": {"id": "ou-2", "name": "Bob"},
+            "last_modified_time": datetime(2023, 12, 13, 8, 13, 11, tzinfo=UTC),
+        }
+    ]
 
 
 def test_lark_bitables_client_search_records_honors_limit() -> None:
@@ -104,7 +165,7 @@ def test_lark_bitables_client_search_records_honors_limit() -> None:
 
     async def run() -> list[dict[str, Any]]:
         async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
-            return await LarkBitablesAsyncClient(aclient).records.search_records("app-1", "table-1", limit=1)
+            return await LarkBitablesAsyncClient(aclient).records.get_table_records("app-1", "table-1", limit=1)
 
     records = asyncio.run(run())
 
@@ -117,14 +178,14 @@ def test_lark_bitables_client_search_records_validates_limit() -> None:
     async def run() -> None:
         async with AsyncHttpClient(base_url="https://example.test") as aclient:
             records = LarkBitablesAsyncClient(aclient).records
-            assert await records.search_records("app-1", "table-1", limit=0) == []
-            await records.search_records("app-1", "table-1", limit=-1)
+            assert await records.get_table_records("app-1", "table-1", limit=0) == []
+            await records.get_table_records("app-1", "table-1", limit=-1)
 
     with pytest.raises(ValueError, match="limit"):
         asyncio.run(run())
 
 
-def test_lark_bitables_fields_client_lists_all_fields() -> None:
+def test_lark_bitables_fields_client_gets_table_fields() -> None:
     requests: list[httpx.Request] = []
 
     async def handler(request: httpx.Request) -> httpx.Response:
@@ -154,6 +215,7 @@ def test_lark_bitables_fields_client_lists_all_fields() -> None:
                         "field_name": "Status",
                         "type": 3,
                         "property": {"options": []},
+                        "ui_type": "SingleSelect",
                     }
                 ],
             }
@@ -161,11 +223,10 @@ def test_lark_bitables_fields_client_lists_all_fields() -> None:
 
     async def run() -> list[dict[str, Any]]:
         async with AsyncHttpClient(base_url="https://example.test", transport=httpx.MockTransport(handler)) as aclient:
-            return await LarkBitableFieldsAsyncClient(aclient).list_fields(
+            return await LarkBitableFieldsAsyncClient(aclient).get_table_fields(
                 "app-1",
                 "table-1",
                 view_id="view-1",
-                text_field_as_array=True,
             )
 
     fields = asyncio.run(run())
@@ -174,18 +235,27 @@ def test_lark_bitables_fields_client_lists_all_fields() -> None:
         {
             "field_id": "fld-1",
             "field_name": "Name",
-            "type": 1,
+            "type": BitableFieldType.TEXT,
             "property": None,
             "is_primary": True,
-            "ui_type": "Text",
+            "is_hidden": False,
+            "ui_type": BitableFieldUiType.TEXT,
         },
-        {"field_id": "fld-2", "field_name": "Status", "type": 3, "property": {"options": []}},
+        {
+            "field_id": "fld-2",
+            "field_name": "Status",
+            "type": BitableFieldType.SINGLE_SELECT,
+            "property": {"options": []},
+            "is_primary": False,
+            "is_hidden": False,
+            "ui_type": BitableFieldUiType.SINGLE_SELECT,
+        },
     ]
     assert [request.url.path for request in requests] == [
         "/bitable/v1/apps/app-1/tables/table-1/fields",
         "/bitable/v1/apps/app-1/tables/table-1/fields",
     ]
-    assert str(requests[0].url.params) == "page_size=100&view_id=view-1&text_field_as_array=true"
+    assert str(requests[0].url.params) == "page_size=50&view_id=view-1"
     assert requests[1].url.params["page_token"] == "page-2"
 
 

@@ -1,6 +1,6 @@
 import httpx
 from athena_kit.http import create_biz_code_validator, extract_response_json_values
-from athena_kit.lark.bitables.mappers import to_bitable_fields
+from athena_kit.lark.bitables.fields.mappers import to_bitable_fields
 from athena_kit.lark.bitables.models import BitableField
 
 _BITABLE_SUCCESS_VALIDATOR = create_biz_code_validator(
@@ -11,21 +11,22 @@ _BITABLE_SUCCESS_VALIDATOR = create_biz_code_validator(
 
 
 class LarkBitableFieldsAsyncClient:
-    """飞书多维表格字段资源异步客户端。"""
-
     def __init__(self, aclient: httpx.AsyncClient):
         self._aclient = aclient
 
-    async def list_fields(
+    async def get_table_fields(
         self,
         app_token: str,
         table_id: str,
         *,
         view_id: str | None = None,
-        text_field_as_array: bool = False,
-        page_size: int = 100,
     ) -> list[BitableField]:
-        """列出数据表中的全部字段元数据，并自动读取全部分页结果。
+        """获取多维表格数据表中的的所有字段。
+
+        Args:
+            app_token: 多维表格 App 的唯一标识。
+            table_id: 多维表格数据表的唯一标识。
+            view_id: 可选的视图唯一标识，传入时仅返回该视图可见的字段。
 
         References:
             https://open.feishu.cn/document/server-docs/docs/bitable-v1/app-table-field/list
@@ -34,14 +35,10 @@ class LarkBitableFieldsAsyncClient:
             raise ValueError("`app_token` should not be empty.")
         if not table_id:
             raise ValueError("`table_id` should not be empty.")
-        if not 1 <= page_size <= 100:
-            raise ValueError("`page_size` should be between 1 and 100.")
 
-        query_params: dict[str, int | str | bool] = {"page_size": page_size}
+        query_params: dict[str, int | str] = {"page_size": 50}
         if view_id is not None:
             query_params["view_id"] = view_id
-        if text_field_as_array:
-            query_params["text_field_as_array"] = True
 
         fields: list[BitableField] = []
         url = f"/bitable/v1/apps/{app_token}/tables/{table_id}/fields"

@@ -1,6 +1,6 @@
 import httpx
-from athena_kit.lark.bitables.field_client import LarkBitableFieldsAsyncClient
-from athena_kit.lark.bitables.record_client import LarkBitableRecordsAsyncClient
+from athena_kit.lark.bitables.fields import LarkBitableFieldsAsyncClient
+from athena_kit.lark.bitables.records import LarkBitableRecordsAsyncClient
 
 
 class LarkBitablesAsyncClient:

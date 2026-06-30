@@ -4,9 +4,9 @@ from athena_kit._import_utils import import_attr
 
 if TYPE_CHECKING:
     from athena_kit.lark.bitables.aclient import LarkBitablesAsyncClient
-    from athena_kit.lark.bitables.field_client import LarkBitableFieldsAsyncClient
-    from athena_kit.lark.bitables.models import BitableField, BitableRecord
-    from athena_kit.lark.bitables.record_client import LarkBitableRecordsAsyncClient
+    from athena_kit.lark.bitables.fields import LarkBitableFieldsAsyncClient
+    from athena_kit.lark.bitables.models import BitableField, BitableFieldType, BitableFieldUiType, BitableRecord
+    from athena_kit.lark.bitables.records import LarkBitableRecordsAsyncClient
 
 __all__ = (
     "LarkBitablesAsyncClient",
@@ -14,14 +14,18 @@ __all__ = (
     "LarkBitableFieldsAsyncClient",
     "BitableRecord",
     "BitableField",
+    "BitableFieldType",
+    "BitableFieldUiType",
 )
 
 _dynamic_imports = {
     "LarkBitablesAsyncClient": "aclient",
-    "LarkBitableRecordsAsyncClient": "record_client",
-    "LarkBitableFieldsAsyncClient": "field_client",
+    "LarkBitableRecordsAsyncClient": "records",
+    "LarkBitableFieldsAsyncClient": "fields",
     "BitableRecord": "models",
     "BitableField": "models",
+    "BitableFieldType": "models",
+    "BitableFieldUiType": "models",
 }
 
 
